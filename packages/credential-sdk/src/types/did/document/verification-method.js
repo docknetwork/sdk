@@ -323,6 +323,20 @@ export class CheqdMainnetVerificationMethod extends withProp(
   option(CheqdMainnetPublicKeyMetadata),
 ) {}
 
+export class CheqdMainnetVerificationMethodAssertion extends withProp(
+  withProp(
+    withProp(
+      CheqdVerificationMethodAssertion,
+      'id',
+      CheqdTestnetVerificationMethodRef,
+    ),
+    'controller',
+    CheqdTestnetDid,
+  ),
+  'metadata',
+  option(CheqdTestnetPublicKeyMetadata),
+) {}
+
 export class CheqdTestnetVerificationMethodAssertion extends withProp(
   withProp(
     withProp(
@@ -386,7 +400,7 @@ export class CheqdVerificationMethodAssertionLegacy extends withFrom(
   }
 }
 
-export class CheqdMainnetVerificationMethodAssertion extends withProp(
+export class CheqdMainnetVerificationMethodAssertionLegacy extends withProp(
   withProp(
     withProp(
       CheqdVerificationMethodAssertionLegacy,

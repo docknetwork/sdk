@@ -235,6 +235,39 @@ export class DidRef extends withExtendedStaticProperties(
   }
 }
 
+export class CheqdDidRef extends withQualifier(DidRef) {
+  static Did = CheqdDid;
+
+  static fromUnqualifiedString(str) {
+    const lastColon = str.lastIndexOf(':');
+    const did = `did:cheqd:${str.slice(0, lastColon)}`;
+    const id = str.slice(lastColon + 1);
+
+    return new this(did, id);
+  }
+
+  toJSON() {
+    return String(this);
+  }
+
+  toEncodedString() {
+    const { did, value } = this;
+
+    let prefix = '';
+    if (did.isTestnet) {
+      prefix = 'testnet';
+    } else if (did.isMainnet) {
+      prefix = 'mainnet';
+    } else {
+      throw new Error(
+        `Can't determine DID type: \`${did}\`, instance of \`${did.constructor.name}\``,
+      );
+    }
+
+    return `${prefix}:${did.toEncodedString()}:${value}`;
+  }
+}
+
 DidOrDidMethodKeySignature.bindVariants(
   DockDidSignature,
   DidMethodKeySignature,

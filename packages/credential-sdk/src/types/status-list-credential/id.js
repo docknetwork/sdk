@@ -9,7 +9,7 @@ import {
 import withFromDockId, {
   patchWithFromDock,
 } from '../generic/with-from-dock-id';
-import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
+import { CheqdDidRef, CheqdMainnetDid, CheqdTestnetDid } from '../did';
 import {
   DockStatusList2021Qualifier,
   CheqdStatusList2021Qualifier,
@@ -64,7 +64,7 @@ export class DockStatusListCredentialId extends StatusListCredentialId {
   }
 }
 
-export class CheqdStatusListCredentialIdValue extends withQualifier(DidRef) {
+export class CheqdStatusListCredentialIdValue extends CheqdDidRef {
   static Qualifier = CheqdStatusList2021Qualifier;
 
   static Ident = withFromDockId(
@@ -72,54 +72,14 @@ export class CheqdStatusListCredentialIdValue extends withQualifier(DidRef) {
     DockStatusListCredentialId,
     'status-list2021:cheqd:',
   );
-
-  static fromUnqualifiedString(str) {
-    const lastColon = str.lastIndexOf(':');
-    const did = `did:cheqd:${str.slice(0, lastColon)}`;
-    const id = str.slice(lastColon + 1);
-
-    return new this(did, id);
-  }
-
-  static cheqdDid(did) {
-    return did.value;
-  }
-
-  toEncodedString() {
-    const { did, value, constructor } = this;
-    const { cheqdDid } = constructor;
-
-    let prefix = '';
-    if (cheqdDid(did) instanceof CheqdTestnetDid) {
-      prefix = 'testnet';
-    } else if (cheqdDid(did) instanceof CheqdMainnetDid) {
-      prefix = 'mainnet';
-    } else {
-      throw new Error(
-        `Can't determine DID type: \`${cheqdDid(did)}\`, instance of \`${
-          cheqdDid(did).constructor.name
-        }\``,
-      );
-    }
-
-    return `${prefix}:${cheqdDid(did).toEncodedString()}:${value}`;
-  }
 }
 
 class CheqdTestnetStatusListCredentialIdValue extends CheqdStatusListCredentialIdValue {
   static Did = CheqdTestnetDid;
-
-  static cheqdDid(did) {
-    return did;
-  }
 }
 
 class CheqdMainnetStatusListCredentialIdValue extends CheqdStatusListCredentialIdValue {
   static Did = CheqdMainnetDid;
-
-  static cheqdDid(did) {
-    return did;
-  }
 }
 
 export class CheqdStatusListCredentialId extends StatusListCredentialId {

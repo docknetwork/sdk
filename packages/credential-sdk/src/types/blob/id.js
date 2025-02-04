@@ -12,7 +12,7 @@ import withFromDockId, {
   patchWithFromDock,
 } from '../generic/with-from-dock-id';
 import { CheqdBlobQualifier, DockBlobQualifier } from './const';
-import { CheqdMainnetDid, CheqdTestnetDid, DidRef } from '../did';
+import { CheqdDidRef, CheqdMainnetDid, CheqdTestnetDid } from '../did';
 import dockDidById from '../../utils/dock-did-by-id';
 
 export class BlobId extends withFrom(
@@ -59,58 +59,18 @@ export class DockBlobId extends BlobId {
   }
 }
 
-export class CheqdBlobIdValue extends withQualifier(DidRef) {
+export class CheqdBlobIdValue extends CheqdDidRef {
   static Qualifier = CheqdBlobQualifier;
 
   static Ident = withFromDockId(TypedUUID, DockBlobId, 'blob:cheqd:');
-
-  static fromUnqualifiedString(str) {
-    const lastColon = str.lastIndexOf(':');
-    const did = `did:cheqd:${str.slice(0, lastColon)}`;
-    const id = str.slice(lastColon + 1);
-
-    return new this(did, id);
-  }
-
-  static cheqdDid(did) {
-    return did.value;
-  }
-
-  toEncodedString() {
-    const { did, value, constructor } = this;
-    const cheqdDid = constructor.cheqdDid(did);
-
-    let prefix = '';
-    if (cheqdDid instanceof CheqdTestnetDid) {
-      prefix = 'testnet';
-    } else if (cheqdDid instanceof CheqdMainnetDid) {
-      prefix = 'mainnet';
-    } else {
-      throw new Error(
-        `Can't determine DID type: \`${cheqdDid(did)}\`, instance of \`${
-          cheqdDid(did).constructor.name
-        }\``,
-      );
-    }
-
-    return `${prefix}:${did.toEncodedString()}:${value}`;
-  }
 }
 
 export class CheqdTestnetBlobIdValue extends CheqdBlobIdValue {
   static Did = CheqdTestnetDid;
-
-  static cheqdDid(did) {
-    return did;
-  }
 }
 
 export class CheqdMainnetBlobIdValue extends CheqdBlobIdValue {
   static Did = CheqdMainnetDid;
-
-  static cheqdDid(did) {
-    return did;
-  }
 }
 
 export class CheqdBlobId extends BlobId {

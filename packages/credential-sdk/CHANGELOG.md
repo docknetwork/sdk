@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.36.0
+
+### Minor Changes
+
+- Use newest DID document format for `cheqd` `mainnet`
+
 ## 0.35.0
 
 ### Minor Changes

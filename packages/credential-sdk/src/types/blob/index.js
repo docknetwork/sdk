@@ -1,5 +1,5 @@
 import { TypedStruct, withProp } from '../generic';
-import { BlobId, CheqdBlobIdValue, DockBlobIdValue } from './blob-id';
+import { BlobId, CheqdBlobIdValue, DockBlobIdValue } from './id';
 import Blob from './blob';
 
 export * from './id';

@@ -4,6 +4,7 @@ import {
   CheqdTestnetVerificationMethodAssertion,
   CheqdVerificationMethodAssertionLegacy,
   CheqdTestnetVerificationMethodAssertionLegacy,
+  CheqdMainnetVerificationMethodAssertionLegacy,
 } from './verification-method';
 import {
   CheqdMainnetVerificationMethodRef,
@@ -55,5 +56,7 @@ export class CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod extends 
 export class CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod extends CheqdVerificationMethodRefOrCheqdVerificationMethod {
   static First = CheqdMainnetVerificationMethodAssertion;
 
-  static Second = CheqdMainnetVerificationMethodRef;
+  static Second = CheqdMainnetVerificationMethodAssertionLegacy;
+
+  static Third = CheqdMainnetVerificationMethodRef;
 }

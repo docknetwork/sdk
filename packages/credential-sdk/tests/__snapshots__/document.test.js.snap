@@ -377,12 +377,6 @@ exports[`DID document workflow \`CheqdMainnetDIDDocument\` 1`] = `
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
-    {
-      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
-      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
-      "verificationMaterial": "11111111111111111111111111111111",
-      "verificationMethodType": "Ed25519VerificationKey2018",
-    },
   ],
   "versionId": "0557d7da-8dea-45cb-8f30-7370b59eab71",
 }
@@ -411,12 +405,6 @@ exports[`DID document workflow \`CheqdMainnetDIDDocument\` 2`] = `
       "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
       "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
-      "verificationMethodType": "Ed25519VerificationKey2018",
-    },
-    {
-      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
-      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
-      "verificationMaterial": "11111111111111111111111111111111",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
   ],
@@ -552,83 +540,6 @@ exports[`DID document workflow \`CheqdTestnetDIDDocument\` 4`] = `
       "controller": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
       "id": "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
       "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
-      "verificationMethodType": "Ed25519VerificationKey2018",
-    },
-  ],
-  "versionId": "0557d7da-8dea-45cb-8f30-7370b59eab71",
-}
-`;
-
-exports[`DID document workflow \`CheqdTestnetDIDDocument\` 5`] = `
-{
-  "alsoKnownAs": [],
-  "assertionMethod": [
-    {
-      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
-      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
-      "verificationMaterial": "CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP",
-      "verificationMethodType": "Bls12381BBSVerificationKeyDock2023",
-    },
-  ],
-  "authentication": [
-    "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
-  ],
-  "capabilityDelegation": [],
-  "capabilityInvocation": [],
-  "context": [
-    "https://www.w3.org/ns/did/v1",
-  ],
-  "controller": [],
-  "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
-  "keyAgreement": [],
-  "service": [],
-  "verificationMethod": [
-    {
-      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
-      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
-      "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
-      "verificationMethodType": "Ed25519VerificationKey2018",
-    },
-    {
-      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
-      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
-      "verificationMaterial": "11111111111111111111111111111111",
-      "verificationMethodType": "Ed25519VerificationKey2018",
-    },
-  ],
-  "versionId": "0557d7da-8dea-45cb-8f30-7370b59eab71",
-}
-`;
-
-exports[`DID document workflow \`CheqdTestnetDIDDocument\` 6`] = `
-{
-  "alsoKnownAs": [],
-  "assertionMethod": [
-    ""{\\"id\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2\\",\\"controller\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\"}"",
-  ],
-  "authentication": [
-    "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
-  ],
-  "capabilityDelegation": [],
-  "capabilityInvocation": [],
-  "context": [
-    "https://www.w3.org/ns/did/v1",
-  ],
-  "controller": [],
-  "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
-  "keyAgreement": [],
-  "service": [],
-  "verificationMethod": [
-    {
-      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
-      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
-      "verificationMaterial": "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
-      "verificationMethodType": "Ed25519VerificationKey2018",
-    },
-    {
-      "controller": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
-      "id": "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
-      "verificationMaterial": "11111111111111111111111111111111",
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
   ],

@@ -25,6 +25,70 @@ import { hexToU8a, maybeToCheqdPayloadOrJSON } from "../src/utils";
 import { verMethodRefsEqual } from "../src/vc";
 import { CheqdTestnetVerificationMethodRef } from "../src/types/did/document/verification-method-ref";
 
+const LEGACY_TESTNET_DOC = {
+  context: ["https://www.w3.org/ns/did/v1"],
+  id: "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
+  alsoKnownAs: [],
+  controller: [],
+  verificationMethod: [
+    {
+      id: "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
+      controller: "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
+      verificationMethodType: "Ed25519VerificationKey2018",
+      verificationMaterial: "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
+    },
+    {
+      id: "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
+      controller: "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
+      verificationMethodType: "Ed25519VerificationKey2018",
+      verificationMaterial: "11111111111111111111111111111111",
+    },
+  ],
+  service: [],
+  authentication: [
+    "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
+  ],
+  assertionMethod: [
+    '"{\\"id\\":\\"did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2\\",\\"controller\\":\\"did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\"}"',
+  ],
+  keyAgreement: [],
+  capabilityInvocation: [],
+  capabilityDelegation: [],
+  versionId: "0557d7da-8dea-45cb-8f30-7370b59eab71",
+};
+
+const LEGACY_MAINNET_DOC = {
+  context: ["https://www.w3.org/ns/did/v1"],
+  id: "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+  alsoKnownAs: [],
+  controller: [],
+  verificationMethod: [
+    {
+      id: "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
+      controller: "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      verificationMethodType: "Ed25519VerificationKey2018",
+      verificationMaterial: "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
+    },
+    {
+      id: "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2",
+      controller: "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165",
+      verificationMethodType: "Ed25519VerificationKey2018",
+      verificationMaterial: "11111111111111111111111111111111",
+    },
+  ],
+  service: [],
+  authentication: [
+    "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",
+  ],
+  assertionMethod: [
+    '"{\\"id\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2\\",\\"controller\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\"}"',
+  ],
+  keyAgreement: [],
+  capabilityInvocation: [],
+  capabilityDelegation: [],
+  versionId: "0557d7da-8dea-45cb-8f30-7370b59eab71",
+};
+
 const RANDOM_PKS = [
   "0xa1aa6a2058dd190e284a64e72adaf4e16a9ae9fbf0673d7575924e6aca3b21dc",
   "0xed28a616e8f8cfd2232b62dac57281b24fc0d538150f8f5d91a0b6c3255cc2c9",
@@ -275,22 +339,9 @@ describe("DID document workflow", () => {
       ]
     ).toCheqd(CheqdTestnetDIDDocument, "0557d7da-8dea-45cb-8f30-7370b59eab71");
 
-    const legacyDoc = DIDDocument.create(
-      "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
-      [
-        new DidKey(RANDOM_PKS[0], AUTH),
-        new DidKey(
-          new BBSPublicKey(new BBSPublicKeyValue(RANDOM_OFFCHAIN_PKS[0]))
-        ),
-      ]
-    ).toCheqd(CheqdMainnetDIDDocument, "0557d7da-8dea-45cb-8f30-7370b59eab71");
-    const strLegacyDoc = JSON.stringify(
-      maybeToCheqdPayloadOrJSON(legacyDoc)
-    ).replace(/mainnet/g, "testnet");
+    const fromLegacy = CheqdTestnetDIDDocument.from(LEGACY_TESTNET_DOC);
 
-    const fromLegacy = CheqdTestnetDIDDocument.from(JSON.parse(strLegacyDoc));
-
-    checkDocs(testnetDoc, fromLegacy, legacyDoc);
+    checkDocs(testnetDoc, fromLegacy);
   });
 
   test(`\`CheqdMainnetDIDDocument\``, () => {
@@ -302,6 +353,8 @@ describe("DID document workflow", () => {
       ]
     ).toCheqd(CheqdMainnetDIDDocument, "0557d7da-8dea-45cb-8f30-7370b59eab71");
 
-    checkDoc(mainnetDoc);
+    const fromLegacy = CheqdMainnetDIDDocument.from(LEGACY_MAINNET_DOC);
+
+    checkDoc(mainnetDoc, fromLegacy);
   });
 });

@@ -1,6 +1,5 @@
 import {
   TypedArray,
-  TypedMap,
   TypedNumber,
   TypedSet,
   TypedString,
@@ -23,7 +22,6 @@ import {
   CheqdVerificationMethod,
   CheqdTestnetVerificationMethod,
   CheqdMainnetVerificationMethod,
-  CheqdMainnetVerificationMethodAssertion,
 } from './verification-method';
 import {
   CheqdVerificationMethodRefOrCheqdVerificationMethod,
@@ -38,7 +36,6 @@ import {
 } from './verification-method-ref';
 import { ATTESTS_IRI, CONTEXT_URI } from './const';
 import { ensureEqualToOrPrototypeOf } from '../../../utils';
-import { Ed25519Verification2018Method } from './verification-method-type';
 
 class Context extends TypedArray {
   static Class = TypedString;
@@ -399,7 +396,8 @@ export class CheqdDIDDocument extends TypedStruct {
     const { verificationMethod } = this;
 
     this.verificationMethod = verificationMethod.filter(
-      (verMethod) => !verMethod.isOffchain(),
+      (verMethod) => !verMethod.isOffchain()
+        && !verMethod.verificationMaterial.bytes.every((item) => !item),
     );
     const offchainVerMethod = verificationMethod.filter((verMethod) => verMethod.isOffchain());
 
@@ -469,15 +467,6 @@ export class CheqdTestnetDIDDocument extends CheqdDIDDocument {
     capabilityDelegation: CheqdTestnetVerificationMethodReferences,
     versionId: option(VersionId),
   };
-
-  constructor(...args) {
-    super(...args);
-    const { verificationMethod } = this;
-
-    this.verificationMethod = verificationMethod.filter(
-      (verMethod) => !verMethod.verificationMaterial.bytes.every((item) => !item),
-    );
-  }
 }
 
 export class CheqdMainnetDIDDocument extends CheqdDIDDocument {
@@ -495,83 +484,6 @@ export class CheqdMainnetDIDDocument extends CheqdDIDDocument {
     capabilityDelegation: CheqdMainnetVerificationMethodReferences,
     versionId: option(VersionId),
   };
-
-  constructor(...args) {
-    super(...args);
-
-    const { verificationMethod, assertionMethod } = this;
-
-    this.verificationMethod = [
-      ...verificationMethod,
-      ...[...assertionMethod]
-        .filter(
-          (keyOrRef) => keyOrRef.id
-            && !verificationMethod.some((verMethod) => verMethod.id.eq(keyOrRef.id)),
-        )
-        .map(
-          (verMethod) => new CheqdMainnetVerificationMethod(
-            verMethod.id,
-            verMethod.controller,
-            new Ed25519Verification2018Method(),
-            Array(32).fill(0),
-          ),
-        ),
-    ];
-  }
-
-  toDIDDocument() {
-    const {
-      context,
-      id,
-      alsoKnownAs,
-      controller,
-      verificationMethod,
-      authentication,
-      assertionMethod,
-      capabilityInvocation,
-      capabilityDelegation,
-      keyAgreement,
-      service,
-    } = this;
-
-    const assertionMethodOffchainKeys = new (class extends TypedMap {
-      static KeyClass = CheqdMainnetVerificationMethodRef;
-
-      static ValueClass = CheqdMainnetVerificationMethodAssertion;
-    })(
-      [...assertionMethod]
-        .map((keyRefOrKey) => (keyRefOrKey.id ? [keyRefOrKey.id, keyRefOrKey] : null))
-        .filter(Boolean),
-    );
-    const verificationMethodWithOffchainKeys = [...verificationMethod].map(
-      (verMethod) => {
-        const offchain = assertionMethodOffchainKeys.get(verMethod.id);
-        if (offchain != null) {
-          return offchain.toVerificationMethod();
-        }
-
-        return verMethod;
-      },
-    );
-    const assertionMethodOnlyRefs = [...assertionMethod].map(
-      (keyRefOrKey) => keyRefOrKey.id ?? keyRefOrKey,
-    );
-
-    return new DIDDocument(
-      context,
-      id,
-      alsoKnownAs,
-      controller,
-      verificationMethodWithOffchainKeys,
-      service,
-      authentication,
-      assertionMethodOnlyRefs,
-      keyAgreement,
-      capabilityInvocation,
-      capabilityDelegation,
-      null,
-    );
-  }
 }
 
 export * from './const';

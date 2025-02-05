@@ -10,13 +10,14 @@ import {
   ServiceEndpoint,
 } from '../../types';
 import { TypedBytes } from '../../types/generic';
+import { maybeToCheqdPayloadOrJSON } from '../../utils';
 import { NoDIDError } from '../abstract/did/errors';
 import { testIf } from './common';
 
 // eslint-disable-next-line jest/no-export
 export default function generateDIDModuleTests(
   { did: module },
-  { Did, OffchainSignatureParamsRef },
+  { Did, ParamsId },
   filter = () => true,
 ) {
   const test = testIf(filter);
@@ -43,14 +44,14 @@ export default function generateDIDModuleTests(
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
-      const ref = new OffchainSignatureParamsRef(
-        did,
-        OffchainSignatureParamsRef.Classes[1].random(),
-      );
+      const paramsRef = [did, ParamsId.random()];
 
-      const bbsKey = new BBSPublicKeyValue(TypedBytes.random(100), ref);
-      const bbsPlusKey = new BBSPlusPublicKeyValue(TypedBytes.random(100), ref);
-      const psKey = new PSPublicKeyValue(TypedBytes.random(1000), ref);
+      const bbsKey = new BBSPublicKeyValue(TypedBytes.random(100), paramsRef);
+      const bbsPlusKey = new BBSPlusPublicKeyValue(
+        TypedBytes.random(100),
+        paramsRef,
+      );
+      const psKey = new PSPublicKeyValue(TypedBytes.random(1000), paramsRef);
 
       const document = DIDDocument.create(did, [
         didKeypair.didKey(),
@@ -58,6 +59,8 @@ export default function generateDIDModuleTests(
         new DidKey(bbsPlusKey),
         new DidKey(psKey),
       ]);
+
+      console.log(maybeToCheqdPayloadOrJSON(document));
 
       await module.createDocument(document, didKeypair);
 

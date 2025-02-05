@@ -1,6 +1,6 @@
 import { maybeToJSONString } from '../../utils';
 import {
-  option, TypedBytes, TypedStruct, Any, withProp,
+  option, TypedBytes, TypedStruct, withProp,
 } from '../generic';
 import {
   CurveType,
@@ -11,6 +11,7 @@ import {
   CheqdMainnetAccumulatorParamsRef,
   CheqdTestnetAccumulatorParamsRef,
   DockAccumulatorParamsRef,
+  DockOrCheqdAccumulatorParamsRef,
 } from './keys';
 import { AccumulatorParams } from './params';
 
@@ -19,7 +20,7 @@ export class AccumulatorPublicKey extends TypedStruct {
 
   static Classes = {
     bytes: class Bytes extends TypedBytes {},
-    paramsRef: option(Any),
+    paramsRef: option(DockOrCheqdAccumulatorParamsRef),
     curveType: CurveType,
   };
 

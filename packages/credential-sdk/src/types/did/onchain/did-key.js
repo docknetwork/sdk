@@ -1,9 +1,5 @@
 import {
-  Any,
-  TypedArray,
-  TypedEnum,
-  TypedMap,
-  TypedStruct,
+  TypedArray, TypedEnum, TypedMap, TypedStruct,
 } from '../../generic';
 import {
   PublicKeyEd25519Value,
@@ -15,6 +11,7 @@ import {
   BBSPublicKeyValue,
   BBSPlusPublicKeyValue,
   PSPublicKeyValue,
+  DockOrCheqdPublicKeyId,
 } from '../../offchain-signatures';
 import { VerificationRelationship } from './verification-relationship';
 import {
@@ -167,7 +164,7 @@ export class DidKeysList extends TypedArray {
 }
 
 export class DidKeys extends TypedMap {
-  static KeyClass = Any;
+  static KeyClass = DockOrCheqdPublicKeyId;
 
   static ValueClass = DidKey;
 }

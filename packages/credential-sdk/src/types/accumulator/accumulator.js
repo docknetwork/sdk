@@ -6,8 +6,8 @@ import {
   ByteArray,
   TypedUUID,
   withProp,
-  withFrom,
   TypedArray,
+  anyOf,
 } from '../generic';
 import {
   DockAccumulatorPublicKeyRef,
@@ -17,13 +17,7 @@ import {
 } from './keys';
 import { createAccumulatorVariants } from './variants';
 
-class TypedUUIDOrTypedNumber extends withFrom(TypedUUID, (value, from) => {
-  try {
-    return TypedNumber.from(value);
-  } catch {
-    return from(value);
-  }
-}) {}
+class TypedUUIDOrTypedNumber extends anyOf(TypedUUID, TypedNumber) {}
 
 export class AccumulatorUpdate extends TypedStruct {
   static Classes = {
@@ -178,21 +172,9 @@ export class CheqdAccumulatorHistory extends TypedStruct {
   };
 }
 
-class CheqdAccumulatorPublicKeyRefOrDockAccumulatorPublicKeyRef extends withFrom(
+class DockOrCheqdAccumulatorPublicKeyRef extends anyOf(
+  DockAccumulatorPublicKeyRef,
   CheqdAccumulatorPublicKeyRef,
-  (value, from) => {
-    try {
-      return from(value);
-    } catch (cheqdErr) {
-      try {
-        return DockAccumulatorPublicKeyRef.from(value);
-      } catch (dockErr) {
-        dockErr.message = `${cheqdErr.message}; ${dockErr.message}`;
-
-        throw dockErr;
-      }
-    }
-  },
 ) {}
 
 export const [
@@ -201,6 +183,4 @@ export const [
   UniversalAccumulator,
   KBUniversalAccumulator,
   PositiveAccumulator,
-] = createAccumulatorVariants(
-  CheqdAccumulatorPublicKeyRefOrDockAccumulatorPublicKeyRef,
-);
+] = createAccumulatorVariants(DockOrCheqdAccumulatorPublicKeyRef);

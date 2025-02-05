@@ -16,7 +16,7 @@ import {
 } from '../onchain/typed-did';
 import { DidKey, DidKeys } from '../onchain/did-key';
 import { VerificationRelationship } from '../onchain/verification-relationship';
-import { Service, CheqdService } from './service';
+import { Service, CheqdService } from './service-endpoint';
 import {
   VerificationMethod,
   CheqdVerificationMethod,
@@ -487,7 +487,7 @@ export class CheqdMainnetDIDDocument extends CheqdDIDDocument {
 }
 
 export * from './const';
-export * from './service';
+export * from './service-endpoint';
 export * from './verification-method';
 export * from './verification-method-type';
 export { default as IdentRef } from './ident-ref';

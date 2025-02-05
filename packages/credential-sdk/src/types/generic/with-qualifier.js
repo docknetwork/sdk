@@ -106,7 +106,7 @@ export default function withQualifier(klass, wrapper = false) {
       },
     };
 
-    return withFrom(classes[name], function (value, from) {
+    return withFrom(classes[name], function from(value, fromFn) {
       if (typeof value === "string" || value instanceof TypedString) {
         if (this.Class != null) {
           return new this(maybeFrom(this.Class, String(value)));
@@ -129,7 +129,7 @@ export default function withQualifier(klass, wrapper = false) {
           }\``
         );
       } else {
-        return from(value);
+        return fromFn(value);
       }
     });
   } else {
@@ -203,7 +203,7 @@ export default function withQualifier(klass, wrapper = false) {
           classes[name]
         )
       ),
-      function (value, from) {
+      function from(value, fromFn) {
         if (typeof value === "string" || value instanceof TypedString) {
           if (this.isQualifiedString(String(value))) {
             return this.fromQualifiedString(String(value));
@@ -219,7 +219,7 @@ export default function withQualifier(klass, wrapper = false) {
             `Value has a different qualifier: \`${value.constructor.Qualifier}\` while expected \`${this.Qualifier}\` by \`${this.name}\``
           );
         } else {
-          return from(value);
+          return fromFn(value);
         }
       }
     );

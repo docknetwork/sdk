@@ -1,25 +1,13 @@
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import generateOffchainSignaturesModuleTests from "@docknetwork/credential-sdk/modules/tests/offchain-signatures-module";
-import {
-  MultiApiOffchainSignaturesModule,
-  MultiApiDIDModule,
-} from "@docknetwork/credential-sdk/modules";
-import {
-  DockDIDModule,
-  DockOffchainSignaturesModule,
-  DockBBSModule,
-  DockBBSPlusModule,
-  DockPSModule,
-} from "../../../src";
+import { DockCoreModules } from "../../../src";
 import {
   FullNodeEndpoint,
   TestAccountURI,
   TestKeyringOpts,
 } from "../../test-constants";
-import {
-  DockDid,
-  DockOffchainSignatureParamsRef,
-} from "@docknetwork/credential-sdk/types";
+import { DockDid } from "@docknetwork/credential-sdk/types";
+import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 
 describe("BlobModule", () => {
   const dock = new DockAPI();
@@ -37,35 +25,14 @@ describe("BlobModule", () => {
     await dock.disconnect();
   });
 
-  generateOffchainSignaturesModuleTests(
-    {
-      did: new DockDIDModule(dock),
-      offchainSignatures: new DockOffchainSignaturesModule(dock),
-      bbs: new DockBBSModule(dock),
-      bbsPlus: new DockBBSPlusModule(dock),
-      ps: new DockPSModule(dock),
-    },
-    {
-      Did: DockDid,
-      OffchainSignatureParamsRef: DockOffchainSignatureParamsRef,
-    }
-  );
+  generateOffchainSignaturesModuleTests(new DockCoreModules(dock), {
+    Did: DockDid,
+  });
 
   generateOffchainSignaturesModuleTests(
-    {
-      did: new MultiApiDIDModule([new DockDIDModule(dock)]),
-      offchainSignatures: new MultiApiOffchainSignaturesModule([
-        new DockOffchainSignaturesModule(dock),
-      ]),
-      bbs: new MultiApiOffchainSignaturesModule([new DockBBSModule(dock)]),
-      bbsPlus: new MultiApiOffchainSignaturesModule([
-        new DockBBSPlusModule(dock),
-      ]),
-      ps: new MultiApiOffchainSignaturesModule([new DockPSModule(dock)]),
-    },
+    new MultiApiCoreModules([new DockCoreModules(dock)]),
     {
       Did: DockDid,
-      OffchainSignatureParamsRef: DockOffchainSignatureParamsRef,
     }
   );
 });

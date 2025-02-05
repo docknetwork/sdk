@@ -1,4 +1,4 @@
-import { TypedMap, TypedUUID } from '@docknetwork/credential-sdk/types/generic';
+import { TypedMap } from '@docknetwork/credential-sdk/types/generic';
 import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils';
 import { CheqdCreateResource } from '@docknetwork/credential-sdk/types';
 import createInternalCheqdModule from './create-internal-cheqd-module';
@@ -8,7 +8,7 @@ const methods = {
   addPublicKey(id, publicKey, did) {
     return new CheqdCreateResource(
       this.types.Did.from(did).value.value,
-      TypedUUID.from(id),
+      this.constructor.PublicKeyId.from(id),
       '1.0',
       [],
       this.constructor.PublicKeyName,

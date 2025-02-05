@@ -1,8 +1,10 @@
-import { TypedStruct, TypedNumber } from '../generic';
+import { TypedStruct } from '../generic';
+import { DockAccumulatorPublicKeyId } from './keys';
+import { DockAccumulatorParamsId } from './params';
 
 export class DockAccumulatorCounters extends TypedStruct {
   static Classes = {
-    paramsCounter: class ParamsCounter extends TypedNumber {},
-    keyCounter: class KeyCounter extends TypedNumber {},
+    paramsCounter: DockAccumulatorParamsId,
+    keyCounter: DockAccumulatorPublicKeyId,
   };
 }

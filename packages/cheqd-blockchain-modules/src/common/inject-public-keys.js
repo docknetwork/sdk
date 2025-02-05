@@ -1,8 +1,5 @@
 import { TypedMap, TypedUUID } from '@docknetwork/credential-sdk/types/generic';
-import {
-  u8aToString,
-  withExtendedStaticProperties,
-} from '@docknetwork/credential-sdk/utils';
+import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils';
 import { CheqdCreateResource } from '@docknetwork/credential-sdk/types';
 import createInternalCheqdModule from './create-internal-cheqd-module';
 import { validateResource } from './resource';
@@ -69,9 +66,7 @@ export default function injectPublicKeys(klass) {
         }
 
         const publicKey = PublicKey.from(
-          JSON.parse(
-            u8aToString(validateResource(item, PublicKeyName, PublicKeyType)),
-          ),
+          validateResource(item, PublicKeyName, PublicKeyType),
         );
         if (includeParams) {
           return await publicKey.withParams(this);

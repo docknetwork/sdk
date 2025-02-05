@@ -1,4 +1,4 @@
-import { stringToU8a, u8aToString } from '../../utils';
+import { stringToU8a } from '../../utils';
 import {
   withExtendedStaticProperties,
   withExtendedPrototypeProperties,
@@ -6,6 +6,7 @@ import {
 import { maybeEq, maybeToJSON } from '../../utils/interfaces';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
+import withFromJSONBytes from './with-from-json-bytes';
 
 /**
  * Enhances provided class by adding prototype methods `toString`/`eq`, static `from` and requiring
@@ -45,8 +46,6 @@ export default function withBase(klass) {
           return obj;
         } else if (Object.getPrototypeOf(obj) === Object.getPrototypeOf({})) {
           return this.fromJSON(obj);
-        } else if (obj instanceof Uint8Array) {
-          return this.fromJSON(JSON.parse(u8aToString(obj)));
         } else {
           return this.fromApi(obj);
         }
@@ -110,7 +109,7 @@ export default function withBase(klass) {
     ['fromJSON', 'fromApi'],
     withExtendedPrototypeProperties(
       ['apply'],
-      withEq(withCatchNull(classes[name])),
+      withFromJSONBytes(withEq(withCatchNull(classes[name]))),
     ),
   );
 }

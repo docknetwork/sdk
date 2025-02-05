@@ -1,0 +1,26 @@
+{
+  "name": "@docknetwork/data-generator",
+  "private": true,
+  "type": "module",
+  "version": "0.1.1",
+  "scripts": {
+    "generate": "babel-node src/main.js"
+  },
+  "dependencies": {
+    "@docknetwork/cheqd-blockchain-api": "0.30.0",
+    "@docknetwork/cheqd-blockchain-modules": "0.29.0",
+    "@docknetwork/credential-sdk": "0.38.0",
+    "@docknetwork/dock-blockchain-api": "0.20.0",
+    "@docknetwork/dock-blockchain-modules": "0.26.0",
+    "@docknetwork/crypto-wasm-ts": "^0.63.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^8.0.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^26.0.0",
+    "eslint-plugin-sonarjs": "0.5.0",
+    "eslint-plugin-unused-imports": "^3.0.0"
+  }
+}

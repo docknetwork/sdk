@@ -5,7 +5,8 @@
   "workspaces": [
     "packages/*",
     "examples",
-    "scripts/migration"
+    "scripts/migration",
+    "scripts/test-data-generator"
   ],
   "dependencies": {},
   "devDependencies": {

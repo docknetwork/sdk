@@ -10,7 +10,7 @@ import TypedStruct from './typed-struct';
  * @template K
  * @param {C} klass
  * @param {Object<string, K>} propertiesToOverride
- * @param {function(*, string, K): *} handleNested
+ * @param {function(*, Object<string, K>): *} handleNested
  * @returns {C}
  */
 export default function withProps(

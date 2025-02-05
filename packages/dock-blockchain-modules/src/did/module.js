@@ -210,32 +210,36 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
     return await this.dockOnly.tx.removeOnchainDid(did, didKeypair);
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  async getDocument(did) {
-    const typedDid = DockDid.from(did);
+  async getDocument(rawDid) {
+    const did = DockDid.from(rawDid);
 
     const [keys, controllers, serviceEndpoints, attests, offchainKeys] = await Promise.all([
-      this.dockOnly.keys(typedDid.asDid),
-      this.dockOnly.controllers(typedDid),
-      this.dockOnly.serviceEndpoints(typedDid.asDid),
-      this.attest.getAttests(typedDid),
-      this.offchainSignatures.dockOnly.getAllPublicKeysByDid(typedDid.asDid),
+      this.dockOnly.keys(did.asDid),
+      this.dockOnly.controllers(did.asDid),
+      this.dockOnly.serviceEndpoints(did.asDid),
+      this.attest.getAttests(did),
+      this.offchainSignatures.dockOnly.getAllPublicKeysByDid(did),
     ]);
 
     const doc = DIDDocument.create(
-      typedDid,
-      keys,
+      did,
+      [],
       controllers,
-      Object.fromEntries(serviceEndpoints),
+      {},
       {
         context: [CONTEXT_URI],
         attests,
       },
     );
 
+    for (const [ref, key] of keys) {
+      doc.addKey(ref, key);
+    }
     for (const [keyId, key] of offchainKeys) {
-      // The gaps in `keyId` might correspond to removed keys
-      doc.addKey([[typedDid, keyId], new DidKey(key)]);
+      doc.addKey([did, keyId], new DidKey(key));
+    }
+    for (const [id, endpoint] of serviceEndpoints) {
+      doc.addServiceEndpoint(id, endpoint);
     }
 
     return doc;

@@ -456,7 +456,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
     return new DidKeys(
       (await this.query.didKeys.entries(DockDid.from(did).asDid))
         .map(([key, value]) => DidKeyWithId.from([maybeToHuman(key)[1], maybeToHuman(value)]))
-        .map((didKeyWithId) => [[did, didKeyWithId[0]], didKeyWithId[1]])
+        .map(([id, key]) => [[did, id], key])
         .filter(([_, pk]) => pk),
     );
   }

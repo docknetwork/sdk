@@ -13,4 +13,6 @@ CHEQD_NETWORK
 CHEQD_MNEMONIC
 DOCK_ACCOUNT_URI
 DID # - dock DID to be used as the owner of the DID Document and all entities/DLRs
+ACCUMULATOR_ID
+STATUS_LIST_CREDENTIAL_ID
 ```

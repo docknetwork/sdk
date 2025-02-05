@@ -10,8 +10,6 @@ import {
   DIDDocument,
   AccumulatorCommon,
   DockStatusListCredentialId,
-  CheqdTestnetStatusListCredentialId,
-  CheqdTestnetAccumulatorId,
   AccumulatorPublicKey,
   DockAccumulatorId,
   PositiveAccumulator as StoredPositiveAccumulator,
@@ -61,15 +59,13 @@ class DIDDataGenerator {
     const { didKp } = this;
     const { did, verificationMethodId } = didKp;
     const keyDoc = getKeyDoc(did, didKp, void 0, String(verificationMethodId));
-    const dockId = DockStatusListCredentialId.random();
-    const id = {
-      dock: dockId,
-      cheqd: new CheqdTestnetStatusListCredentialId.Class(did, dockId),
-    };
-
+    const id = DockStatusListCredentialId.from(
+      process.env.STATUS_LIST_CREDENTIAL_ID ||
+        DockStatusListCredentialId.random()
+    );
     return {
       id,
-      credential: await StatusList2021Credential.create(keyDoc, id.dock),
+      credential: await StatusList2021Credential.create(keyDoc, id),
     };
   }
 
@@ -102,11 +98,9 @@ class DIDDataGenerator {
     }
     await accumulator.addBatch(members, keypair.secretKey, accumState);
 
-    const dockId = DockAccumulatorId.random();
-    const id = {
-      dock: dockId,
-      cheqd: new CheqdTestnetAccumulatorId.Class(did, dockId),
-    };
+    const id = DockAccumulatorId.from(
+      process.env.ACCUMULATOR_ID || DockAccumulatorId.random()
+    );
     const accumulated = this.modules.accumulator.constructor.accumulatedAsHex(
       accumulator.accumulated,
       AccumulatorType.VBPos
@@ -152,7 +146,7 @@ class DIDTransactionSender {
   async newStatusListCredential({ id, credential }) {
     return await this.forEach((modules) =>
       modules.statusListCredential.createStatusListCredential(
-        modules instanceof DockCoreModules ? id.dock : id.cheqd,
+        id,
         credential,
         this.didKp
       )
@@ -171,11 +165,7 @@ class DIDTransactionSender {
         did,
         didKp
       );
-      await modules.accumulator.addAccumulator(
-        modules instanceof DockCoreModules ? id.dock : id.cheqd,
-        accumulator,
-        this.didKp
-      );
+      await modules.accumulator.addAccumulator(id, accumulator, this.didKp);
     });
   }
 }

@@ -31,7 +31,7 @@ export default function generateAccumulatorTests(
     AccumulatorPublicKey: StoredAccumulatorPublicKey,
   },
 ) {
-  describe(`Using ${didModule.constructor.name} and ${accumulatorModule.constructor.name}`, () => {
+  describe(`Using ${didModule.constructor.name} and ${accumulatorModule.constructor.name} with ${Did.name}`, () => {
     // Incase updating an accumulator is expensive like making a blockchain txn, a cheaper strategy
     // is to add the members to the accumulator beforehand but not giving out the witnesses yet.
     // Eg. accumulator manager wants to add a million members over an year, rather than publishing

@@ -13,7 +13,7 @@ export default function generateBlobModuleTests(
 ) {
   const test = testIf(filter);
 
-  describe(`Using ${didModule.constructor.name} and ${blobModule.constructor.name}`, () => {
+  describe(`Using ${didModule.constructor.name} and ${blobModule.constructor.name} with ${Did.name}`, () => {
     test('Generates a `DIDDocument` and creates a `Blob` owned by this DID', async () => {
       const did = Did.random();
 

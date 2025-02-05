@@ -11,7 +11,6 @@ import {
   BBSPublicKeyValue,
   BBSPlusPublicKeyValue,
   PSPublicKeyValue,
-  DockOrCheqdPublicKeyId,
 } from '../../offchain-signatures';
 import { VerificationRelationship } from './verification-relationship';
 import {
@@ -19,6 +18,7 @@ import {
   Bls12381BBSDockVerKeyName,
   Bls12381PSDockVerKeyName,
 } from '../../../vc/crypto';
+import { VerificationMethodRef } from '../document/verification-method-ref';
 
 /**
  * Class representing either of possible DidKeys.
@@ -164,7 +164,7 @@ export class DidKeysList extends TypedArray {
 }
 
 export class DidKeys extends TypedMap {
-  static KeyClass = DockOrCheqdPublicKeyId;
+  static KeyClass = VerificationMethodRef;
 
   static ValueClass = DidKey;
 }

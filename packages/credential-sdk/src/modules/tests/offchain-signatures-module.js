@@ -29,7 +29,7 @@ export default function generateOffchainSignatureModuleTests(
 ) {
   const test = testIf(filter);
 
-  describe(`Checks ${didModule.constructor.name} and ${offchainSignatures.constructor.name} with all public keys and params`, () => {
+  describe(`Checks ${didModule.constructor.name} and ${offchainSignatures.constructor.name} with ${Did.name} and all public key types and params types`, () => {
     test('Generates a `DIDDocument` with `OffchainPublicKey` and creates a `OffchainParameters` owned by this DID', async () => {
       const did = Did.random();
 

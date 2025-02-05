@@ -10,7 +10,6 @@ import {
   ServiceEndpoint,
 } from '../../types';
 import { TypedBytes } from '../../types/generic';
-import { maybeToCheqdPayloadOrJSON } from '../../utils';
 import { NoDIDError } from '../abstract/did/errors';
 import { testIf } from './common';
 
@@ -22,7 +21,7 @@ export default function generateDIDModuleTests(
 ) {
   const test = testIf(filter);
 
-  describe(`Using ${module.constructor.name}`, () => {
+  describe(`Using ${module.constructor.name} with ${Did.name}`, () => {
     test('Creates basic `DIDDocument` with keys', async () => {
       const did = Did.random();
 
@@ -59,8 +58,6 @@ export default function generateDIDModuleTests(
         new DidKey(bbsPlusKey),
         new DidKey(psKey),
       ]);
-
-      console.log(maybeToCheqdPayloadOrJSON(document));
 
       await module.createDocument(document, didKeypair);
 

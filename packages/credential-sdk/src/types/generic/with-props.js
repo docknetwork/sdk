@@ -1,4 +1,4 @@
-import { isEqualToOrPrototypeOf } from '../../utils';
+import { isEqualToOrPrototypeOf, mapObj } from '../../utils';
 import TypedEnum from './typed-enum';
 import TypedStruct from './typed-struct';
 
@@ -18,8 +18,8 @@ export default function withProps(
   propertiesToOverride,
   handleNested = withProps,
 ) {
-  const name = `withProps(${klass.name}, ${JSON.stringify(
-    propertiesToOverride,
+  const fnName = `withProps(${klass.name}, ${JSON.stringify(
+    mapObj(propertiesToOverride, ({ name }) => name),
   )})`;
   const isStruct = isEqualToOrPrototypeOf(TypedStruct, klass);
   const isEnum = isEqualToOrPrototypeOf(TypedEnum, klass);
@@ -29,7 +29,7 @@ export default function withProps(
 
   if (isStruct) {
     const obj = {
-      [name]: class extends klass {
+      [fnName]: class extends klass {
         static Classes = {
           ...klass.Classes,
           ...propertiesToOverride,
@@ -37,10 +37,10 @@ export default function withProps(
       },
     };
 
-    return obj[name];
+    return obj[fnName];
   } else {
     const obj = {
-      [name]:
+      [fnName]:
         klass.Class != null
           ? class extends klass {
             static Class = handleNested(klass.Class, propertiesToOverride);
@@ -50,6 +50,6 @@ export default function withProps(
           },
     };
 
-    return obj[name];
+    return obj[fnName];
   }
 }

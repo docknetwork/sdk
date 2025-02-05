@@ -3,11 +3,9 @@ import {
   DockDid,
   DockDidOrDidMethodKey,
   DidKey,
-  VerificationMethod,
 } from '@docknetwork/credential-sdk/types';
 import {
   DIDDocument,
-  Service,
   CONTEXT_URI,
 } from '@docknetwork/credential-sdk/types/did';
 import DockDIDModuleInternal from './internal';
@@ -215,92 +213,31 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   async getDocument(did) {
     const typedDid = DockDid.from(did);
-    const hexDid = typedDid.asDid;
 
-    const { data: didDetails } = await this.dockOnly.getOnchainDidDetail(
-      hexDid,
-    );
+    const [keys, controllers, serviceEndpoints, attests, offchainKeys] = await Promise.all([
+      this.dockOnly.keys(typedDid.asDid),
+      this.dockOnly.controllers(typedDid),
+      this.dockOnly.serviceEndpoints(typedDid.asDid),
+      this.attest.getAttests(typedDid),
+      this.offchainSignatures.dockOnly.getAllPublicKeysByDid(typedDid.asDid),
+    ]);
 
-    // Get DIDs attestations
-    const attests = await this.attest.getAttests(typedDid);
-
-    // If given DID was in hex, encode to SS58 and then construct fully qualified DID else the DID was already fully qualified
-    const id = String(typedDid);
-
-    // Get controllers
-    const controllers = didDetails.activeControllers > 0
-      ? await this.dockOnly.controllers(typedDid)
-      : [];
-
-    // Get service endpoints
-    const serviceEndpoints = await this.dockOnly.serviceEndpoints(hexDid);
-
-    // Get keys and categorize them by verification relationship type
-    const keys = [];
-    const assert = [];
-    const authn = [];
-    const capInv = [];
-    const keyAgr = [];
-
-    if (didDetails.lastKeyId > 0) {
-      const dks = await this.dockOnly.keys(hexDid);
-
-      [...dks.entries()].forEach(([index, didKey]) => {
-        keys.push([index, didKey]);
-
-        if (didKey.verRels.isAuthentication()) {
-          authn.push(index);
-        }
-        if (didKey.verRels.isAssertion()) {
-          assert.push(index);
-        }
-        if (didKey.verRels.isCapabilityInvocation()) {
-          capInv.push(index);
-        }
-        if (didKey.verRels.isKeyAgreement()) {
-          keyAgr.push(index);
-        }
-      });
-    }
-
-    for (const [
-      keyId,
-      key,
-    ] of await this.offchainSignatures.dockOnly.getAllPublicKeysByDid(hexDid)) {
-      // The gaps in `keyId` might correspond to removed keys
-      keys.push([keyId, new DidKey(key)]);
-
-      assert.push(keyId);
-    }
-
-    keys.sort((a, b) => a[0] - b[0]);
-    assert.sort();
-    authn.sort();
-    capInv.sort();
-    keyAgr.sort();
-
-    const verificationMethod = keys.map(([index, pk]) => VerificationMethod.fromDidKey([id, index], pk));
-    const assertion = assert.map((i) => `${id}#keys-${i}`);
-    const authentication = authn.map((i) => `${id}#keys-${i}`);
-    const capabilityInvocation = capInv.map((i) => `${id}#keys-${i}`);
-    const keyAgreement = keyAgr.map((i) => `${id}#keys-${i}`);
-
-    const service = [...serviceEndpoints].map(([spId, sp]) => Service.fromServiceEndpoint(spId, sp));
-
-    // Construct document
-    return new DIDDocument(
-      [CONTEXT_URI],
-      id,
-      [],
+    const doc = DIDDocument.create(
+      typedDid,
+      keys,
       controllers,
-      verificationMethod,
-      service,
-      authentication,
-      assertion,
-      keyAgreement,
-      capabilityInvocation,
-      [],
-      attests,
+      Object.fromEntries(serviceEndpoints),
+      {
+        context: [CONTEXT_URI],
+        attests,
+      },
     );
+
+    for (const [keyId, key] of offchainKeys) {
+      // The gaps in `keyId` might correspond to removed keys
+      doc.addKey([[typedDid, keyId], new DidKey(key)]);
+    }
+
+    return doc;
   }
 }

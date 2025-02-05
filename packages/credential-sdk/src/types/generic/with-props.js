@@ -9,7 +9,7 @@ import TypedStruct from './typed-struct';
  * @template C
  * @template K
  * @param {C} klass
- * @param {{ [string]: K }} propertiesToOverride
+ * @param {Object<string, K>} propertiesToOverride
  * @param {function(*, string, K): *} handleNested
  * @returns {C}
  */

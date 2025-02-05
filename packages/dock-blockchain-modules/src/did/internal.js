@@ -130,11 +130,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @returns {Promise<*>}
    */
   async newOffchain(did, didDocRef, params) {
-    return await this.send.newOffchain(
-      did,
-      didDocRef,
-      params,
-    );
+    return await this.send.newOffchain(did, didDocRef, params);
   }
 
   /**
@@ -143,16 +139,8 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param didDocRef
    * @returns {Promise<*>}
    */
-  async setOffchainDidDocRef(
-    did,
-    didDocRef,
-    params,
-  ) {
-    return await this.send.setOffchainDidDocRef(
-      did,
-      didDocRef,
-      params,
-    );
+  async setOffchainDidDocRef(did, didDocRef, params) {
+    return await this.send.setOffchainDidDocRef(did, didDocRef, params);
   }
 
   /**
@@ -171,12 +159,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param {array} controllers - Array of `Did`s as expected by the Substrate node.
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async newOnchain(
-    did,
-    didKeys,
-    controllers,
-    params,
-  ) {
+  async newOnchain(did, didKeys, controllers, params) {
     return await this.send.newOnchain(did, didKeys, controllers, params);
   }
 
@@ -209,12 +192,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param signingKeyRef - Signer's keypair reference
    * @returns {Promise<*>}
    */
-  async addControllers(
-    controllers,
-    targetDid,
-    didKeypair,
-    params,
-  ) {
+  async addControllers(controllers, targetDid, didKeypair, params) {
     return await this.send.addControllers(
       controllers,
       targetDid,
@@ -303,11 +281,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
    * @param signingKeyRef - Signer's keypair reference
    * @return {Promise<object>} Promise to the pending transaction
    */
-  async removeOnchainDid(
-    targetDid,
-    didKeypair,
-    params,
-  ) {
+  async removeOnchainDid(targetDid, didKeypair, params) {
     return await this.send.removeOnchainDid(targetDid, didKeypair, params);
   }
 
@@ -482,6 +456,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
     return new DidKeys(
       (await this.query.didKeys.entries(DockDid.from(did).asDid))
         .map(([key, value]) => DidKeyWithId.from([maybeToHuman(key)[1], maybeToHuman(value)]))
+        .map((didKeyWithId) => [[did, didKeyWithId[0]], didKeyWithId[1]])
         .filter(([_, pk]) => pk),
     );
   }

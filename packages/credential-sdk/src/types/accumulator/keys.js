@@ -1,4 +1,6 @@
-import { TypedTuple, TypedNumber, TypedUUID } from '../generic';
+import {
+  TypedTuple, TypedNumber, TypedUUID, anyOf,
+} from '../generic';
 import withFromDockId from '../generic/with-from-dock-id';
 import {
   CheqdDLRRef,
@@ -46,3 +48,8 @@ export class CheqdTestnetAccumulatorParamsRef extends CheqdAccumulatorParamsRef 
 export class CheqdMainnetAccumulatorParamsRef extends CheqdAccumulatorParamsRef {
   static Did = CheqdMainnetDid;
 }
+
+export class DockOrCheqdAccumulatorParamsRef extends anyOf(
+  DockAccumulatorParamsRef,
+  CheqdAccumulatorParamsRef,
+) {}

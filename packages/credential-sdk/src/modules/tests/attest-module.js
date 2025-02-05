@@ -10,7 +10,7 @@ export default function generateAttestModuleTests(
 ) {
   const test = testIf(filter);
 
-  describe(`Using ${didModule.constructor.name} and ${attestModule.constructor.name}`, () => {
+  describe(`Using ${didModule.constructor.name} and ${attestModule.constructor.name} with ${Did.name}`, () => {
     test('Generates a `DIDDocument` and appends an `Attest` to it', async () => {
       const did = Did.random();
 

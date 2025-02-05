@@ -3,6 +3,7 @@ import didModuleTests from "@docknetwork/credential-sdk/modules/tests/did-module
 import CheqdDIDModule from "../src/did/module";
 import { faucet, url, network } from "./constants";
 import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
+import { CheqdParamsId } from "@docknetwork/credential-sdk/types";
 
 describe("DIDModule", () => {
   const cheqd = new CheqdAPI();
@@ -21,10 +22,10 @@ describe("DIDModule", () => {
 
   didModuleTests(
     { did: new CheqdDIDModule(cheqd) },
-    cheqd.constructor.Types[network]
+    { ...cheqd.constructor.Types[network], ParamsId: CheqdParamsId }
   );
   didModuleTests(
     { did: new MultiApiDIDModule([new CheqdDIDModule(cheqd)]) },
-    cheqd.constructor.Types[network]
+    { ...cheqd.constructor.Types[network], ParamsId: CheqdParamsId }
   );
 });

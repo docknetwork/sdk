@@ -91,6 +91,25 @@ export const filterObj = (obj, filter) => {
 };
 
 /**
+ * Maps properties of the object according to the supplied `map`.
+ *
+ * @template K
+ * @template VI
+ * @template VO
+ * @param {Object<K, VI>} obj
+ * @param {function(VI): VO} map
+ * @returns {Object<K, VO>}
+ */
+export const mapObj = (obj, map) => {
+  const res = Object.create(Object.getPrototypeOf(obj));
+  for (const [key, value] of Object.entries(obj)) {
+    res[key] = map(value);
+  }
+
+  return res;
+};
+
+/**
  * Sets prototype of the supplied object to `null`, returns the object.
  * @template T
  * @param {T}

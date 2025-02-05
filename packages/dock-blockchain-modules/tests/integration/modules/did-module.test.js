@@ -1,10 +1,7 @@
 import didModuleTests from "@docknetwork/credential-sdk/modules/tests/did-module";
 import { DockAPI } from "@docknetwork/dock-blockchain-api";
 import { MultiApiDIDModule } from "@docknetwork/credential-sdk/modules";
-import {
-  DockDid,
-  DockOffchainSignatureParamsRef,
-} from "@docknetwork/credential-sdk/types";
+import { DockDid, DockParamsId } from "@docknetwork/credential-sdk/types";
 import DockDIDModule from "../../../src/did/module";
 import {
   FullNodeEndpoint,
@@ -36,7 +33,7 @@ describe("DIDModule", () => {
     { did: new DockDIDModule(dock) },
     {
       Did: DockDid,
-      OffchainSignatureParamsRef: DockOffchainSignatureParamsRef,
+      ParamsId: DockParamsId,
     },
     filter
   );
@@ -45,7 +42,7 @@ describe("DIDModule", () => {
     { did: new MultiApiDIDModule([new DockDIDModule(dock)]) },
     {
       Did: DockDid,
-      OffchainSignatureParamsRef: DockOffchainSignatureParamsRef,
+      ParamsId: DockParamsId,
     },
     filter
   );

@@ -11,52 +11,22 @@ import {
   CheqdTestnetVerificationMethodRef,
   CheqdVerificationMethodRef,
 } from './verification-method-ref';
-import { withFrom } from '../../generic';
+import { anyOf } from '../../generic';
 
-export class CheqdVerificationMethodRefOrCheqdVerificationMethod extends withFrom(
+export class CheqdVerificationMethodRefOrCheqdVerificationMethod extends anyOf(
+  CheqdVerificationMethodAssertion,
+  CheqdVerificationMethodAssertionLegacy,
   CheqdVerificationMethodRef,
-  function from(value) {
-    try {
-      return this.First.from(value);
-    } catch (firstErr) {
-      try {
-        return this.Second.from(value);
-      } catch (secondErr) {
-        secondErr.message = `${firstErr.message}; ${secondErr.message}`;
+) {}
 
-        if (this.Third == null) {
-          throw secondErr;
-        }
-        try {
-          return this.Third.from(value);
-        } catch (thirdErr) {
-          thirdErr.message = `${secondErr.message}; ${thirdErr.message}`;
+export class CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod extends anyOf(
+  CheqdTestnetVerificationMethodAssertion,
+  CheqdTestnetVerificationMethodAssertionLegacy,
+  CheqdTestnetVerificationMethodRef,
+) {}
 
-          throw thirdErr;
-        }
-      }
-    }
-  },
-) {
-  static First = CheqdVerificationMethodAssertion;
-
-  static Second = CheqdVerificationMethodAssertionLegacy;
-
-  static Third = CheqdVerificationMethodRef;
-}
-
-export class CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod extends CheqdVerificationMethodRefOrCheqdVerificationMethod {
-  static First = CheqdTestnetVerificationMethodAssertion;
-
-  static Second = CheqdTestnetVerificationMethodAssertionLegacy;
-
-  static Third = CheqdTestnetVerificationMethodRef;
-}
-
-export class CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod extends CheqdVerificationMethodRefOrCheqdVerificationMethod {
-  static First = CheqdMainnetVerificationMethodAssertion;
-
-  static Second = CheqdMainnetVerificationMethodAssertionLegacy;
-
-  static Third = CheqdMainnetVerificationMethodRef;
-}
+export class CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod extends anyOf(
+  CheqdMainnetVerificationMethodAssertion,
+  CheqdMainnetVerificationMethodAssertionLegacy,
+  CheqdMainnetVerificationMethodRef,
+) {}

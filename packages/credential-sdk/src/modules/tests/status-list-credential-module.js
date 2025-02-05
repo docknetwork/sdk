@@ -15,7 +15,7 @@ export default function generateStatusListCredentialModuleTests(
 ) {
   const test = testIf(filter);
 
-  describe(`Using ${didModule.constructor.name} and ${statusListCredentialModule.constructor.name}`, () => {
+  describe(`Using ${didModule.constructor.name} and ${statusListCredentialModule.constructor.name} with ${Did.name}`, () => {
     test('Generates a `DIDDocument` and creates a `StatusListCredential` owned by this DID', async () => {
       const did = Did.random();
 

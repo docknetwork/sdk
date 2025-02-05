@@ -1,9 +1,5 @@
 import {
-  Any,
-  TypedArray,
-  TypedEnum,
-  TypedMap,
-  TypedStruct,
+  TypedArray, TypedEnum, TypedMap, TypedStruct,
 } from '../../generic';
 import {
   PublicKeyEd25519Value,
@@ -22,6 +18,7 @@ import {
   Bls12381BBSDockVerKeyName,
   Bls12381PSDockVerKeyName,
 } from '../../../vc/crypto';
+import { VerificationMethodRef } from '../document/verification-method-ref';
 
 /**
  * Class representing either of possible DidKeys.
@@ -167,7 +164,7 @@ export class DidKeysList extends TypedArray {
 }
 
 export class DidKeys extends TypedMap {
-  static KeyClass = Any;
+  static KeyClass = VerificationMethodRef;
 
   static ValueClass = DidKey;
 }

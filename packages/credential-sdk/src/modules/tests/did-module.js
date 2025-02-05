@@ -16,12 +16,12 @@ import { testIf } from './common';
 // eslint-disable-next-line jest/no-export
 export default function generateDIDModuleTests(
   { did: module },
-  { Did, OffchainSignatureParamsRef },
+  { Did, ParamsId },
   filter = () => true,
 ) {
   const test = testIf(filter);
 
-  describe(`Using ${module.constructor.name}`, () => {
+  describe(`Using ${module.constructor.name} with ${Did.name}`, () => {
     test('Creates basic `DIDDocument` with keys', async () => {
       const did = Did.random();
 
@@ -43,14 +43,14 @@ export default function generateDIDModuleTests(
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
-      const ref = new OffchainSignatureParamsRef(
-        did,
-        OffchainSignatureParamsRef.Classes[1].random(),
-      );
+      const paramsRef = [did, ParamsId.random()];
 
-      const bbsKey = new BBSPublicKeyValue(TypedBytes.random(100), ref);
-      const bbsPlusKey = new BBSPlusPublicKeyValue(TypedBytes.random(100), ref);
-      const psKey = new PSPublicKeyValue(TypedBytes.random(1000), ref);
+      const bbsKey = new BBSPublicKeyValue(TypedBytes.random(100), paramsRef);
+      const bbsPlusKey = new BBSPlusPublicKeyValue(
+        TypedBytes.random(100),
+        paramsRef,
+      );
+      const psKey = new PSPublicKeyValue(TypedBytes.random(1000), paramsRef);
 
       const document = DIDDocument.create(did, [
         didKeypair.didKey(),

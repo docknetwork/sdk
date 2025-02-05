@@ -354,8 +354,8 @@ exports[`DID document workflow \`CheqdMainnetDIDDocument\` 1`] = `
         "paramsRef": "did:cheqd:mainnet:00acfa7c-ba73-4e6d-89d2-80c157b5e25c/resources/00000000-0000-4000-8000-000000000000",
         "participantId": null,
       },
-      "verificationMaterial": "CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP",
-      "verificationMethodType": "Bls12381BBSVerificationKeyDock2023",
+      "publicKeyBase58": "CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP",
+      "type": "Bls12381BBSVerificationKeyDock2023",
     },
   ],
   "authentication": [
@@ -386,7 +386,7 @@ exports[`DID document workflow \`CheqdMainnetDIDDocument\` 2`] = `
 {
   "alsoKnownAs": [],
   "assertionMethod": [
-    ""{\\"id\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2\\",\\"controller\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165\\",\\"verificationMethodType\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"verificationMaterial\\":\\"Px8b9bKxU5BC8RxPofE4eUMze5uUMnYg4ib1QLw7oPKTDX9nFeVE9tmHLNCfneuzWFoTB5kfy2YpC8tmNY9AQxwsGujLwE3Rb39pkXCYp6e8jMANnNTmzMQBvhr4wxcwrTcAHUGH1PX8tYoqZbQhMvvC1PrevPqV7MbKaGvhm5mL3WJVMYQkNNhzxeo1wVBZmwH3DzGgGoJ9CfWFVwVLFZ7HT45siEAWpiNGdue3MkuYeM2tW2h2HCXex8SdBBKrbvhFqJtnH6c1z26Hte47kWELTJVmKEoTKLgjLATeeoXnF7TvRh3RSQPNASEQJMAKPiXHyYsgey1yL2np\\"}"",
+    ""{\\"id\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-2\\",\\"type\\":\\"Bls12381BBSVerificationKeyDock2023\\",\\"controller\\":\\"did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165\\",\\"publicKeyBase58\\":\\"CeEf4Q1kvLo66eSbTSujuasf2mv1rTQEpK8rnuyqMxpP\\",\\"metadata\\":{\\"paramsRef\\":\\"did:cheqd:mainnet:00acfa7c-ba73-4e6d-89d2-80c157b5e25c/resources/00000000-0000-4000-8000-000000000000\\",\\"curveType\\":\\"Bls12381\\",\\"participantId\\":null}}"",
   ],
   "authentication": [
     "did:cheqd:mainnet:ed3a581d-b968-423e-afd1-64239a086165#keys-1",

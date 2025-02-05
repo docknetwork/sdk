@@ -7,8 +7,8 @@ import {
   TypedString,
   withProp,
   TypedNumber,
-  Any,
   withBase58btc,
+  withProps,
 } from '../../generic';
 import {
   BBDT16PublicKey,
@@ -21,6 +21,7 @@ import {
   CurveTypeBls12381,
   CheqdTestnetOffchainSignatureParamsRef,
   CheqdMainnetOffchainSignatureParamsRef,
+  DockOrCheqdOffchainSignatureParamsRef,
 } from '../../offchain-signatures';
 import {
   PublicKeyEd25519,
@@ -77,13 +78,19 @@ export class PublicKeyMetadata extends withFrom(TypedStruct, (value, from) => {
   }
 }) {
   static Classes = {
-    paramsRef: option(Any),
+    paramsRef: option(DockOrCheqdOffchainSignatureParamsRef),
     curveType: CurveType,
     participantId: option(TypedNumber),
   };
 
   constructor(paramsRef, curveType = new CurveTypeBls12381(), ...args) {
     super(paramsRef, curveType, ...args);
+  }
+
+  toArgs() {
+    const { paramsRef, curveType, participantId } = this;
+
+    return [paramsRef, curveType, participantId];
   }
 }
 
@@ -113,8 +120,8 @@ export class CheqdMainnetPublicKeyMetadata extends withProp(
 
 export class VerificationMethod extends withFrom(
   TypedStruct,
-  function (value, from) {
-    return from(
+  function from(value, fromFn) {
+    return fromFn(
       // eslint-disable-next-line no-use-before-define
       value instanceof CheqdVerificationMethod
         ? value.toVerificationMethod(this)
@@ -188,13 +195,7 @@ export class VerificationMethod extends withFrom(
   publicKey() {
     const PublicKey = this.publicKeyClass();
     const bytes = this.publicKeyBytes();
-    const metaArgs = this.metadata
-      ? [
-        this.metadata.paramsRef,
-        this.metadata.curveType,
-        this.metadata.participantId,
-      ]
-      : [];
+    const metaArgs = this.metadata?.toArgs() || [];
 
     return new PublicKey(new PublicKey.Class(bytes, ...metaArgs));
   }
@@ -240,8 +241,8 @@ export class VerificationMethod extends withFrom(
 
 export class CheqdVerificationMethod extends withFrom(
   TypedStruct,
-  function (value, from) {
-    return from(
+  function from(value, fromFn) {
+    return fromFn(
       value instanceof VerificationMethod ? value.toCheqd(this) : value,
     );
   },
@@ -303,52 +304,40 @@ export class CheqdVerificationMethodAssertion extends withProp(
   }
 }
 
-export class CheqdTestnetVerificationMethod extends withProp(
-  withProp(
-    withProp(CheqdVerificationMethod, 'id', CheqdTestnetVerificationMethodRef),
-    'controller',
-    CheqdTestnetDid,
-  ),
-  'metadata',
-  option(CheqdTestnetPublicKeyMetadata),
+export class CheqdTestnetVerificationMethod extends withProps(
+  CheqdVerificationMethod,
+  {
+    id: CheqdTestnetVerificationMethodRef,
+    controller: CheqdTestnetDid,
+    metadata: option(CheqdTestnetPublicKeyMetadata),
+  },
 ) {}
 
-export class CheqdMainnetVerificationMethod extends withProp(
-  withProp(
-    withProp(CheqdVerificationMethod, 'id', CheqdMainnetVerificationMethodRef),
-    'controller',
-    CheqdMainnetDid,
-  ),
-  'metadata',
-  option(CheqdMainnetPublicKeyMetadata),
+export class CheqdMainnetVerificationMethod extends withProps(
+  CheqdVerificationMethod,
+  {
+    id: CheqdMainnetVerificationMethodRef,
+    controller: CheqdMainnetDid,
+    metadata: option(CheqdMainnetPublicKeyMetadata),
+  },
 ) {}
 
-export class CheqdMainnetVerificationMethodAssertion extends withProp(
-  withProp(
-    withProp(
-      CheqdVerificationMethodAssertion,
-      'id',
-      CheqdTestnetVerificationMethodRef,
-    ),
-    'controller',
-    CheqdTestnetDid,
-  ),
-  'metadata',
-  option(CheqdTestnetPublicKeyMetadata),
+export class CheqdMainnetVerificationMethodAssertion extends withProps(
+  CheqdVerificationMethodAssertion,
+  {
+    id: CheqdMainnetVerificationMethodRef,
+    controller: CheqdMainnetDid,
+    metadata: option(CheqdMainnetPublicKeyMetadata),
+  },
 ) {}
 
-export class CheqdTestnetVerificationMethodAssertion extends withProp(
-  withProp(
-    withProp(
-      CheqdVerificationMethodAssertion,
-      'id',
-      CheqdTestnetVerificationMethodRef,
-    ),
-    'controller',
-    CheqdTestnetDid,
-  ),
-  'metadata',
-  option(CheqdTestnetPublicKeyMetadata),
+export class CheqdTestnetVerificationMethodAssertion extends withProps(
+  CheqdVerificationMethodAssertion,
+  {
+    id: CheqdTestnetVerificationMethodRef,
+    controller: CheqdTestnetDid,
+    metadata: option(CheqdTestnetPublicKeyMetadata),
+  },
 ) {}
 
 export class CheqdVerificationMethodAssertionLegacy extends withFrom(
@@ -400,30 +389,20 @@ export class CheqdVerificationMethodAssertionLegacy extends withFrom(
   }
 }
 
-export class CheqdMainnetVerificationMethodAssertionLegacy extends withProp(
-  withProp(
-    withProp(
-      CheqdVerificationMethodAssertionLegacy,
-      'id',
-      CheqdMainnetVerificationMethodRef,
-    ),
-    'controller',
-    CheqdMainnetDid,
-  ),
-  'metadata',
-  option(CheqdMainnetPublicKeyMetadata),
+export class CheqdMainnetVerificationMethodAssertionLegacy extends withProps(
+  CheqdVerificationMethodAssertionLegacy,
+  {
+    id: CheqdMainnetVerificationMethodRef,
+    controller: CheqdMainnetDid,
+    metadata: option(CheqdMainnetPublicKeyMetadata),
+  },
 ) {}
 
-export class CheqdTestnetVerificationMethodAssertionLegacy extends withProp(
-  withProp(
-    withProp(
-      CheqdVerificationMethodAssertionLegacy,
-      'id',
-      CheqdTestnetVerificationMethodRef,
-    ),
-    'controller',
-    CheqdTestnetDid,
-  ),
-  'metadata',
-  option(CheqdTestnetPublicKeyMetadata),
+export class CheqdTestnetVerificationMethodAssertionLegacy extends withProps(
+  CheqdVerificationMethodAssertionLegacy,
+  {
+    id: CheqdTestnetVerificationMethodRef,
+    controller: CheqdTestnetDid,
+    metadata: option(CheqdTestnetPublicKeyMetadata),
+  },
 ) {}

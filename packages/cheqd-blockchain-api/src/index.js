@@ -44,9 +44,7 @@ import {
   CheqdMainnetDIDDocument,
   CheqdMainnetStoredAccumulator,
   CheqdTestnetStoredAccumulator,
-  CheqdTestnetOffchainSignatureParamsRef,
   CheqdTestnetOffchainSignatureKeyRef,
-  CheqdMainnetOffchainSignatureParamsRef,
   CheqdMainnetOffchainSignatureKeyRef,
   CheqdTestnetAccumulator,
   CheqdMainnetAccumulator,
@@ -55,6 +53,8 @@ import {
   CheqdTestnetVerificationMethodSignature,
   CheqdTestnetAccumulatorCommon,
   CheqdMainnetAccumulatorCommon,
+  CheqdMainnetOffchainSignaturePublicKeyValue,
+  CheqdTestnetOffchainSignaturePublicKeyValue,
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 
@@ -108,8 +108,9 @@ export class CheqdAPI extends AbstractApiProvider {
       AccumulatorId: CheqdTestnetAccumulatorId,
       AccumulatorPublicKey: CheqdTestnetAccumulatorPublicKey,
       StoredAccumulator: CheqdTestnetStoredAccumulator,
-      OffchainSignatureParamsRef: CheqdTestnetOffchainSignatureParamsRef,
       OffchainSignatureKeyRef: CheqdTestnetOffchainSignatureKeyRef,
+      OffchainSignaturePublicKeyValue:
+        CheqdTestnetOffchainSignaturePublicKeyValue,
       BlobId: CheqdTestnetBlobId,
       StatusListCredentialId: CheqdTestnetStatusListCredentialId,
       VerificationMethodSignature: CheqdTestnetVerificationMethodSignature,
@@ -122,8 +123,9 @@ export class CheqdAPI extends AbstractApiProvider {
       AccumulatorPublicKey: CheqdMainnetAccumulatorPublicKey,
       Accumulator: CheqdMainnetAccumulator,
       StoredAccumulator: CheqdMainnetStoredAccumulator,
-      OffchainSignatureParamsRef: CheqdMainnetOffchainSignatureParamsRef,
       OffchainSignatureKeyRef: CheqdMainnetOffchainSignatureKeyRef,
+      OffchainSignaturePublicKeyValue:
+        CheqdMainnetOffchainSignaturePublicKeyValue,
       BlobId: CheqdMainnetBlobId,
       StatusListCredentialId: CheqdMainnetStatusListCredentialId,
       VerificationMethodSignature: CheqdMainnetVerificationMethodSignature,

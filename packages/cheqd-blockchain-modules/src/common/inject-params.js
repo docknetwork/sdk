@@ -1,19 +1,18 @@
-import { TypedMap, TypedUUID } from '@docknetwork/credential-sdk/types/generic';
-import {
-  withExtendedStaticProperties,
-  u8aToString,
-} from '@docknetwork/credential-sdk/utils';
+import { TypedMap } from '@docknetwork/credential-sdk/types/generic';
+import { withExtendedStaticProperties } from '@docknetwork/credential-sdk/utils';
 import { CheqdCreateResource } from '@docknetwork/credential-sdk/types';
 import createInternalCheqdModule from './create-internal-cheqd-module';
 import { validateResource } from './resource';
 
 const methods = {
   addParams(id, params, did) {
-    const { ParamsName, ParamsType, Params } = this.constructor;
+    const {
+      ParamsName, ParamsType, Params, ParamsId,
+    } = this.constructor;
 
     return new CheqdCreateResource(
       this.types.Did.from(did).value.value,
-      TypedUUID.from(id),
+      ParamsId.from(id),
       '1.0',
       [],
       ParamsName,
@@ -68,11 +67,7 @@ export default function injectParams(klass) {
           return null;
         }
 
-        return Params.from(
-          JSON.parse(
-            u8aToString(validateResource(item, ParamsName, ParamsType)),
-          ),
-        );
+        return Params.from(validateResource(item, ParamsName, ParamsType));
       }
 
       /**
@@ -91,9 +86,7 @@ export default function injectParams(klass) {
         return new this.constructor.ParamsMap(
           [...resources].map(([key, item]) => [
             key,
-            JSON.parse(
-              u8aToString(validateResource(item, ParamsName, ParamsType)),
-            ),
+            validateResource(item, ParamsName, ParamsType),
           ]),
         );
       }

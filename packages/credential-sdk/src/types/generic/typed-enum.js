@@ -14,6 +14,7 @@ import withBase from './with-base';
 import Null from './typed-null';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
+import withFromJSONBytes from './with-from-json-bytes';
 
 /**
  * @template V
@@ -327,6 +328,6 @@ class TypedEnum extends withBase(class EnumBase {}) {
   }
 }
 
-export default withEq(
-  withCatchNull(withExtendedStaticProperties(['Variants'], TypedEnum)),
+export default withFromJSONBytes(
+  withEq(withCatchNull(withExtendedStaticProperties(['Variants'], TypedEnum))),
 );

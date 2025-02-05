@@ -1,4 +1,4 @@
-import { TypedTuple } from '../../generic';
+import { TypedTuple, anyOf } from '../../generic';
 import {
   DockDidValue,
   DockDidOrDidMethodKey,
@@ -39,3 +39,8 @@ export class CheqdMainnetOffchainSignatureParamsRef extends CheqdDLRRef {
 
   static Id = CheqdParamsId;
 }
+
+export class DockOrCheqdOffchainSignatureParamsRef extends anyOf(
+  DockOffchainSignatureParamsRef,
+  CheqdOffchainSignatureParamsRef,
+) {}

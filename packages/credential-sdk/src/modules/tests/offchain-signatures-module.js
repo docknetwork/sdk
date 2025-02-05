@@ -24,12 +24,12 @@ export default function generateOffchainSignatureModuleTests(
   {
     did: didModule, offchainSignatures, bbs, bbsPlus, ps,
   },
-  { Did, OffchainSignatureParamsRef },
+  { Did },
   filter = () => true,
 ) {
   const test = testIf(filter);
 
-  describe(`Checks ${didModule.constructor.name} and ${offchainSignatures.constructor.name} with all public keys and params`, () => {
+  describe(`Checks ${didModule.constructor.name} and ${offchainSignatures.constructor.name} with ${Did.name} and all public key types and params types`, () => {
     test('Generates a `DIDDocument` with `OffchainPublicKey` and creates a `OffchainParameters` owned by this DID', async () => {
       const did = Did.random();
 
@@ -42,7 +42,7 @@ export default function generateOffchainSignatureModuleTests(
       );
 
       const bbsParamsId = await offchainSignatures.nextParamsId(did);
-      const bbsParamsRef = new OffchainSignatureParamsRef(did, bbsParamsId);
+      const bbsParamsRef = [did, bbsParamsId];
       const bbsParams = new BBSParams(
         new BBSParamsValue(TypedBytes.random(100), stringToU8a('bbs')),
       );
@@ -54,10 +54,7 @@ export default function generateOffchainSignatureModuleTests(
       );
 
       const bbsPlusParamsId = await offchainSignatures.nextParamsId(did);
-      const bbsPlusParamsRef = new OffchainSignatureParamsRef(
-        did,
-        bbsPlusParamsId,
-      );
+      const bbsPlusParamsRef = [did, bbsPlusParamsId];
       const bbsPlusParams = new BBSPlusParams(
         new BBSPlusParamsValue(TypedBytes.random(100), stringToU8a('bbs+')),
       );
@@ -69,7 +66,7 @@ export default function generateOffchainSignatureModuleTests(
       );
 
       const psParamsId = await offchainSignatures.nextParamsId(did);
-      const psParamsRef = new OffchainSignatureParamsRef(did, psParamsId);
+      const psParamsRef = [did, psParamsId];
       const psParams = new PSParams(
         new PSParamsValue(TypedBytes.random(100), stringToU8a('ps')),
       );
@@ -147,7 +144,7 @@ export default function generateOffchainSignatureModuleTests(
       const document = DIDDocument.create(did, [didKeypair.didKey()]);
 
       const psParamsId = await offchainSignatures.nextParamsId(did);
-      const psParamsRef = new OffchainSignatureParamsRef(did, psParamsId);
+      const psParamsRef = [did, psParamsId];
 
       await didModule.createDocument(document, didKeypair);
       const psKey = new PSPublicKey(
@@ -198,7 +195,7 @@ export default function generateOffchainSignatureModuleTests(
         );
 
         const id = await offchainSignatures.nextParamsId(did);
-        const ref = new OffchainSignatureParamsRef(did, id);
+        const ref = [did, id];
         const params = new Params(
           new Params.Class(
             TypedBytes.random(100),

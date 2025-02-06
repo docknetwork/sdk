@@ -409,7 +409,9 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     { additions, removals, witnessUpdateInfo },
     didKeypair,
   ) {
-    return await this.cheqdOnly.tx.updateAccumulator(
+    const accId = AccumulatorId.from(id);
+
+    return await this.moduleById(accId).updateAccumulatorTx(
       id,
       accumulator,
       { additions, removals, witnessUpdateInfo },

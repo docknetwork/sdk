@@ -4714,6 +4714,80 @@
     fix-esm "^1.0.1"
     jsonld digitalcredentials/jsonld.js#v10.x
 
+"@docknetwork/cheqd-blockchain-api@0.18.0":
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/cheqd-blockchain-api/-/cheqd-blockchain-api-0.18.0.tgz#ca50a247d3a67c3ead5d7fb39d8424b606b7ff40"
+  integrity sha512-Saxku1pxHT+WsnsTrEsN8MXh8u+BHLtRIhGlwTrQ3vts9ObRoIAKY6sbo2uEC/K5IoFg7MfLP5iTC0TQcB3pdQ==
+  dependencies:
+    "@cheqd/sdk" cjs
+    "@docknetwork/credential-sdk" "0.24.0"
+
+"@docknetwork/credential-sdk@0.23.0":
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/credential-sdk/-/credential-sdk-0.23.0.tgz#6366fda4076fe3971dcb14481b9550620bb9089d"
+  integrity sha512-DgJacyyw1HfTlyxzPjO584rDTcY2xgCaZz+7a5ZGRApTwRnIwDUVkBGTpE9sO0HZJ6LoI82EsKf1dW0ZEeyOPg==
+  dependencies:
+    "@comunica/query-sparql-rdfjs" "^4.0.2"
+    "@digitalcredentials/vc-status-list" "^8.0.0"
+    "@docknetwork/crypto-wasm-ts" "^0.67.0"
+    "@juanelas/base64" "^1.1.5"
+    "@sphereon/ssi-sdk-ext.did-resolver-jwk" "^0.26.0"
+    "@stablelib/ed25519" "^1.0.0"
+    "@subsquid/ss58-codec" latest
+    "@transmute/json-web-signature" "^0.7.0-unstable.82"
+    blakejs "^1.2.1"
+    bs58 "^5.0.0"
+    deep-equal "^2.2.3"
+    elliptic "6.6.0"
+    js-sha256 "^0.11.0"
+    json-canonicalize "1.0.4"
+    json-stringify-deterministic "^1.0.12"
+    jsonld "^5.0.0"
+    jsonld-signatures "^9.3.1"
+    jsonschema "1.4.1"
+    key-did-resolver "^1.4.0"
+    mrklt "^0.2.0"
+    multiformats "^9.5.4"
+    n3 "^1.17.4"
+    rify "^0.7.1"
+    semver "^7.6.0"
+    uuid "^10.0.0"
+    uuidv4 "^6.2.13"
+    varint "^6.0.0"
+
+"@docknetwork/credential-sdk@0.24.0":
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/credential-sdk/-/credential-sdk-0.24.0.tgz#057725143c11e0b1f3cc8dbf69652201c3cf42ef"
+  integrity sha512-nfL+zWGI62/wIG5U2kazMJSHSv8i5XxJzzBJt2hZxLQtyyB+4nl7+qc/zBx/fzE+arSaA2VjpBxFEmNwsjcDiA==
+  dependencies:
+    "@comunica/query-sparql-rdfjs" "^4.0.2"
+    "@digitalcredentials/vc-status-list" "^8.0.0"
+    "@docknetwork/crypto-wasm-ts" "^0.67.0"
+    "@juanelas/base64" "^1.1.5"
+    "@sphereon/ssi-sdk-ext.did-resolver-jwk" "^0.26.0"
+    "@stablelib/ed25519" "^1.0.0"
+    "@subsquid/ss58-codec" latest
+    "@transmute/json-web-signature" "^0.7.0-unstable.82"
+    blakejs "^1.2.1"
+    bs58 "^5.0.0"
+    deep-equal "^2.2.3"
+    elliptic "6.6.0"
+    js-sha256 "^0.11.0"
+    json-canonicalize "1.0.4"
+    json-stringify-deterministic "^1.0.12"
+    jsonld "^5.0.0"
+    jsonld-signatures "^9.3.1"
+    jsonschema "1.4.1"
+    key-did-resolver "^1.4.0"
+    mrklt "^0.2.0"
+    multiformats "^9.5.4"
+    n3 "^1.17.4"
+    rify "^0.7.1"
+    semver "^7.6.0"
+    uuid "^10.0.0"
+    uuidv4 "^6.2.13"
+    varint "^6.0.0"
+
 "@docknetwork/crypto-wasm-ts@^0.63.0":
   version "0.63.0"
   resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.63.0.tgz#f1ab39693b63e70d682d362e9eacd85842ae56e0"
@@ -4729,6 +4803,60 @@
     lodash "^4.17.21"
     lzutf8 "0.6.3"
     semver "^7.6.0"
+
+"@docknetwork/crypto-wasm-ts@^0.67.0":
+  version "0.67.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.67.0.tgz#6cb748ba107523fdb3b3770a4126d8fe74f0676c"
+  integrity sha512-S2QC10XTe7RbK/OfvFo3PHh98m/576E3XAGJWhoabc3w7nz5bgrBacEwsBsZqnZ4ttiB7/HLyDVnSD0OCTelrA==
+  dependencies:
+    "@types/flat" "^5.0.2"
+    "@types/lodash" "^4.14.195"
+    bs58 "5.0.0"
+    crypto-wasm-new "npm:@docknetwork/crypto-wasm@0.33.0"
+    flat "^5.0.2"
+    json-pointer "^0.6.2"
+    json-stringify-deterministic "^1.0.11"
+    lodash "^4.17.21"
+    lzutf8 "0.6.3"
+    semver "^7.6.0"
+    typedoc-github-theme "^0.1.2"
+
+"@docknetwork/dock-blockchain-api@0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@docknetwork/dock-blockchain-api/-/dock-blockchain-api-0.9.2.tgz#191cf9a60acdae738f54bf9bb57d511ee00eba1d"
+  integrity sha512-vxOgqLUSdJkslhmSll2p49h2bgLV1hdl8TJebDtynKGcIc9BSId1Dwq6hFg6bU90oqMOq4Dmg4BqmLiTsoYPww==
+  dependencies:
+    "@docknetwork/credential-sdk" "0.24.0"
+    "@docknetwork/node-types" "^0.17.0"
+    "@juanelas/base64" "^1.0.5"
+    "@polkadot/api" "10.12.4"
+    "@transmute/json-web-signature" "^0.7.0-unstable.80"
+    base64url "3.0.1"
+    blake2b "2.1.4"
+    bs58 "5.0.0"
+    cross-fetch "3.1.6"
+    deep-equal "2.0.5"
+    dotenv "16.0.1"
+    elliptic "6.6.0"
+    flat "^5.0.2"
+    js-sha256 "0.9.0"
+    json-canonicalize "1.0.4"
+    json-stringify-deterministic "^1.0.11"
+    jsonschema "1.4.1"
+    key-did-resolver "^1.4.0"
+    mrklt "^0.2.0"
+    multiformats "^9.5.4"
+    n3 "1.16.2"
+    pako "^2.1.0"
+    rify "^0.7.1"
+    semver "^7.6.0"
+
+"@docknetwork/dock-blockchain-modules@0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/dock-blockchain-modules/-/dock-blockchain-modules-0.13.0.tgz#e2d2e04b7aad09a5fa9b5b1ded80a3e10eb065b9"
+  integrity sha512-DfqaBKDjmVTXii49p7qDZZG8YEE/DHtUG27N3u8HCgXZK+udoF1rKfHMsAOYz4j981jIv8Md0HcIp7bIBT8y4w==
+  dependencies:
+    "@docknetwork/credential-sdk" "0.23.0"
 
 "@docknetwork/node-types@^0.17.0":
   version "0.17.0"
@@ -8428,6 +8556,13 @@ crypto-ld@^6.0.0:
   dependencies:
     buffer "^6.0.3"
 
+"crypto-wasm-new@npm:@docknetwork/crypto-wasm@0.33.0":
+  version "0.33.0"
+  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.33.0.tgz#56c45659b9f5d54493048855a305c679adbfcfbe"
+  integrity sha512-af3sOB2vJsJimu86PG+79Vbe4SJrTLbGd65on06Au2WyOnPXF4J2pPfSqKl+40vO6I43HaxUzeR23gt8WGEx5g==
+  dependencies:
+    buffer "^6.0.3"
+
 data-uri-to-buffer@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/data-uri-to-buffer/-/data-uri-to-buffer-3.0.1.tgz#594b8973938c5bc2c33046535785341abc4f3636"
@@ -11363,15 +11498,6 @@ jwt-decode@^3.1.2:
   resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-3.1.2.tgz#3fb319f3675a2df0c2895c8f5e9fa4b67b04ed59"
   integrity sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==
 
-keccak@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/keccak/-/keccak-3.0.4.tgz#edc09b89e633c0549da444432ecf062ffadee86d"
-  integrity sha512-3vKuW0jV8J3XNTzvfyicFR5qvxrSAGl7KIhvgOu5cmWwM7tZRj3fMbj/pfIf4be7aznbc+prBWGjywox/g2Y6Q==
-  dependencies:
-    node-addon-api "^2.0.0"
-    node-gyp-build "^4.2.0"
-    readable-stream "^3.6.0"
-
 key-did-resolver@^1.4.0:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/key-did-resolver/-/key-did-resolver-1.4.4.tgz#0195ae6993de340ceb3429054c9b0b03b32fbab2"
@@ -11883,11 +12009,6 @@ node-abi@^3.3.0:
   integrity sha512-ThjYBfoDNr08AWx6hGaRbfPwxKV9kVzAzOzlLKbk2CuqXE2xnCh+cbAGnwM3t8Lq4v9rUB7VfondlkBckcJrVA==
   dependencies:
     semver "^7.3.5"
-
-node-addon-api@^2.0.0:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.2.tgz#432cfa82962ce494b132e9d72a15b29f71ff5d32"
-  integrity sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==
 
 node-addon-api@^5.0.0:
   version "5.1.0"
@@ -13854,6 +13975,11 @@ typed-array-length@^1.0.6:
     is-typed-array "^1.1.13"
     possible-typed-array-names "^1.0.0"
 
+typedoc-github-theme@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/typedoc-github-theme/-/typedoc-github-theme-0.1.2.tgz#54bcaa05a22ec864d1a996c3c460d895a8b10a8b"
+  integrity sha512-GFwQeq+z4FMtA9u2+wBx/UvzaX6t3xueigv6Jrt1G8JQLLyYuFfWwE3ESuKzpLfDu1+29GK4n70GbIqFRG+gaw==
+
 typescript@5.0.4:
   version "5.0.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.4.tgz#b217fd20119bd61a94d4011274e0ab369058da3b"
@@ -13936,9 +14062,9 @@ undici-types@~6.19.2:
   integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
 undici@^6.6.2:
-  version "6.19.7"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-6.19.7.tgz#7d4cf26dc689838aa8b6753a3c5c4288fc1e0216"
-  integrity sha512-HR3W/bMGPSr90i8AAp2C4DM3wChFdJPLrWYpIS++LxS8K+W535qftjt+4MyjNYHeWabMj1nvtmLIi7l++iq91A==
+  version "6.21.1"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-6.21.1.tgz#336025a14162e6837e44ad7b819b35b6c6af0e05"
+  integrity sha512-q/1rj5D0/zayJB2FraXdaWxbhWiNKDvu8naDT2dl1yTlvJp4BLtOcp2a5BvgGNQpYYJzau7tf1WgKv3b+7mqpQ==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"

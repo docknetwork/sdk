@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.39.0
+
+### Minor Changes
+
+- Use parsed accumulator identifier in `createAccumulator`/`updateAccumulator` calls
+
 ## 0.38.0
 
 ### Minor Changes

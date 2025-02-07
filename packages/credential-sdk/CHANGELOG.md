@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.40.0
+
+### Minor Changes
+
+- Export blob resolver
+
 ## 0.39.0
 
 ### Minor Changes

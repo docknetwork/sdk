@@ -385,7 +385,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     const accId = AccumulatorId.from(id);
 
     return await this.moduleById(accId).addAccumulatorTx(
-      id,
+      accId,
       accumulator,
       didKeypair,
     );
@@ -412,7 +412,7 @@ export default class MultiApiAccumulatorModule extends injectModuleRouter(
     const accId = AccumulatorId.from(id);
 
     return await this.moduleById(accId).updateAccumulatorTx(
-      id,
+      accId,
       accumulator,
       { additions, removals, witnessUpdateInfo },
       didKeypair,

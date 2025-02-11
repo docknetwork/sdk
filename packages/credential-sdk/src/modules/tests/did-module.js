@@ -32,9 +32,7 @@ export default function generateDIDModuleTests(
 
       await module.createDocument(document, didKeypair);
 
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
     });
 
     test('Creates `DIDDocument` containing BBS/BBSPlus/PS keys', async () => {
@@ -61,9 +59,7 @@ export default function generateDIDModuleTests(
 
       await module.createDocument(document, didKeypair);
 
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
     });
 
     test('Updates `DIDDocument` containing BBS/BBSPlus/PS keys', async () => {
@@ -82,9 +78,7 @@ export default function generateDIDModuleTests(
 
       await module.createDocument(document, didKeypair);
 
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
 
       document.addKey([did, document.nextKeyIndex()], bbsKey);
       document.addKey([did, document.nextKeyIndex()], bbsPlusKey);
@@ -92,9 +86,7 @@ export default function generateDIDModuleTests(
 
       await module.updateDocument(document, didKeypair);
 
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
 
       expect(document.didKeys().toJSON()).toEqual([
         [
@@ -127,9 +119,7 @@ export default function generateDIDModuleTests(
 
       await module.createDocument(document, didKeypair);
 
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
     });
 
     test('Updates `DIDDocument` containing services', async () => {
@@ -149,26 +139,20 @@ export default function generateDIDModuleTests(
 
       await module.createDocument(document, didKeypair);
 
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
 
       document.addServiceEndpoint([did, 'service1'], service1);
       document.addServiceEndpoint([did, 'service2'], service2);
 
       await module.updateDocument(document, didKeypair);
 
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
 
       document.removeServiceEndpoint([did, 'service2']);
 
       await module.updateDocument(document, didKeypair);
 
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
 
       expect(document.service.length).toEqual(1);
     });
@@ -190,23 +174,17 @@ export default function generateDIDModuleTests(
       ]);
 
       await module.createDocument(document, didKeypair2);
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
 
       document.removeKey([did, 2]);
       await module.updateDocument(document, didKeypair1);
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
 
       document.addKey([did, 3], didKeypair3.didKey());
       await expect(() => module.updateDocument(document, didKeypair2)).rejects.toThrow();
 
       await module.updateDocument(document, didKeypair1);
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
     });
 
     test('Removes (deactivates) `DIDDocument`', async () => {
@@ -218,9 +196,7 @@ export default function generateDIDModuleTests(
       const document = DIDDocument.create(did, [didKeypair.didKey()]);
 
       await module.createDocument(document, didKeypair);
-      expect((await module.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
 
       await module.removeDocument(did, didKeypair);
       await expect(() => module.getDocument(did)).rejects.toThrow(
@@ -247,7 +223,9 @@ export default function generateDIDModuleTests(
 
       await module.createDocument(document, didKeypair);
 
-      expect(await resolver.resolve(String(did))).toEqual(document.toJSON());
+      expect(
+        DIDDocument.from(await resolver.resolve(String(did))).eq(document),
+      ).toBe(true);
     });
   });
 }

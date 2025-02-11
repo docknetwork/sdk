@@ -1,6 +1,6 @@
 import { DidKeypair, Ed25519Keypair } from '../../keypairs';
 import { NoBlobError } from '../abstract/blob/errors';
-import { DIDDocument } from '../../types';
+import { DIDDocument, NamespaceDid } from '../../types';
 import { testIf } from './common';
 import { BlobResolver } from '../../resolver/blob';
 import { stringToU8a } from '../../utils';
@@ -76,10 +76,11 @@ export default function generateBlobModuleTests(
       };
 
       await blobModule.new(blob1, didKeypair);
-      expect(await resolver.resolve(String(blob1.id))).toEqual([
-        String(did),
-        stringToU8a(blob1.blob),
-      ]);
+      const [resolvedDid, resolvedBlob] = await resolver.resolve(
+        String(blob1.id),
+      );
+      expect(NamespaceDid.from(resolvedDid).eq(did)).toBe(true);
+      expect(resolvedBlob).toEqual(stringToU8a(blob1.blob));
     });
   });
 }

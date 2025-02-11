@@ -1,10 +1,22 @@
+import { Ed25519Keypair } from "../src/keypairs";
+import { AbstractDIDModule } from "../src/modules";
+import AbstractApiProvider from "../src/modules/abstract/common/abstract-api-provider";
 import {
   Resolver,
   ResolverRouter,
+  DIDResolverWithDIDReplacement,
   WILDCARD,
   WildcardResolverRouter,
   createResolver,
+  DIDResolver,
 } from "../src/resolver";
+import {
+  CheqdTestnetDIDDocument,
+  DockDid,
+  DIDDocument,
+  DidKey,
+} from "../src/types";
+import { decodeFromBase58 } from "../src/utils";
 
 class APrefixBMethodResolver extends Resolver {
   prefix = "a";
@@ -82,6 +94,65 @@ class WildcardPrefixAndMethodResolver extends Resolver {
 }
 
 describe("Resolvers", () => {
+  it("checks `DIDResolverWithDIDReplacement`", async () => {
+    const did = "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5";
+    const document = DIDDocument.create(
+      did,
+      [
+        new DidKey({
+          ed25519: decodeFromBase58(
+            "4qGHUs2Lofp8YH7EtkfUBxcA2B9A3KNHfkhwfd4mC4ZS"
+          ),
+        }),
+      ],
+      [
+        did,
+        "did:cheqd:testnet:ec2ffc8f-bef0-4307-b1dc-1e945aa05a04",
+        "did:cheqd:testnet:13426782-8e61-4ea3-9255-20de06ef13ba",
+      ]
+    );
+
+    const dummyApi = new (class Module extends AbstractDIDModule {
+      methods() {
+        return ["dock"];
+      }
+
+      async getDocument(_) {
+        return document.toCheqd(
+          CheqdTestnetDIDDocument,
+          "0f6edb02-59d7-4cc2-aabd-dd205badb2d5"
+        );
+      }
+
+      createDocumentTx() {}
+
+      updateDocumentTx() {}
+
+      removeDocumentTx() {}
+    })(
+      new (class Api extends AbstractApiProvider {
+        methods() {
+          return ["dock"];
+        }
+        isInitialized() {
+          return true;
+        }
+        supportsIdentifier() {
+          return true;
+        }
+        stateChangeBytes() {}
+        signAndSend() {}
+      })()
+    );
+
+    expect(
+      await new DIDResolverWithDIDReplacement(dummyApi).resolve(String(did))
+    ).toMatchSnapshot();
+    expect(
+      await new DIDResolver(dummyApi).resolve(String(did))
+    ).toMatchSnapshot();
+  });
+
   it("checks `ResolverRouter`", async () => {
     expect(() => new ResolverRouter()).toThrowError(
       "No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers"

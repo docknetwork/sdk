@@ -11,7 +11,9 @@ import {
   BBDT16PublicKeyValue,
 } from './value';
 import {
+  CheqdMainnetOffchainSignatureParamsRef,
   CheqdOffchainSignatureParamsRef,
+  CheqdTestnetOffchainSignatureParamsRef,
   DockOffchainSignatureParamsRef,
 } from './ref';
 import { Bls12381BBDT16DockVerKeyName } from '../../../vc/crypto/constants';
@@ -125,6 +127,17 @@ export class CheqdOffchainSignaturePublicKey extends withProp(
   OffchainSignaturePublicKey,
   'paramsRef',
   option(CheqdOffchainSignatureParamsRef),
+) {}
+
+export class CheqdTestnetOffchainSignaturePublicKey extends withProp(
+  OffchainSignaturePublicKey,
+  'paramsRef',
+  option(CheqdTestnetOffchainSignatureParamsRef),
+) {}
+export class CheqdMainnetOffchainSignaturePublicKey extends withProp(
+  OffchainSignaturePublicKey,
+  'paramsRef',
+  option(CheqdMainnetOffchainSignatureParamsRef),
 ) {}
 
 export * from './value';

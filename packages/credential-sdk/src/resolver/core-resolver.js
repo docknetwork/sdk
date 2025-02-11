@@ -1,7 +1,7 @@
-import { DIDResolver } from './did';
+import { DIDResolverWithDIDReplacement } from './did';
 import { StatusList2021Resolver } from './status-list2021';
-import { ResolverRouter } from './generic';
 import { BlobResolver } from './blob';
+import { ResolverRouter } from './generic';
 import { ensureInstanceOf } from '../utils';
 import { AbstractCoreModules } from '../modules';
 
@@ -10,12 +10,15 @@ import { AbstractCoreModules } from '../modules';
  */
 export default class CoreResolver extends ResolverRouter {
   constructor(modules) {
-    ensureInstanceOf(modules, AbstractCoreModules);
+    const { did, statusListCredential, blob } = ensureInstanceOf(
+      modules,
+      AbstractCoreModules,
+    );
 
     super([
-      new DIDResolver(modules.did),
-      new StatusList2021Resolver(modules.statusListCredential),
-      new BlobResolver(modules.blob),
+      new DIDResolverWithDIDReplacement(did),
+      new StatusList2021Resolver(statusListCredential),
+      new BlobResolver(blob),
     ]);
   }
 }

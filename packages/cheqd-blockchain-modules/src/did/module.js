@@ -68,7 +68,7 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
       }
     }
     if (doc == null) {
-      throw new NoDIDError(cheqdDid);
+      throw new NoDIDError(did);
     }
 
     return this.types.DidDocument.from(doc)

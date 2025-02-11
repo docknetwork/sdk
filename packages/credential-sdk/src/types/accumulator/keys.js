@@ -7,7 +7,9 @@ import {
   CheqdMainnetDid,
   CheqdTestnetDid,
   DockDidOrDidMethodKey,
+  NamespaceDid,
 } from '../did';
+import { CheqdAccumulatorParamsId, DockAccumulatorParamsId } from './params';
 
 export class DockAccumulatorPublicKeyId extends TypedNumber {}
 
@@ -37,8 +39,28 @@ export class CheqdMainnetAccumulatorPublicKeyRef extends CheqdAccumulatorPublicK
   static Did = CheqdMainnetDid;
 }
 
+export class DockOrCheqdAccumulatorPublicKeyRef extends TypedTuple {
+  constructor(...args) {
+    super(...args);
+
+    if (this[0].isCheqd) {
+      return CheqdAccumulatorPublicKeyRef.from(this);
+    } else if (
+      this[0].isDock
+      && this[1] instanceof DockAccumulatorPublicKeyId
+    ) {
+      return DockAccumulatorPublicKeyRef.from(this);
+    }
+  }
+
+  static Classes = [
+    NamespaceDid,
+    anyOf(DockAccumulatorPublicKeyId, CheqdAccumulatorPublicKeyId),
+  ];
+}
+
 export class CheqdAccumulatorParamsRef extends CheqdDLRRef {
-  static Id = CheqdAccumulatorPublicKeyId;
+  static Id = CheqdAccumulatorParamsId;
 }
 
 export class CheqdTestnetAccumulatorParamsRef extends CheqdAccumulatorParamsRef {
@@ -49,7 +71,19 @@ export class CheqdMainnetAccumulatorParamsRef extends CheqdAccumulatorParamsRef 
   static Did = CheqdMainnetDid;
 }
 
-export class DockOrCheqdAccumulatorParamsRef extends anyOf(
-  DockAccumulatorParamsRef,
-  CheqdAccumulatorParamsRef,
-) {}
+export class DockOrCheqdAccumulatorParamsRef extends TypedTuple {
+  constructor(...args) {
+    super(...args);
+
+    if (this[0].isCheqd) {
+      return CheqdAccumulatorParamsRef.from(this);
+    } else if (this[0].isDock && this[1] instanceof DockAccumulatorParamsId) {
+      return DockAccumulatorParamsRef.from(this);
+    }
+  }
+
+  static Classes = [
+    NamespaceDid,
+    anyOf(DockAccumulatorParamsId, CheqdAccumulatorParamsId),
+  ];
+}

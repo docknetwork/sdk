@@ -21,27 +21,21 @@ export default function generateAttestModuleTests(
 
       await didModule.createDocument(document, didKeypair);
 
-      expect((await didModule.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await didModule.getDocument(did)).eq(document)).toBe(true);
 
       const iri = 'some iri';
       await attestModule.setClaim(iri, did, didKeypair);
 
       expect((await attestModule.getAttests(did)).toString()).toBe(iri);
       document.setAttests(iri);
-      expect((await didModule.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await didModule.getDocument(did)).eq(document)).toBe(true);
 
       const iri2 = 'other iri';
       await attestModule.setClaim(iri2, did, didKeypair);
 
       expect((await attestModule.getAttests(did)).toString()).toBe(iri2);
       document.setAttests(iri2);
-      expect((await didModule.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await didModule.getDocument(did)).eq(document)).toBe(true);
     });
 
     test('Returns `null` on missing attest', async () => {

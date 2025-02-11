@@ -80,7 +80,9 @@ class TypedEnum extends withBase(class EnumBase {}) {
           if (this[isIdentifier]) {
             return this[Type];
           } else {
-            throw new Error(`Not a \`${Type}\``);
+            throw new Error(
+              `Not a \`${Type}\` by \`${this.constructor.name}\``
+            );
           }
         },
         enumerable: false,

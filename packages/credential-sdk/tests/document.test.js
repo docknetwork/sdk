@@ -302,7 +302,7 @@ describe("DID document workflow", () => {
       [cheqdDid],
       []
     );
-    expect(doc2.toDIDDocument().toJSON()).toEqual(doc2DIDDocument.toJSON());
+    expect(doc2.toDIDDocument().eq(doc2DIDDocument)).toBe(true);
 
     const doc3 = DIDDocument.create(
       "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54",

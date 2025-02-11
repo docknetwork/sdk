@@ -16,7 +16,13 @@ import {
 } from '../onchain/typed-did';
 import { DidKey, DidKeys } from '../onchain/did-key';
 import { VerificationRelationship } from '../onchain/verification-relationship';
-import { Service, CheqdService } from './service-endpoint';
+import {
+  Service,
+  CheqdService,
+  ServiceEndpointId,
+  CheqdTestnetService,
+  CheqdMainnetService,
+} from './service-endpoint';
 import {
   VerificationMethod,
   CheqdVerificationMethod,
@@ -91,6 +97,14 @@ export class Services extends TypedArray {
 
 class CheqdServices extends TypedArray {
   static Class = CheqdService;
+}
+
+class CheqdTestnetServices extends CheqdServices {
+  static Class = CheqdTestnetService;
+}
+
+class CheqdMainnetServices extends CheqdServices {
+  static Class = CheqdMainnetService;
 }
 
 export class VerificationMethodReferences extends TypedArray {
@@ -169,13 +183,25 @@ export class DIDDocument extends withFrom(
       attests,
     );
 
-    let idx = 0;
-    for (const key of keys) {
-      const didKey = DidKey.from(key);
-      doc.addKey([did, ++idx], didKey);
+    let keyIdx = 0;
+    const keysWithRefs = Array.isArray(keys)
+      ? keys.map((key) => [[did, ++keyIdx], key])
+      : Object.entries(keys);
+    const serviceEndpointsWithRefs = Object.entries(serviceEndpoints).map(
+      ([ref, serviceEndpoint]) => {
+        try {
+          return [ServiceEndpointId.from(ref), serviceEndpoint];
+        } catch {
+          return [ServiceEndpointId.from([did, ref]), serviceEndpoint];
+        }
+      },
+    );
+
+    for (const [keyRef, didKey] of keysWithRefs) {
+      doc.addKey(keyRef, didKey);
     }
-    for (const [id, serviceEndpoint] of Object.entries(serviceEndpoints)) {
-      doc.addServiceEndpoint([did, id], serviceEndpoint);
+    for (const [ref, serviceEndpoint] of serviceEndpointsWithRefs) {
+      doc.addServiceEndpoint(ref, serviceEndpoint);
     }
 
     return doc;
@@ -459,7 +485,7 @@ export class CheqdTestnetDIDDocument extends CheqdDIDDocument {
     alsoKnownAs: AlsoKnownAs,
     controller: CheqdTestnetControllers,
     verificationMethod: CheqdTestnetVerificationMethods,
-    service: CheqdServices,
+    service: CheqdTestnetServices,
     authentication: CheqdTestnetVerificationMethodReferences,
     assertionMethod: CheqdTestnetAssertionMethod,
     keyAgreement: CheqdTestnetVerificationMethodReferences,
@@ -476,7 +502,7 @@ export class CheqdMainnetDIDDocument extends CheqdDIDDocument {
     alsoKnownAs: AlsoKnownAs,
     controller: CheqdMainnetControllers,
     verificationMethod: CheqdMainnetVerificationMethods,
-    service: CheqdServices,
+    service: CheqdMainnetServices,
     authentication: CheqdMainnetVerificationMethodReferences,
     assertionMethod: CheqdMainnetAssertionMethod,
     keyAgreement: CheqdMainnetVerificationMethodReferences,

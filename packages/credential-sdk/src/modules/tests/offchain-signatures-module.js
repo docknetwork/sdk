@@ -91,9 +91,7 @@ export default function generateOffchainSignatureModuleTests(
 
       await didModule.updateDocument(document, didKeypair);
 
-      expect((await didModule.getDocument(did)).toJSON()).toEqual(
-        document.toJSON(),
-      );
+      expect((await didModule.getDocument(did)).eq(document)).toBe(true);
 
       expect(
         (await offchainSignatures.getParams(did, bbsParamsId)).toJSON(),
@@ -218,9 +216,7 @@ export default function generateOffchainSignatureModuleTests(
 
         await didModule.updateDocument(document, didKeypair);
 
-        expect((await didModule.getDocument(did)).toJSON()).toEqual(
-          document.toJSON(),
-        );
+        expect((await didModule.getDocument(did)).eq(document)).toBe(true);
 
         expect((await module.getParams(did, id)).toJSON()).toEqual(
           params.toJSON(),

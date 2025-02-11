@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { PatternMatcher } from './generic';
 import { METHOD_REG_EXP_PATTERN } from '../resolver/generic/const';
+import { ensureString } from './type-helpers';
 
 // deep copy a json serializable object
 export function deepClone(obj) {
@@ -43,7 +44,7 @@ const DID_MATCHER = new RegExp(
  */
 export function parseDIDUrl(didUrl) {
   if (didUrl === '' || !didUrl) throw new Error('Missing DID');
-  const sections = didUrl.match(DID_MATCHER);
+  const sections = ensureString(didUrl).match(DID_MATCHER);
   if (sections) {
     const parts = {
       did: `did:${sections[1]}:${sections[2]}`,

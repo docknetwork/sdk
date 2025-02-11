@@ -1,8 +1,4 @@
-import {
-  CheqdDid,
-  Iri,
-  CheqdCreateResource,
-} from '@docknetwork/credential-sdk/types';
+import { Iri, CheqdCreateResource } from '@docknetwork/credential-sdk/types';
 import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
 import { createInternalCheqdModule, validateResource } from '../common';
 
@@ -12,7 +8,7 @@ const Type = 'attest';
 const methods = {
   setClaim(iri, targetDid) {
     return new CheqdCreateResource(
-      CheqdDid.from(targetDid).value,
+      this.types.Did.from(targetDid).value,
       TypedUUID.random(),
       '1.0',
       [],

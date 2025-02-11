@@ -223,23 +223,17 @@ export default class DockDIDModule extends injectDock(AbstractDIDModule) {
 
     const doc = DIDDocument.create(
       did,
-      [],
+      Object.fromEntries(keys),
       controllers,
-      {},
+      Object.fromEntries(serviceEndpoints),
       {
         context: [CONTEXT_URI],
         attests,
       },
     );
 
-    for (const [ref, key] of keys) {
-      doc.addKey(ref, key);
-    }
     for (const [keyId, key] of offchainKeys) {
       doc.addKey([did, keyId], new DidKey(key));
-    }
-    for (const [id, endpoint] of serviceEndpoints) {
-      doc.addServiceEndpoint(id, endpoint);
     }
 
     return doc;

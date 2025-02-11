@@ -180,9 +180,11 @@ for (const Class of [CheqdTestnetDid, CheqdMainnetDid]) {
   const fromFn = Class.from;
 
   Class.from = function from(value) {
-    if (value instanceof DockDid || value instanceof DockNamespaceDid) {
-      return new this(TypedUUID.fromDockIdent(value, 'did:cheqd:'));
-    } else {
+    try {
+      return new this(
+        TypedUUID.fromDockIdent(DockNamespaceDid.from(value), 'did:cheqd:'),
+      );
+    } catch {
       return fromFn.call(this, value);
     }
   };

@@ -1,4 +1,4 @@
-import { isEqualToOrPrototypeOf } from '../../utils';
+import anyOf from './any-of';
 
 /**
  * Enhances `prototype.eq` of the provided class to make it catch `null`ish values and
@@ -17,19 +17,21 @@ export default function withEq(klass) {
           return false;
         } else if (Object.is(this, other)) {
           return true;
-        } else if (
-          !isEqualToOrPrototypeOf(this.constructor, other.constructor)
-        ) {
-          let compareWith;
+        } else {
+          let compareWith = other;
+          const { value, constructor } = this;
+          const tryFrom = [
+            constructor,
+            value?.constructor,
+            value?.constructor?.Class,
+          ].filter((fn) => typeof fn?.from === 'function');
           try {
-            compareWith = this.constructor.from(other);
-          } catch {
+            compareWith = constructor.from(anyOf(...tryFrom).from(compareWith));
+          } catch (err) {
             return false;
           }
 
-          return this.eq(compareWith);
-        } else {
-          return super.eq(other);
+          return super.eq(compareWith);
         }
       }
     },

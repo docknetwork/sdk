@@ -354,10 +354,10 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
       await this.query.dids(did.asDid),
     );
     if (resp == null) {
-      throw new NoDIDError(String(did));
+      throw new NoDIDError(did);
     }
     if (resp.isOffChain) {
-      throw new NoOnchainDIDError(String(did));
+      throw new NoOnchainDIDError(did);
     }
 
     return resp.asOnChain;
@@ -369,7 +369,7 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
       await this.query.didMethodKeys(didKey.asDidMethodKey),
     );
     if (resp == null) {
-      throw new NoDIDError(String(didKey));
+      throw new NoDIDError(didKey);
     }
 
     return resp;
@@ -386,10 +386,10 @@ export default class DockDIDModuleInternal extends createInternalDockModule({
       await this.query.dids(did.asDid),
     );
     if (resp == null) {
-      throw new NoDIDError(String(did));
+      throw new NoDIDError(did);
     }
     if (resp.isOnChain) {
-      throw new NoOffchainDIDError(String(did));
+      throw new NoOffchainDIDError(did);
     }
 
     return resp.asOffChain;

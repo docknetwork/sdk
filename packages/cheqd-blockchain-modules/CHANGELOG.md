@@ -1,10 +1,28 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.30.0
+
+### Minor Changes
+
+- Bump up all packages
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.42.0
+
+## 0.29.0
+
+### Minor Changes
+
+- Add tests for all types of identifiers that can be received by the modules, use replacement resolver for DID documents
+
 ## 0.28.3
 
 ### Patch Changes
 
 - Updated dependencies
+  - @docknetwork/credential-sdk@0.39.0
   - @docknetwork/credential-sdk@0.40.0
 
 ## 0.28.2

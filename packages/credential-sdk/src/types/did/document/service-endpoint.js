@@ -1,4 +1,8 @@
-import { maybeToJSONString, maybeToNumber } from '../../../utils';
+import {
+  ensureEqualToOrPrototypeOf,
+  maybeToJSONString,
+  maybeToNumber,
+} from '../../../utils';
 import {
   TypedStruct,
   TypedString,
@@ -7,11 +11,25 @@ import {
   createPlaceholder,
   TypedMap,
   withFrom,
+  withProp,
 } from '../../generic';
 import IdentRef from './ident-ref';
 import { isBytes } from '../../../utils/type-helpers';
+import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from '../onchain';
 
 export class ServiceEndpointId extends IdentRef {}
+
+export class CheqdServiceEndpointId extends IdentRef {
+  static Did = CheqdDid;
+}
+
+export class CheqdTestnetServiceEndpointId extends ServiceEndpointId {
+  static Did = CheqdTestnetDid;
+}
+
+export class CheqdMainnetServiceEndpointId extends ServiceEndpointId {
+  static Did = CheqdMainnetDid;
+}
 
 export class SuffixServiceEndpointId extends withFrom(
   TypedString,
@@ -85,15 +103,25 @@ export class Service extends TypedStruct {
     return new this(id, serviceEndpoint.type, serviceEndpoint.origins);
   }
 
-  toCheqdService() {
+  // eslint-disable-next-line no-use-before-define
+  toCheqd(Class = CheqdService) {
     // eslint-disable-next-line no-use-before-define
-    return new CheqdService(this.id, this.type, this.serviceEndpoint);
+    return new (ensureEqualToOrPrototypeOf(CheqdService, Class))(
+      this.id,
+      this.type,
+      this.serviceEndpoint,
+    );
   }
 }
 
-export class CheqdService extends withFrom(TypedStruct, (value, from) => (value instanceof Service ? value.toCheqdService() : from(value))) {
+export class CheqdService extends withFrom(
+  TypedStruct,
+  function from(value, fromFn) {
+    return fromFn(value instanceof Service ? value.toCheqd(this) : value);
+  },
+) {
   static Classes = {
-    id: ServiceEndpointId,
+    id: CheqdServiceEndpointId,
     serviceType: LinkedDomains,
     serviceEndpoint: class ServiceEndpoints extends TypedArray {
       static Class = class ServiceEndpointString extends TypedString {};
@@ -104,6 +132,17 @@ export class CheqdService extends withFrom(TypedStruct, (value, from) => (value 
     return new this(id, serviceEndpoint.type, serviceEndpoint.origins);
   }
 }
+
+export class CheqdTestnetService extends withProp(
+  CheqdService,
+  'id',
+  CheqdTestnetServiceEndpointId,
+) {}
+export class CheqdMainnetService extends withProp(
+  CheqdService,
+  'id',
+  CheqdMainnetServiceEndpointId,
+) {}
 
 export class ServiceEndpoints extends TypedMap {
   static KeyClass = ServiceEndpointId;

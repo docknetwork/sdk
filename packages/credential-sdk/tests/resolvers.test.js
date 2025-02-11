@@ -1,10 +1,21 @@
+import { Ed25519Keypair } from "../src/keypairs";
+import { AbstractDIDModule } from "../src/modules";
+import AbstractApiProvider from "../src/modules/abstract/common/abstract-api-provider";
 import {
   Resolver,
   ResolverRouter,
+  DIDResolverWithDIDReplacement,
   WILDCARD,
   WildcardResolverRouter,
   createResolver,
+  DIDResolver,
 } from "../src/resolver";
+import {
+  CheqdTestnetDIDDocument,
+  DockDid,
+  DIDDocument,
+  DidKey,
+} from "../src/types";
 
 class APrefixBMethodResolver extends Resolver {
   prefix = "a";
@@ -82,6 +93,52 @@ class WildcardPrefixAndMethodResolver extends Resolver {
 }
 
 describe("Resolvers", () => {
+  it("checks `DIDResolverWithDIDReplacement`", async () => {
+    const did = DockDid.random();
+    const document = DIDDocument.create(
+      did,
+      [new DidKey(Ed25519Keypair.random().publicKey())],
+      [did, DockDid.random(), DockDid.random()]
+    );
+
+    const dummyApi = new (class Module extends AbstractDIDModule {
+      methods() {
+        return ["dock"];
+      }
+
+      async getDocument(_) {
+        return document.toCheqd(CheqdTestnetDIDDocument);
+      }
+
+      createDocumentTx() {}
+
+      updateDocumentTx() {}
+
+      removeDocumentTx() {}
+    })(
+      new (class Api extends AbstractApiProvider {
+        methods() {
+          return ["dock"];
+        }
+        isInitialized() {
+          return true;
+        }
+        supportsIdentifier() {
+          return true;
+        }
+        stateChangeBytes() {}
+        signAndSend() {}
+      })()
+    );
+
+    expect(
+      await new DIDResolverWithDIDReplacement(dummyApi).resolve(String(did))
+    ).toMatchSnapshot();
+    expect(
+      await new DIDResolver(dummyApi).resolve(String(did))
+    ).toMatchSnapshot();
+  });
+
   it("checks `ResolverRouter`", async () => {
     expect(() => new ResolverRouter()).toThrowError(
       "No resolvers were provided. You need to either implement `resolve` or provide a list of resolvers"

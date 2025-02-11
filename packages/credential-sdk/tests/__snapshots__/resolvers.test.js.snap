@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Resolvers checks \`DIDResolverWithDIDReplacement\` 1`] = `
+{
+  "alsoKnownAs": [],
+  "assertionMethod": [
+    "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5#keys-1",
+  ],
+  "authentication": [
+    "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5#keys-1",
+  ],
+  "capabilityDelegation": [],
+  "capabilityInvocation": [
+    "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5#keys-1",
+  ],
+  "context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
+  "controller": [
+    "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5",
+    "did:cheqd:testnet:ec2ffc8f-bef0-4307-b1dc-1e945aa05a04",
+    "did:cheqd:testnet:13426782-8e61-4ea3-9255-20de06ef13ba",
+  ],
+  "id": "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5",
+  "keyAgreement": [],
+  "service": [],
+  "verificationMethod": [
+    {
+      "controller": "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5",
+      "id": "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5#keys-1",
+      "verificationMaterial": "4qGHUs2Lofp8YH7EtkfUBxcA2B9A3KNHfkhwfd4mC4ZS",
+      "verificationMethodType": "Ed25519VerificationKey2018",
+    },
+  ],
+  "versionId": "0f6edb02-59d7-4cc2-aabd-dd205badb2d5",
+}
+`;
+
+exports[`Resolvers checks \`DIDResolverWithDIDReplacement\` 2`] = `
+{
+  "alsoKnownAs": [],
+  "assertionMethod": [
+    "did:cheqd:testnet:b05a3c71-113a-4949-a7ea-3e57d31fd6fb#keys-1",
+  ],
+  "authentication": [
+    "did:cheqd:testnet:b05a3c71-113a-4949-a7ea-3e57d31fd6fb#keys-1",
+  ],
+  "capabilityDelegation": [],
+  "capabilityInvocation": [
+    "did:cheqd:testnet:b05a3c71-113a-4949-a7ea-3e57d31fd6fb#keys-1",
+  ],
+  "context": [
+    "https://www.w3.org/ns/did/v1",
+  ],
+  "controller": [
+    "did:cheqd:testnet:b05a3c71-113a-4949-a7ea-3e57d31fd6fb",
+    "did:cheqd:testnet:ec2ffc8f-bef0-4307-b1dc-1e945aa05a04",
+    "did:cheqd:testnet:13426782-8e61-4ea3-9255-20de06ef13ba",
+  ],
+  "id": "did:cheqd:testnet:b05a3c71-113a-4949-a7ea-3e57d31fd6fb",
+  "keyAgreement": [],
+  "service": [],
+  "verificationMethod": [
+    {
+      "controller": "did:cheqd:testnet:b05a3c71-113a-4949-a7ea-3e57d31fd6fb",
+      "id": "did:cheqd:testnet:b05a3c71-113a-4949-a7ea-3e57d31fd6fb#keys-1",
+      "verificationMaterial": "4qGHUs2Lofp8YH7EtkfUBxcA2B9A3KNHfkhwfd4mC4ZS",
+      "verificationMethodType": "Ed25519VerificationKey2018",
+    },
+  ],
+  "versionId": "1760b5ea-35d1-414f-a183-293d4296225f",
+}
+`;

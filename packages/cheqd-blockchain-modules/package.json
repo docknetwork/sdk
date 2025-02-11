@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/cheqd-blockchain-modules",
-  "version": "0.28.2",
+  "version": "0.29.0",
   "type": "module",
   "license": "MIT",
   "main": "./dist/esm/index.js",
@@ -74,7 +74,7 @@
     "lint": "eslint \"src/**/*.js\"",
     "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
     "dev-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG ../../scripts/run_cheqd_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
-    "test": "NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/did-module.test.js",
+    "test": "NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/*",
     "test-with-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK ../../scripts/with_cheqd_docker_test_node yarn test",
     "prepublishOnly": "yarn build"
   }

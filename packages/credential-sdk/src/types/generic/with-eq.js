@@ -1,5 +1,4 @@
-import { isEqualToOrPrototypeOf } from "../../utils";
-import anyOf from "./any-of";
+import anyOf from './any-of';
 
 /**
  * Enhances `prototype.eq` of the provided class to make it catch `null`ish values and
@@ -25,13 +24,13 @@ export default function withEq(klass) {
             constructor,
             value?.constructor,
             value?.constructor?.Class,
-          ].filter((fn) => typeof fn?.from === "function");
+          ].filter((fn) => typeof fn?.from === 'function');
           try {
             compareWith = constructor.from(anyOf(...tryFrom).from(compareWith));
           } catch (err) {
             console.log(
               err,
-              tryFrom.map((v) => v.name)
+              tryFrom.map((v) => v.name),
             );
             return false;
           }

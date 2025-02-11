@@ -14,6 +14,7 @@ import {
   CheqdAccumulatorPublicKeyRef,
   CheqdTestnetAccumulatorPublicKeyRef,
   CheqdMainnetAccumulatorPublicKeyRef,
+  DockOrCheqdAccumulatorPublicKeyRef,
 } from './keys';
 import { createAccumulatorVariants } from './variants';
 
@@ -171,11 +172,6 @@ export class CheqdAccumulatorHistory extends TypedStruct {
     },
   };
 }
-
-class DockOrCheqdAccumulatorPublicKeyRef extends anyOf(
-  DockAccumulatorPublicKeyRef,
-  CheqdAccumulatorPublicKeyRef,
-) {}
 
 export const [
   AccumulatorCommon,

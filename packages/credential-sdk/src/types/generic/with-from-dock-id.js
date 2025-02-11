@@ -1,7 +1,7 @@
-import { DockDid } from "../did/onchain/typed-did";
-import anyOf from "./any-of";
-import TypedUUID from "./typed-uuid";
-import withFrom from "./with-from";
+import { DockDid } from '../did/onchain/typed-did';
+import anyOf from './any-of';
+import TypedUUID from './typed-uuid';
+import withFrom from './with-from';
 
 export default function withFromDockId(klass, fromClass, prefix) {
   return withFrom(klass, (value, from) => {
@@ -10,7 +10,7 @@ export default function withFromDockId(klass, fromClass, prefix) {
     return from(
       parsedValue instanceof fromClass
         ? TypedUUID.fromDockIdent(parsedValue, prefix)
-        : parsedValue
+        : parsedValue,
     );
   });
 }
@@ -45,7 +45,7 @@ export function patchWithFromDock(klass, Type, mapping) {
       const dockDid = mapping.mainnet[hexId] ?? mapping.testnet[hexId];
       if (dockDid == null) {
         throw new Error(
-          `Dock DID not found for ${hexId} - can't create ${this.name}`
+          `Dock DID not found for ${hexId} - can't create ${this.name}`,
         );
       }
 

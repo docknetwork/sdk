@@ -1,19 +1,18 @@
-import { DidMethodKeyPublicKey, DidMethodKeySignature } from "./did-method-key";
-import DockDidValue, { DockDidSignature } from "./dock-did-value";
+import { DidMethodKeyPublicKey, DidMethodKeySignature } from './did-method-key';
+import DockDidValue, { DockDidSignature } from './dock-did-value';
 import {
   TypedEnum,
   TypedTuple,
   TypedUUID,
-  anyOf,
   createConverter,
   withQualifier,
-} from "../../../generic";
-import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from "./cheqd-did";
+} from '../../../generic';
+import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from './cheqd-did';
 import {
   withExtendedStaticProperties,
   isHexWithGivenByteSize,
-} from "../../../../utils";
-import DidOrDidMethodKeySignature from "./signature";
+} from '../../../../utils';
+import DidOrDidMethodKeySignature from './signature';
 
 export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
   /**
@@ -58,7 +57,7 @@ export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
   async changeState(api, method, name, payload, keyRef) {
     return await method(
       payload,
-      await this.signStateChange(api, name, payload, keyRef)
+      await this.signStateChange(api, name, payload, keyRef),
     );
   }
 
@@ -148,29 +147,29 @@ export class NamespaceDid extends withQualifier(TypedEnum, true) {
     return super.from(
       value instanceof DockDidOrDidMethodKey && value.isDid
         ? { dock: value.asDid }
-        : value
+        : value,
     );
   }
 }
 
 export class DockNamespaceDid extends NamespaceDid {
-  static Qualifier = "did:dock:";
+  static Qualifier = 'did:dock:';
 
-  static Type = "dock";
+  static Type = 'dock';
 
   static Class = DockDidValue;
 }
 export class DidNamespaceKey extends NamespaceDid {
-  static Qualifier = "did:key:";
+  static Qualifier = 'did:key:';
 
-  static Type = "didMethodKey";
+  static Type = 'didMethodKey';
 
   static Class = DidMethodKeyPublicKey;
 }
 export class CheqdNamespaceDid extends NamespaceDid {
-  static Qualifier = "did:cheqd:";
+  static Qualifier = 'did:cheqd:';
 
-  static Type = "cheqd";
+  static Type = 'cheqd';
 
   static Class = CheqdDid;
 }
@@ -183,7 +182,7 @@ for (const Class of [CheqdTestnetDid, CheqdMainnetDid]) {
   Class.from = function from(value) {
     try {
       return new this(
-        TypedUUID.fromDockIdent(DockNamespaceDid.from(value), "did:cheqd:")
+        TypedUUID.fromDockIdent(DockNamespaceDid.from(value), 'did:cheqd:'),
       );
     } catch {
       return fromFn.call(this, value);
@@ -192,10 +191,10 @@ for (const Class of [CheqdTestnetDid, CheqdMainnetDid]) {
 }
 
 export class DidRef extends withExtendedStaticProperties(
-  ["Ident"],
-  withQualifier(TypedTuple)
+  ['Ident'],
+  withQualifier(TypedTuple),
 ) {
-  static Qualifier = "";
+  static Qualifier = '';
 
   static Did = NamespaceDid;
 
@@ -242,7 +241,7 @@ export class CheqdDidRef extends withQualifier(DidRef) {
   static Did = CheqdDid;
 
   static fromUnqualifiedString(str) {
-    const lastColon = str.lastIndexOf(":");
+    const lastColon = str.lastIndexOf(':');
     const did = `did:cheqd:${str.slice(0, lastColon)}`;
     const id = str.slice(lastColon + 1);
 
@@ -256,14 +255,14 @@ export class CheqdDidRef extends withQualifier(DidRef) {
   toEncodedString() {
     const { did, value } = this;
 
-    let prefix = "";
+    let prefix = '';
     if (did.isTestnet) {
-      prefix = "testnet";
+      prefix = 'testnet';
     } else if (did.isMainnet) {
-      prefix = "mainnet";
+      prefix = 'mainnet';
     } else {
       throw new Error(
-        `Can't determine DID type: \`${did}\`, instance of \`${did.constructor.name}\``
+        `Can't determine DID type: \`${did}\`, instance of \`${did.constructor.name}\``,
       );
     }
 
@@ -273,7 +272,7 @@ export class CheqdDidRef extends withQualifier(DidRef) {
 
 DidOrDidMethodKeySignature.bindVariants(
   DockDidSignature,
-  DidMethodKeySignature
+  DidMethodKeySignature,
 );
 
 /**
@@ -286,8 +285,8 @@ export const possibleDids = createConverter(
   String,
   DockDid,
   CheqdTestnetDid,
-  CheqdMainnetDid
+  CheqdMainnetDid,
 );
 
 export { DockDidValue, DidMethodKeyPublicKey };
-export * from "./cheqd-did";
+export * from './cheqd-did';

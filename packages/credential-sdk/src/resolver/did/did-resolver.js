@@ -1,9 +1,9 @@
-import { AbstractDIDModule } from "../../modules/abstract/did";
-import { ensureInstanceOf, parseDIDUrl } from "../../utils";
-import { Resolver } from "../generic";
+import { AbstractDIDModule } from '../../modules/abstract/did';
+import { ensureInstanceOf, parseDIDUrl } from '../../utils';
+import { Resolver } from '../generic';
 
 class DIDResolver extends Resolver {
-  prefix = "did";
+  prefix = 'did';
 
   get method() {
     return this.didModule.methods();

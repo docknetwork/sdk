@@ -2,7 +2,7 @@ import {
   ensureEqualToOrPrototypeOf,
   maybeToJSONString,
   maybeToNumber,
-} from "../../../utils";
+} from '../../../utils';
 import {
   TypedStruct,
   TypedString,
@@ -12,10 +12,10 @@ import {
   TypedMap,
   withFrom,
   withProp,
-} from "../../generic";
-import IdentRef from "./ident-ref";
-import { isBytes } from "../../../utils/type-helpers";
-import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from "../onchain";
+} from '../../generic';
+import IdentRef from './ident-ref';
+import { isBytes } from '../../../utils/type-helpers';
+import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from '../onchain';
 
 export class ServiceEndpointId extends IdentRef {}
 
@@ -33,15 +33,14 @@ export class CheqdMainnetServiceEndpointId extends ServiceEndpointId {
 
 export class SuffixServiceEndpointId extends withFrom(
   TypedString,
-  (value, from) =>
-    from(isBytes(value) ? value : ServiceEndpointId.from(value)[1])
+  (value, from) => from(isBytes(value) ? value : ServiceEndpointId.from(value)[1]),
 ) {}
 
 const LinkedDomainsPlaceholder = createPlaceholder((value) => {
   if (
-    +maybeToNumber(value) === 0b0001 ||
-    String(value) === "LinkedDomains" ||
-    value == null
+    +maybeToNumber(value) === 0b0001
+    || String(value) === 'LinkedDomains'
+    || value == null
   ) {
     return 0b0001;
   } else {
@@ -63,7 +62,7 @@ export class ServiceEndpointType extends TypedEnum {
   }
 }
 export class LinkedDomains extends ServiceEndpointType {
-  static Type = "LinkedDomains";
+  static Type = 'LinkedDomains';
 
   static Class = LinkedDomainsPlaceholder;
 
@@ -110,7 +109,7 @@ export class Service extends TypedStruct {
     return new (ensureEqualToOrPrototypeOf(CheqdService, Class))(
       this.id,
       this.type,
-      this.serviceEndpoint
+      this.serviceEndpoint,
     );
   }
 }
@@ -119,7 +118,7 @@ export class CheqdService extends withFrom(
   TypedStruct,
   function from(value, fromFn) {
     return fromFn(value instanceof Service ? value.toCheqd(this) : value);
-  }
+  },
 ) {
   static Classes = {
     id: CheqdServiceEndpointId,
@@ -136,13 +135,13 @@ export class CheqdService extends withFrom(
 
 export class CheqdTestnetService extends withProp(
   CheqdService,
-  "id",
-  CheqdTestnetServiceEndpointId
+  'id',
+  CheqdTestnetServiceEndpointId,
 ) {}
 export class CheqdMainnetService extends withProp(
   CheqdService,
-  "id",
-  CheqdMainnetServiceEndpointId
+  'id',
+  CheqdMainnetServiceEndpointId,
 ) {}
 
 export class ServiceEndpoints extends TypedMap {

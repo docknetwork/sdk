@@ -13,6 +13,7 @@ import {
   VBWitnessUpdateInfo,
   VBMembershipWitness,
   AccumulatorPublicKey,
+  initializeWasm,
 } from '../../crypto';
 import { AccumulatorType } from '../abstract/accumulator/module';
 import {
@@ -22,7 +23,7 @@ import {
 import { Ed25519Keypair, DidKeypair } from '../../keypairs';
 
 // eslint-disable-next-line jest/no-export
-export default function generateAccumulatorTests(
+export default function generateAccumulatorModuleTests(
   { did: didModule, accumulator: accumulatorModule },
   {
     Did,
@@ -63,6 +64,7 @@ export default function generateAccumulatorTests(
     const accumState = new InMemoryState();
 
     beforeAll(async () => {
+      await initializeWasm();
       await didModule.createDocument(
         DIDDocument.create(did, [pair.didKey()]),
         pair,

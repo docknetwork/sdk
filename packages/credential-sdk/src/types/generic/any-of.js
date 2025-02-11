@@ -1,5 +1,5 @@
-import { fmtIter } from "../../utils";
-import withFrom from "./with-from";
+import { fmtIter } from '../../utils';
+import withFrom from './with-from';
 
 /**
  * Creates a new type that can be constructed from any of the provided types.

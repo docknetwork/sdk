@@ -4,7 +4,7 @@ import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 import { faucet, url, network } from "./constants";
 import { CheqdCoreModules } from "../src";
 
-class DockDidRandomToString extends DockDid {
+export class DockDidRandomToString extends DockDid {
   static random() {
     return String(super.random());
   }
@@ -27,38 +27,15 @@ export function tests(name, generateTests, customTypes) {
       await cheqd.disconnect();
     });
 
-    generateTests(new CheqdCoreModules(cheqd), {
-      ...cheqd.constructor.Types[network],
-      ...customTypes,
-    });
-
-    generateTests(new MultiApiCoreModules([new CheqdCoreModules(cheqd)]), {
-      ...cheqd.constructor.Types[network],
-      ...customTypes,
-    });
-
-    generateTests(new CheqdCoreModules(cheqd), {
-      ...cheqd.constructor.Types[network],
-      ...customTypes,
-      Did: DockDid,
-    });
-
-    generateTests(new MultiApiCoreModules([new CheqdCoreModules(cheqd)]), {
-      ...cheqd.constructor.Types[network],
-      ...customTypes,
-      Did: DockDid,
-    });
-
-    generateTests(new CheqdCoreModules(cheqd), {
-      ...cheqd.constructor.Types[network],
-      ...customTypes,
-      Did: DockDidRandomToString,
-    });
-
-    generateTests(new MultiApiCoreModules([new CheqdCoreModules(cheqd)]), {
-      ...cheqd.constructor.Types[network],
-      ...customTypes,
-      Did: DockDidRandomToString,
-    });
+    const core = new CheqdCoreModules(cheqd);
+    for (const modules of [core, new MultiApiCoreModules([core])]) {
+      for (const Did of [null, DockDid, DockDidRandomToString]) {
+        generateTests(modules, {
+          ...cheqd.constructor.Types[network],
+          ...customTypes,
+          ...(Did && { Did }),
+        });
+      }
+    }
   });
 }

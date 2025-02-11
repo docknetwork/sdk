@@ -7,7 +7,9 @@ import {
   CheqdMainnetDid,
   CheqdTestnetDid,
   DockDidOrDidMethodKey,
+  NamespaceDid,
 } from '../did';
+import { CheqdAccumulatorParamsId, DockAccumulatorParamsId } from './params';
 
 export class DockAccumulatorPublicKeyId extends TypedNumber {}
 
@@ -37,8 +39,15 @@ export class CheqdMainnetAccumulatorPublicKeyRef extends CheqdAccumulatorPublicK
   static Did = CheqdMainnetDid;
 }
 
+export class DockOrCheqdAccumulatorPublicKeyRef extends TypedTuple {
+  static Classes = [
+    NamespaceDid,
+    anyOf(CheqdAccumulatorPublicKeyId, DockAccumulatorPublicKeyId),
+  ];
+}
+
 export class CheqdAccumulatorParamsRef extends CheqdDLRRef {
-  static Id = CheqdAccumulatorPublicKeyId;
+  static Id = CheqdAccumulatorParamsId;
 }
 
 export class CheqdTestnetAccumulatorParamsRef extends CheqdAccumulatorParamsRef {
@@ -49,7 +58,9 @@ export class CheqdMainnetAccumulatorParamsRef extends CheqdAccumulatorParamsRef 
   static Did = CheqdMainnetDid;
 }
 
-export class DockOrCheqdAccumulatorParamsRef extends anyOf(
-  DockAccumulatorParamsRef,
-  CheqdAccumulatorParamsRef,
-) {}
+export class DockOrCheqdAccumulatorParamsRef extends TypedTuple {
+  static Classes = [
+    NamespaceDid,
+    anyOf(CheqdAccumulatorParamsId, DockAccumulatorParamsId),
+  ];
+}

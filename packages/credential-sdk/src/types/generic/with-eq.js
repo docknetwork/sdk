@@ -28,10 +28,6 @@ export default function withEq(klass) {
           try {
             compareWith = constructor.from(anyOf(...tryFrom).from(compareWith));
           } catch (err) {
-            console.log(
-              err,
-              tryFrom.map((v) => v.name),
-            );
             return false;
           }
 

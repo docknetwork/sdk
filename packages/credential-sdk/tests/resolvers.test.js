@@ -16,6 +16,7 @@ import {
   DIDDocument,
   DidKey,
 } from "../src/types";
+import { decodeFromBase58 } from "../src/utils";
 
 class APrefixBMethodResolver extends Resolver {
   prefix = "a";
@@ -94,11 +95,21 @@ class WildcardPrefixAndMethodResolver extends Resolver {
 
 describe("Resolvers", () => {
   it("checks `DIDResolverWithDIDReplacement`", async () => {
-    const did = DockDid.random();
+    const did = "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5";
     const document = DIDDocument.create(
       did,
-      [new DidKey(Ed25519Keypair.random().publicKey())],
-      [did, DockDid.random(), DockDid.random()]
+      [
+        new DidKey({
+          ed25519: decodeFromBase58(
+            "4qGHUs2Lofp8YH7EtkfUBxcA2B9A3KNHfkhwfd4mC4ZS"
+          ),
+        }),
+      ],
+      [
+        did,
+        "did:cheqd:testnet:ec2ffc8f-bef0-4307-b1dc-1e945aa05a04",
+        "did:cheqd:testnet:13426782-8e61-4ea3-9255-20de06ef13ba",
+      ]
     );
 
     const dummyApi = new (class Module extends AbstractDIDModule {
@@ -107,7 +118,10 @@ describe("Resolvers", () => {
       }
 
       async getDocument(_) {
-        return document.toCheqd(CheqdTestnetDIDDocument);
+        return document.toCheqd(
+          CheqdTestnetDIDDocument,
+          "0f6edb02-59d7-4cc2-aabd-dd205badb2d5"
+        );
       }
 
       createDocumentTx() {}

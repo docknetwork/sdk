@@ -68,6 +68,6 @@ exports[`Resolvers checks \`DIDResolverWithDIDReplacement\` 2`] = `
       "verificationMethodType": "Ed25519VerificationKey2018",
     },
   ],
-  "versionId": "1760b5ea-35d1-414f-a183-293d4296225f",
+  "versionId": "0f6edb02-59d7-4cc2-aabd-dd205badb2d5",
 }
 `;

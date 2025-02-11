@@ -42,5 +42,5 @@ export class CheqdMainnetOffchainSignatureParamsRef extends CheqdDLRRef {
 }
 
 export class DockOrCheqdOffchainSignatureParamsRef extends TypedTuple {
-  static Classes = [NamespaceDid, anyOf(CheqdParamsId, DockParamsId)];
+  static Classes = [NamespaceDid, anyOf(DockParamsId, CheqdParamsId)];
 }

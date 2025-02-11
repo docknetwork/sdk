@@ -665,9 +665,7 @@ exports[`DID document workflow \`DIDDocument\` 3`] = `
       "metadata": {
         "curveType": "Bls12381",
         "paramsRef": [
-          {
-            "did": "0xc9b4c22c2f5738b0adaf605a8233cdc2451c5ece045c25a3bc2b4c840fe9b11d",
-          },
+          "did:dock:5GdBBJdo3EWbbVpehRMUkGqfyEm7TJ7ugGCoPKNXzqrgPQqT",
           0,
         ],
         "participantId": null,
@@ -693,9 +691,7 @@ exports[`DID document workflow \`DIDDocument\` 3`] = `
       "metadata": {
         "curveType": "Bls12381",
         "paramsRef": [
-          {
-            "did": "0xc9b4c22c2f5738b0adaf605a8233cdc2451c5ece045c25a3bc2b4c840fe9b11d",
-          },
+          "did:dock:5GdBBJdo3EWbbVpehRMUkGqfyEm7TJ7ugGCoPKNXzqrgPQqT",
           1,
         ],
         "participantId": null,
@@ -739,9 +735,7 @@ exports[`DID document workflow \`DIDDocument\` 3`] = `
       "metadata": {
         "curveType": "Bls12381",
         "paramsRef": [
-          {
-            "did": "0xc9b4c22c2f5738b0adaf605a8233cdc2451c5ece045c25a3bc2b4c840fe9b11d",
-          },
+          "did:dock:5GdBBJdo3EWbbVpehRMUkGqfyEm7TJ7ugGCoPKNXzqrgPQqT",
           2,
         ],
         "participantId": null,
@@ -755,9 +749,7 @@ exports[`DID document workflow \`DIDDocument\` 3`] = `
       "metadata": {
         "curveType": "Bls12381",
         "paramsRef": [
-          {
-            "did": "0xc9b4c22c2f5738b0adaf605a8233cdc2451c5ece045c25a3bc2b4c840fe9b11d",
-          },
+          "did:dock:5GdBBJdo3EWbbVpehRMUkGqfyEm7TJ7ugGCoPKNXzqrgPQqT",
           3,
         ],
         "participantId": null,

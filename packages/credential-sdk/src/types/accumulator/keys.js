@@ -61,6 +61,6 @@ export class CheqdMainnetAccumulatorParamsRef extends CheqdAccumulatorParamsRef 
 export class DockOrCheqdAccumulatorParamsRef extends TypedTuple {
   static Classes = [
     NamespaceDid,
-    anyOf(CheqdAccumulatorParamsId, DockAccumulatorParamsId),
+    anyOf(DockAccumulatorParamsId, CheqdAccumulatorParamsId),
   ];
 }

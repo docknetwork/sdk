@@ -42,7 +42,7 @@ export class CheqdMainnetAccumulatorPublicKeyRef extends CheqdAccumulatorPublicK
 export class DockOrCheqdAccumulatorPublicKeyRef extends TypedTuple {
   static Classes = [
     NamespaceDid,
-    anyOf(CheqdAccumulatorPublicKeyId, DockAccumulatorPublicKeyId),
+    anyOf(DockAccumulatorPublicKeyId, CheqdAccumulatorPublicKeyId),
   ];
 }
 

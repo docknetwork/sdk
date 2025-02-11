@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/dock-blockchain-api",
-  "version": "0.19.5",
+  "version": "0.20.0",
   "license": "MIT",
   "main": "./dist/esm/index.js",
   "type": "module",
@@ -88,7 +88,7 @@
     "@polkadot/api": "10.12.4"
   },
   "dependencies": {
-    "@docknetwork/credential-sdk": "0.41.0",
+    "@docknetwork/credential-sdk": "0.42.0",
     "@docknetwork/node-types": "^0.17.0",
     "@juanelas/base64": "^1.0.5",
     "@polkadot/api": "10.12.4",

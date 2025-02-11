@@ -6,10 +6,13 @@
 
 - Add tests for all types of identifiers that can be received by the modules, use replacement resolver for DID documents
 
+## 0.28.3
+
 ### Patch Changes
 
 - Updated dependencies
   - @docknetwork/credential-sdk@0.39.0
+  - @docknetwork/credential-sdk@0.40.0
 
 ## 0.28.2
 

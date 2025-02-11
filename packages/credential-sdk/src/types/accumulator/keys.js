@@ -50,8 +50,6 @@ export class DockOrCheqdAccumulatorPublicKeyRef extends TypedTuple {
       && this[1] instanceof DockAccumulatorPublicKeyId
     ) {
       return DockAccumulatorPublicKeyRef.from(this);
-    } else {
-      throw new Error(`Must be dock or cheqd, got: \`${this[0]}\``);
     }
   }
 

@@ -42,5 +42,15 @@ export class CheqdMainnetOffchainSignatureParamsRef extends CheqdDLRRef {
 }
 
 export class DockOrCheqdOffchainSignatureParamsRef extends TypedTuple {
+  constructor(...args) {
+    super(...args);
+
+    if (this[0].isCheqd) {
+      return CheqdOffchainSignatureParamsRef.from(this);
+    } else if (this[0].isDock && this[1] instanceof DockParamsId) {
+      return DockOffchainSignatureParamsRef.from(this);
+    }
+  }
+
   static Classes = [NamespaceDid, anyOf(DockParamsId, CheqdParamsId)];
 }

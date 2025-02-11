@@ -40,6 +40,21 @@ export class CheqdMainnetAccumulatorPublicKeyRef extends CheqdAccumulatorPublicK
 }
 
 export class DockOrCheqdAccumulatorPublicKeyRef extends TypedTuple {
+  constructor(...args) {
+    super(...args);
+
+    if (this[0].isCheqd) {
+      return CheqdAccumulatorPublicKeyRef.from(this);
+    } else if (
+      this[0].isDock
+      && this[1] instanceof DockAccumulatorPublicKeyId
+    ) {
+      return DockAccumulatorPublicKeyRef.from(this);
+    } else {
+      throw new Error(`Must be dock or cheqd, got: \`${this[0]}\``);
+    }
+  }
+
   static Classes = [
     NamespaceDid,
     anyOf(DockAccumulatorPublicKeyId, CheqdAccumulatorPublicKeyId),
@@ -59,6 +74,16 @@ export class CheqdMainnetAccumulatorParamsRef extends CheqdAccumulatorParamsRef 
 }
 
 export class DockOrCheqdAccumulatorParamsRef extends TypedTuple {
+  constructor(...args) {
+    super(...args);
+
+    if (this[0].isCheqd) {
+      return CheqdAccumulatorParamsRef.from(this);
+    } else if (this[0].isDock && this[1] instanceof DockAccumulatorParamsId) {
+      return DockAccumulatorParamsRef.from(this);
+    }
+  }
+
   static Classes = [
     NamespaceDid,
     anyOf(DockAccumulatorParamsId, CheqdAccumulatorParamsId),

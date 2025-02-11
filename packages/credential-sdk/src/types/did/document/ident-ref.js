@@ -1,13 +1,15 @@
-import { withQualifier, TypedTuple, TypedString } from '../../generic';
-import { NamespaceDid } from '../onchain/typed-did';
+import { withQualifier, TypedTuple, TypedString } from "../../generic";
+import { NamespaceDid } from "../onchain/typed-did";
 
 export default class IdentRef extends withQualifier(TypedTuple) {
-  static Qualifier = '';
+  static Qualifier = "";
+
+  static Did = NamespaceDid;
 
   static Ident = TypedString;
 
   static get Classes() {
-    return [NamespaceDid, this.Ident];
+    return [this.Did, this.Ident];
   }
 
   static random(did) {

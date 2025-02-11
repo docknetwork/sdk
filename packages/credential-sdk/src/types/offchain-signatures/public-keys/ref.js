@@ -1,12 +1,13 @@
-import { TypedTuple, anyOf } from '../../generic';
+import { TypedTuple, anyOf } from "../../generic";
 import {
   DockDidValue,
   DockDidOrDidMethodKey,
   CheqdDLRRef,
   CheqdTestnetDid,
   CheqdMainnetDid,
-} from '../../did/onchain/typed-did';
-import { CheqdParamsId, DockParamsId } from '../params/id';
+  NamespaceDid,
+} from "../../did/onchain/typed-did";
+import { CheqdParamsId, DockParamsId } from "../params/id";
 
 export class DockOffchainSignatureKeyRef extends TypedTuple {
   static Classes = [DockDidValue, DockParamsId];
@@ -40,7 +41,6 @@ export class CheqdMainnetOffchainSignatureParamsRef extends CheqdDLRRef {
   static Id = CheqdParamsId;
 }
 
-export class DockOrCheqdOffchainSignatureParamsRef extends anyOf(
-  DockOffchainSignatureParamsRef,
-  CheqdOffchainSignatureParamsRef,
-) {}
+export class DockOrCheqdOffchainSignatureParamsRef extends TypedTuple {
+  static Classes = [NamespaceDid, anyOf(CheqdParamsId, DockParamsId)];
+}

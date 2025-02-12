@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.43.0
+
+### Minor Changes
+
+- Remove ld.dock.io cache mapping
+
 ## 0.42.0
 
 ### Minor Changes

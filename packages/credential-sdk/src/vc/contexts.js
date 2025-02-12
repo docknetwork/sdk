@@ -21,12 +21,6 @@ import sphereonId from './contexts/sphereon-wallet-identity-v1.json';
 // Lookup of following URLs will lead to loading data from the context directory, this is done as the Sr25519 keys are not
 // supported in any W3C standard and vc-js has them stored locally. This is a temporary solution.
 export default new Map([
-  ['https://ld.dock.io/credentials/prettyvc', dockPrettyVCContext],
-  ['https://ld.dock.io/security/bbs/v1', dockBBSV1Context],
-  ['https://ld.dock.io/security/bbs23/v1', dockBBS23V1Context],
-  ['https://ld.dock.io/security/ps/v1', dockPSV1Context],
-  ['https://ld.dock.io/security/bbdt16/v1', dockBBDT16V1Context],
-  ['https://ld.dock.io/private-status-list-21', privateStatusList21Context],
   ['https://ld.truvera.io/credentials/prettyvc', dockPrettyVCContext],
   ['https://ld.truvera.io/security/bbs/v1', dockBBSV1Context],
   ['https://ld.truvera.io/security/bbs23/v1', dockBBS23V1Context],

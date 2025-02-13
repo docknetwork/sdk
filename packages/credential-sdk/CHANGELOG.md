@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.44.0
+
+### Minor Changes
+
+- ldTypeGen support legacy LD term
+
 ## 0.43.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.31.0
+
+### Minor Changes
+
+- Switch `cheqd/sdk` to the latest version, add tests for stringified `CheqdDid` identifier
+
 ## 0.30.2
 
 ### Patch Changes

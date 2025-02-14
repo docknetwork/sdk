@@ -10,6 +10,7 @@ import {
   ResourceModule,
   createCheqdSDK,
   CheqdNetwork,
+  FeemarketModule,
 } from '@cheqd/sdk';
 import {
   MsgCreateDidDocPayload,
@@ -153,7 +154,7 @@ export class CheqdAPI extends AbstractApiProvider {
 
     this.ensureNotInitialized();
     const options = {
-      modules: [DIDModule, ResourceModule],
+      modules: [DIDModule, ResourceModule, FeemarketModule],
       rpcUrl: url,
       wallet,
       network,

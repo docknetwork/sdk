@@ -2,17 +2,17 @@
   "name": "@docknetwork/migration",
   "private": true,
   "type": "module",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "scripts": {
     "migrate": "babel-node src/index.js",
     "did-by-id": "babel-node src/did-by-id.js",
     "dock-id-to-cheqd": "babel-node src/dock-id-to-cheqd.js"
   },
   "dependencies": {
-    "@docknetwork/cheqd-blockchain-api": "0.31.0",
-    "@docknetwork/credential-sdk": "0.44.0",
-    "@docknetwork/dock-blockchain-api": "0.20.2",
-    "@docknetwork/dock-blockchain-modules": "0.26.2",
+    "@docknetwork/cheqd-blockchain-api": "0.31.1",
+    "@docknetwork/credential-sdk": "0.45.0",
+    "@docknetwork/dock-blockchain-api": "0.20.3",
+    "@docknetwork/dock-blockchain-modules": "0.26.3",
     "p-limit": "^6.1.0"
   },
   "devDependencies": {

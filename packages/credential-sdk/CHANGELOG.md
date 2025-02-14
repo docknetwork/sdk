@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.45.0
+
+### Minor Changes
+
+- Fix VerifiablePresentation class potentially re-ordering credentials
+
 ## 0.44.0
 
 ### Minor Changes

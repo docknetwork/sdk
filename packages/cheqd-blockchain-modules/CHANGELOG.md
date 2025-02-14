@@ -1,5 +1,12 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 0.31.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.45.0
+
 ## 0.31.0
 
 ### Minor Changes

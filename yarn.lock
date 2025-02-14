@@ -1368,41 +1368,7 @@
     uuid "^10.0.0"
     uuid-cjs "npm:uuid@^10.0.0"
 
-"@cheqd/sdk@cjs":
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/@cheqd/sdk/-/sdk-2.6.0.tgz#062c315f0d72029bf0dc438b67efd9f97b3d07a3"
-  integrity sha512-Lx3/0dT7QoKaWfQcc4PzhcaFud5Fkgm1//Q7KfPXakerSLuOkyaVy95VnFnnoLERuWZcE6r3nI1xoKq1GFckDg==
-  dependencies:
-    "@cheqd/ts-proto" "^2.4.0"
-    "@cosmjs/amino" "~0.30.1"
-    "@cosmjs/crypto" "~0.30.1"
-    "@cosmjs/encoding" "~0.30.1"
-    "@cosmjs/math" "~0.30.1"
-    "@cosmjs/proto-signing" "~0.30.1"
-    "@cosmjs/stargate" "~0.30.1"
-    "@cosmjs/tendermint-rpc" "~0.30.1"
-    "@cosmjs/utils" "~0.30.1"
-    "@stablelib/ed25519" "^1.0.3"
-    "@types/secp256k1" "^4.0.6"
-    cosmjs-types "^0.7.2"
-    did-jwt "^8.0.4"
-    did-resolver "^4.1.0"
-    file-type "^16.5.4"
-    long "^4.0.0"
-    multiformats "^9.9.0"
-    secp256k1 "^5.0.0"
-    uuid "^10.0.0"
-
 "@cheqd/ts-proto-cjs@npm:@cheqd/ts-proto@~2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@cheqd/ts-proto/-/ts-proto-2.4.0.tgz#4894314559a3663e4ba556495c0187da55480b43"
-  integrity sha512-+iPJujk1IfeWdcbVzMEjleVXab1leYshiFZNQGpDw6PCOWkRRZ/0BOJgRm6/LQjcj70ceDje4Io/8+CIh+9A5g==
-  dependencies:
-    "@bufbuild/protobuf" "^2.2.2"
-    long "^5.2.3"
-    protobufjs "^7.4.0"
-
-"@cheqd/ts-proto@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@cheqd/ts-proto/-/ts-proto-2.4.0.tgz#4894314559a3663e4ba556495c0187da55480b43"
   integrity sha512-+iPJujk1IfeWdcbVzMEjleVXab1leYshiFZNQGpDw6PCOWkRRZ/0BOJgRm6/LQjcj70ceDje4Io/8+CIh+9A5g==
@@ -4558,7 +4524,7 @@
     "@cosmjs/math" "^0.30.1"
     "@cosmjs/utils" "^0.30.1"
 
-"@cosmjs/amino@^0.30.1", "@cosmjs/amino@~0.30.1":
+"@cosmjs/amino@^0.30.1":
   version "0.30.1"
   resolved "https://registry.yarnpkg.com/@cosmjs/amino/-/amino-0.30.1.tgz#7c18c14627361ba6c88e3495700ceea1f76baace"
   integrity sha512-yNHnzmvAlkETDYIpeCTdVqgvrdt1qgkOXwuRVi8s27UKI5hfqyE9fJ/fuunXE6ZZPnKkjIecDznmuUOMrMvw4w==
@@ -4591,7 +4557,7 @@
     elliptic "^6.5.4"
     libsodium-wrappers "^0.7.6"
 
-"@cosmjs/crypto@^0.30.1", "@cosmjs/crypto@~0.30.1":
+"@cosmjs/crypto@^0.30.1":
   version "0.30.1"
   resolved "https://registry.yarnpkg.com/@cosmjs/crypto/-/crypto-0.30.1.tgz#21e94d5ca8f8ded16eee1389d2639cb5c43c3eb5"
   integrity sha512-rAljUlake3MSXs9xAm87mu34GfBLN0h/1uPPV6jEwClWjNkAMotzjC0ab9MARy5FFAvYHL3lWb57bhkbt2GtzQ==
@@ -4626,7 +4592,7 @@
     bech32 "^1.1.4"
     readonly-date "^1.0.0"
 
-"@cosmjs/encoding@^0.30.1", "@cosmjs/encoding@~0.30.1":
+"@cosmjs/encoding@^0.30.1":
   version "0.30.1"
   resolved "https://registry.yarnpkg.com/@cosmjs/encoding/-/encoding-0.30.1.tgz#b5c4e0ef7ceb1f2753688eb96400ed70f35c6058"
   integrity sha512-rXmrTbgqwihORwJ3xYhIgQFfMSrwLu1s43RIK9I8EBudPx3KmnmyAKzMOVsRDo9edLFNuZ9GIvysUCwQfq3WlQ==
@@ -4667,7 +4633,7 @@
   dependencies:
     bn.js "^5.2.0"
 
-"@cosmjs/math@^0.30.1", "@cosmjs/math@~0.30.1":
+"@cosmjs/math@^0.30.1":
   version "0.30.1"
   resolved "https://registry.yarnpkg.com/@cosmjs/math/-/math-0.30.1.tgz#8b816ef4de5d3afa66cb9fdfb5df2357a7845b8a"
   integrity sha512-yaoeI23pin9ZiPHIisa6qqLngfnBR/25tSaWpkTm8Cy10MX70UF5oN4+/t1heLaM6SSmRrhk3psRkV4+7mH51Q==
@@ -4694,7 +4660,7 @@
     cosmjs-types "^0.7.1"
     long "^4.0.0"
 
-"@cosmjs/proto-signing@^0.30.1", "@cosmjs/proto-signing@~0.30.1":
+"@cosmjs/proto-signing@^0.30.1":
   version "0.30.1"
   resolved "https://registry.yarnpkg.com/@cosmjs/proto-signing/-/proto-signing-0.30.1.tgz#f0dda372488df9cd2677150b89b3e9c72b3cb713"
   integrity sha512-tXh8pPYXV4aiJVhTKHGyeZekjj+K9s2KKojMB93Gcob2DxUjfKapFYBMJSgfKPuWUPEmyr8Q9km2hplI38ILgQ==
@@ -4773,24 +4739,6 @@
     cosmjs-types "^0.9.0"
     xstream "^11.14.0"
 
-"@cosmjs/stargate@~0.30.1":
-  version "0.30.1"
-  resolved "https://registry.yarnpkg.com/@cosmjs/stargate/-/stargate-0.30.1.tgz#e1b22e1226cffc6e93914a410755f1f61057ba04"
-  integrity sha512-RdbYKZCGOH8gWebO7r6WvNnQMxHrNXInY/gPHPzMjbQF6UatA6fNM2G2tdgS5j5u7FTqlCI10stNXrknaNdzog==
-  dependencies:
-    "@confio/ics23" "^0.6.8"
-    "@cosmjs/amino" "^0.30.1"
-    "@cosmjs/encoding" "^0.30.1"
-    "@cosmjs/math" "^0.30.1"
-    "@cosmjs/proto-signing" "^0.30.1"
-    "@cosmjs/stream" "^0.30.1"
-    "@cosmjs/tendermint-rpc" "^0.30.1"
-    "@cosmjs/utils" "^0.30.1"
-    cosmjs-types "^0.7.1"
-    long "^4.0.0"
-    protobufjs "~6.11.3"
-    xstream "^11.14.0"
-
 "@cosmjs/stream@^0.30.1":
   version "0.30.1"
   resolved "https://registry.yarnpkg.com/@cosmjs/stream/-/stream-0.30.1.tgz#ba038a2aaf41343696b1e6e759d8e03a9516ec1a"
@@ -4821,7 +4769,7 @@
     readonly-date "^1.0.0"
     xstream "^11.14.0"
 
-"@cosmjs/tendermint-rpc@^0.30.1", "@cosmjs/tendermint-rpc@~0.30.1":
+"@cosmjs/tendermint-rpc@^0.30.1":
   version "0.30.1"
   resolved "https://registry.yarnpkg.com/@cosmjs/tendermint-rpc/-/tendermint-rpc-0.30.1.tgz#c16378892ba1ac63f72803fdf7567eab9d4f0aa0"
   integrity sha512-Z3nCwhXSbPZJ++v85zHObeUggrEHVfm1u18ZRwXxFE9ZMl5mXTybnwYhczuYOl7KRskgwlB+rID0WYACxj4wdQ==
@@ -4858,7 +4806,7 @@
   resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.30.1.tgz#6d92582341be3c2ec8d82090253cfa4b7f959edb"
   integrity sha512-KvvX58MGMWh7xA+N+deCfunkA/ZNDvFLw4YbOmX3f/XBIkqrVY7qlotfy2aNb1kgp6h4B6Yc8YawJPDTfvWX7g==
 
-"@cosmjs/utils@^0.30.1", "@cosmjs/utils@~0.30.1":
+"@cosmjs/utils@^0.30.1":
   version "0.30.1"
   resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.30.1.tgz#6d92582341be3c2ec8d82090253cfa4b7f959edb"
   integrity sha512-KvvX58MGMWh7xA+N+deCfunkA/ZNDvFLw4YbOmX3f/XBIkqrVY7qlotfy2aNb1kgp6h4B6Yc8YawJPDTfvWX7g==
@@ -4983,80 +4931,6 @@
     fix-esm "^1.0.1"
     jsonld digitalcredentials/jsonld.js#v10.x
 
-"@docknetwork/cheqd-blockchain-api@0.18.0":
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/cheqd-blockchain-api/-/cheqd-blockchain-api-0.18.0.tgz#ca50a247d3a67c3ead5d7fb39d8424b606b7ff40"
-  integrity sha512-Saxku1pxHT+WsnsTrEsN8MXh8u+BHLtRIhGlwTrQ3vts9ObRoIAKY6sbo2uEC/K5IoFg7MfLP5iTC0TQcB3pdQ==
-  dependencies:
-    "@cheqd/sdk" cjs
-    "@docknetwork/credential-sdk" "0.24.0"
-
-"@docknetwork/credential-sdk@0.23.0":
-  version "0.23.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/credential-sdk/-/credential-sdk-0.23.0.tgz#6366fda4076fe3971dcb14481b9550620bb9089d"
-  integrity sha512-DgJacyyw1HfTlyxzPjO584rDTcY2xgCaZz+7a5ZGRApTwRnIwDUVkBGTpE9sO0HZJ6LoI82EsKf1dW0ZEeyOPg==
-  dependencies:
-    "@comunica/query-sparql-rdfjs" "^4.0.2"
-    "@digitalcredentials/vc-status-list" "^8.0.0"
-    "@docknetwork/crypto-wasm-ts" "^0.67.0"
-    "@juanelas/base64" "^1.1.5"
-    "@sphereon/ssi-sdk-ext.did-resolver-jwk" "^0.26.0"
-    "@stablelib/ed25519" "^1.0.0"
-    "@subsquid/ss58-codec" latest
-    "@transmute/json-web-signature" "^0.7.0-unstable.82"
-    blakejs "^1.2.1"
-    bs58 "^5.0.0"
-    deep-equal "^2.2.3"
-    elliptic "6.6.0"
-    js-sha256 "^0.11.0"
-    json-canonicalize "1.0.4"
-    json-stringify-deterministic "^1.0.12"
-    jsonld "^5.0.0"
-    jsonld-signatures "^9.3.1"
-    jsonschema "1.4.1"
-    key-did-resolver "^1.4.0"
-    mrklt "^0.2.0"
-    multiformats "^9.5.4"
-    n3 "^1.17.4"
-    rify "^0.7.1"
-    semver "^7.6.0"
-    uuid "^10.0.0"
-    uuidv4 "^6.2.13"
-    varint "^6.0.0"
-
-"@docknetwork/credential-sdk@0.24.0":
-  version "0.24.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/credential-sdk/-/credential-sdk-0.24.0.tgz#057725143c11e0b1f3cc8dbf69652201c3cf42ef"
-  integrity sha512-nfL+zWGI62/wIG5U2kazMJSHSv8i5XxJzzBJt2hZxLQtyyB+4nl7+qc/zBx/fzE+arSaA2VjpBxFEmNwsjcDiA==
-  dependencies:
-    "@comunica/query-sparql-rdfjs" "^4.0.2"
-    "@digitalcredentials/vc-status-list" "^8.0.0"
-    "@docknetwork/crypto-wasm-ts" "^0.67.0"
-    "@juanelas/base64" "^1.1.5"
-    "@sphereon/ssi-sdk-ext.did-resolver-jwk" "^0.26.0"
-    "@stablelib/ed25519" "^1.0.0"
-    "@subsquid/ss58-codec" latest
-    "@transmute/json-web-signature" "^0.7.0-unstable.82"
-    blakejs "^1.2.1"
-    bs58 "^5.0.0"
-    deep-equal "^2.2.3"
-    elliptic "6.6.0"
-    js-sha256 "^0.11.0"
-    json-canonicalize "1.0.4"
-    json-stringify-deterministic "^1.0.12"
-    jsonld "^5.0.0"
-    jsonld-signatures "^9.3.1"
-    jsonschema "1.4.1"
-    key-did-resolver "^1.4.0"
-    mrklt "^0.2.0"
-    multiformats "^9.5.4"
-    n3 "^1.17.4"
-    rify "^0.7.1"
-    semver "^7.6.0"
-    uuid "^10.0.0"
-    uuidv4 "^6.2.13"
-    varint "^6.0.0"
-
 "@docknetwork/crypto-wasm-ts@^0.63.0":
   version "0.63.0"
   resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.63.0.tgz#f1ab39693b63e70d682d362e9eacd85842ae56e0"
@@ -5072,60 +4946,6 @@
     lodash "^4.17.21"
     lzutf8 "0.6.3"
     semver "^7.6.0"
-
-"@docknetwork/crypto-wasm-ts@^0.67.0":
-  version "0.67.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm-ts/-/crypto-wasm-ts-0.67.0.tgz#6cb748ba107523fdb3b3770a4126d8fe74f0676c"
-  integrity sha512-S2QC10XTe7RbK/OfvFo3PHh98m/576E3XAGJWhoabc3w7nz5bgrBacEwsBsZqnZ4ttiB7/HLyDVnSD0OCTelrA==
-  dependencies:
-    "@types/flat" "^5.0.2"
-    "@types/lodash" "^4.14.195"
-    bs58 "5.0.0"
-    crypto-wasm-new "npm:@docknetwork/crypto-wasm@0.33.0"
-    flat "^5.0.2"
-    json-pointer "^0.6.2"
-    json-stringify-deterministic "^1.0.11"
-    lodash "^4.17.21"
-    lzutf8 "0.6.3"
-    semver "^7.6.0"
-    typedoc-github-theme "^0.1.2"
-
-"@docknetwork/dock-blockchain-api@0.9.2":
-  version "0.9.2"
-  resolved "https://registry.yarnpkg.com/@docknetwork/dock-blockchain-api/-/dock-blockchain-api-0.9.2.tgz#191cf9a60acdae738f54bf9bb57d511ee00eba1d"
-  integrity sha512-vxOgqLUSdJkslhmSll2p49h2bgLV1hdl8TJebDtynKGcIc9BSId1Dwq6hFg6bU90oqMOq4Dmg4BqmLiTsoYPww==
-  dependencies:
-    "@docknetwork/credential-sdk" "0.24.0"
-    "@docknetwork/node-types" "^0.17.0"
-    "@juanelas/base64" "^1.0.5"
-    "@polkadot/api" "10.12.4"
-    "@transmute/json-web-signature" "^0.7.0-unstable.80"
-    base64url "3.0.1"
-    blake2b "2.1.4"
-    bs58 "5.0.0"
-    cross-fetch "3.1.6"
-    deep-equal "2.0.5"
-    dotenv "16.0.1"
-    elliptic "6.6.0"
-    flat "^5.0.2"
-    js-sha256 "0.9.0"
-    json-canonicalize "1.0.4"
-    json-stringify-deterministic "^1.0.11"
-    jsonschema "1.4.1"
-    key-did-resolver "^1.4.0"
-    mrklt "^0.2.0"
-    multiformats "^9.5.4"
-    n3 "1.16.2"
-    pako "^2.1.0"
-    rify "^0.7.1"
-    semver "^7.6.0"
-
-"@docknetwork/dock-blockchain-modules@0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/dock-blockchain-modules/-/dock-blockchain-modules-0.13.0.tgz#e2d2e04b7aad09a5fa9b5b1ded80a3e10eb065b9"
-  integrity sha512-DfqaBKDjmVTXii49p7qDZZG8YEE/DHtUG27N3u8HCgXZK+udoF1rKfHMsAOYz4j981jIv8Md0HcIp7bIBT8y4w==
-  dependencies:
-    "@docknetwork/credential-sdk" "0.23.0"
 
 "@docknetwork/node-types@^0.17.0":
   version "0.17.0"
@@ -8787,7 +8607,7 @@ core-js@^3.30.2:
     long "^4.0.0"
     protobufjs "~6.11.2"
 
-cosmjs-types@^0.7.1, cosmjs-types@^0.7.2:
+cosmjs-types@^0.7.1:
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/cosmjs-types/-/cosmjs-types-0.7.2.tgz#a757371abd340949c5bd5d49c6f8379ae1ffd7e2"
   integrity sha512-vf2uLyktjr/XVAgEq0DjMxeAWh1yYREe7AMHDKd7EiHVqxBPCaBS+qEEQUkXbR9ndnckqr1sUG8BQhazh4X5lA==
@@ -8877,13 +8697,6 @@ crypto-ld@^6.0.0:
   version "0.30.0"
   resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.30.0.tgz#d54a56989cf98847e6e4ebe8119b6eb6012d8da4"
   integrity sha512-xwDtakDBaiOf0Cm6H74JsJ2I610rc+d9tSrgjuACE7QBpmkTug6QX4Q4OzxXA12wp86K5QqRMHoCzc6geS1Z0g==
-  dependencies:
-    buffer "^6.0.3"
-
-"crypto-wasm-new@npm:@docknetwork/crypto-wasm@0.33.0":
-  version "0.33.0"
-  resolved "https://registry.yarnpkg.com/@docknetwork/crypto-wasm/-/crypto-wasm-0.33.0.tgz#56c45659b9f5d54493048855a305c679adbfcfbe"
-  integrity sha512-af3sOB2vJsJimu86PG+79Vbe4SJrTLbGd65on06Au2WyOnPXF4J2pPfSqKl+40vO6I43HaxUzeR23gt8WGEx5g==
   dependencies:
     buffer "^6.0.3"
 
@@ -10028,15 +9841,6 @@ file-entry-cache@^6.0.1:
     flat-cache "^3.0.4"
 
 "file-type-cjs@npm:file-type@^16.5.4":
-  version "16.5.4"
-  resolved "https://registry.yarnpkg.com/file-type/-/file-type-16.5.4.tgz#474fb4f704bee427681f98dd390058a172a6c2fd"
-  integrity sha512-/yFHK0aGjFEgDJjEKP0pWCplsPFPhwyfwevf/pVxiN0tmE4L9LmwWxWukdJSHdoCli4VgQLehjJtwQBnqmsKcw==
-  dependencies:
-    readable-web-to-node-stream "^3.0.0"
-    strtok3 "^6.2.4"
-    token-types "^4.1.1"
-
-file-type@^16.5.4:
   version "16.5.4"
   resolved "https://registry.yarnpkg.com/file-type/-/file-type-16.5.4.tgz#474fb4f704bee427681f98dd390058a172a6c2fd"
   integrity sha512-/yFHK0aGjFEgDJjEKP0pWCplsPFPhwyfwevf/pVxiN0tmE4L9LmwWxWukdJSHdoCli4VgQLehjJtwQBnqmsKcw==
@@ -12349,7 +12153,7 @@ multiformats@^13.3.0:
   resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-13.3.2.tgz#a77c2a09c490e90c73b3049551604e6e1a4854e0"
   integrity sha512-qbB0CQDt3QKfiAzZ5ZYjLFOs+zW43vA4uyM8g27PeEuXZybUOFyjrVdP93HPBHMoglibwfkdVwbzfUq8qGcH6g==
 
-multiformats@^9.4.2, multiformats@^9.5.4, multiformats@^9.6.2, multiformats@^9.9.0:
+multiformats@^9.4.2, multiformats@^9.5.4, multiformats@^9.6.2:
   version "9.9.0"
   resolved "https://registry.yarnpkg.com/multiformats/-/multiformats-9.9.0.tgz#c68354e7d21037a8f1f8833c8ccd68618e8f1d37"
   integrity sha512-HoMUjhH9T8DDBNT+6xzkrd9ga/XiBI4xLr58LJACwK6G3HTOPeMz4nB4KJs33L2BelrIJa7P0VuNaVF3hMYfjg==
@@ -14404,11 +14208,6 @@ typed-array-length@^1.0.6:
     has-proto "^1.0.3"
     is-typed-array "^1.1.13"
     possible-typed-array-names "^1.0.0"
-
-typedoc-github-theme@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/typedoc-github-theme/-/typedoc-github-theme-0.1.2.tgz#54bcaa05a22ec864d1a996c3c460d895a8b10a8b"
-  integrity sha512-GFwQeq+z4FMtA9u2+wBx/UvzaX6t3xueigv6Jrt1G8JQLLyYuFfWwE3ESuKzpLfDu1+29GK4n70GbIqFRG+gaw==
 
 typescript@5.0.4:
   version "5.0.4"

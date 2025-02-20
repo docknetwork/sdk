@@ -1,5 +1,15 @@
 # @docknetwork/migration
 
+## 0.8.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/dock-blockchain-modules@0.27.0
+  - @docknetwork/credential-sdk@0.46.0
+  - @docknetwork/cheqd-blockchain-api@0.31.2
+  - @docknetwork/dock-blockchain-api@0.20.4
+
 ## 0.8.1
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-modules
 
+## 0.27.0
+
+### Minor Changes
+
+- Specify accumulator keys by ID mapping not index
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.46.0
+
 ## 0.26.3
 
 ### Patch Changes

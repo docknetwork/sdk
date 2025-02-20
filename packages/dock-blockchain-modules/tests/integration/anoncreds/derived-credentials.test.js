@@ -683,7 +683,7 @@ describe.each(Schemes)(
       });
 
       const accumulatorPublicKeys = new Map();
-      accumulatorPublicKeys.set(0, accumPk);
+      accumulatorPublicKeys.set(credentialStatus.id, accumPk);
 
       // Create a VP and verify it from this credential
       await createAndVerifyPresentation(credentials, {
@@ -804,7 +804,7 @@ describe.each(Schemes)(
       });
 
       const accumulatorPublicKeys = new Map();
-      accumulatorPublicKeys.set(0, accumPk);
+      accumulatorPublicKeys.set(credentialStatus.id, accumPk);
 
       // Create a VP and verify it from this credential
       await createAndVerifyPresentation(credentials, {

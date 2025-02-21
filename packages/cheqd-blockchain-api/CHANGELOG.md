@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.32.0
+
+### Minor Changes
+
+- Downgrade cheqd SDK to cjs
+
 ## 0.31.2
 
 ### Patch Changes

@@ -1,4 +1,4 @@
-import { AbstractApiProvider } from "@docknetwork/credential-sdk/modules/abstract/common";
+import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
 import {
   maybeToJSONString,
   fmtIterable,
@@ -6,8 +6,8 @@ import {
   maybeToCheqdPayloadOrJSON,
   retry,
   u8aToHex,
-} from "@docknetwork/credential-sdk/utils";
-import { sha256 } from "js-sha256";
+} from '@docknetwork/credential-sdk/utils';
+import { sha256 } from 'js-sha256';
 import {
   DIDModule,
   ResourceModule,
@@ -16,17 +16,17 @@ import {
   FeemarketModule,
   // eslint-disable-next-line no-unused-vars
   CheqdSDK,
-} from "@cheqd/sdk";
+} from '@cheqd/sdk';
 import {
   MsgCreateDidDocPayload,
   MsgUpdateDidDocPayload,
   MsgDeactivateDidDocPayload,
   protobufPackage as didProtobufPackage,
-} from "@cheqd/ts-proto/cheqd/did/v2/index.js";
+} from '@cheqd/ts-proto/cheqd/did/v2/index.js';
 import {
   MsgCreateResourcePayload,
   protobufPackage as resourceProtobufPackage,
-} from "@cheqd/ts-proto/cheqd/resource/v2/index.js";
+} from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
 import {
   DidRef,
   NamespaceDid,
@@ -61,14 +61,14 @@ import {
   CheqdMainnetAccumulatorCommon,
   CheqdMainnetOffchainSignaturePublicKeyValue,
   CheqdTestnetOffchainSignaturePublicKeyValue,
-} from "@docknetwork/credential-sdk/types";
-import { TypedEnum } from "@docknetwork/credential-sdk/types/generic";
-import pLimit from "p-limit";
-import { getBalance } from "../balance";
+} from '@docknetwork/credential-sdk/types';
+import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
+import pLimit from 'p-limit';
+import { getBalance } from '../balance';
 
 const fullTypeUrl = (typeUrl) => {
   const match = String(typeUrl).match(
-    /^\/(?<prefix>[^/]*?(?=\.([^/.]+)$))\.(?<name>[^/.]+)$|^(?<nameOnly>[^/.]+)$/
+    /^\/(?<prefix>[^/]*?(?=\.([^/.]+)$))\.(?<name>[^/.]+)$|^(?<nameOnly>[^/.]+)$/,
   );
 
   if (match == null) {
@@ -82,7 +82,7 @@ const fullTypeUrl = (typeUrl) => {
   const prefixByName = Prefixes[nameOnly ?? name];
   if (!prefixByName) {
     throw new Error(
-      `Invalid typeUrl name provided: \`${typeUrl}\`, can't find prefix for \`${nameOnly}\``
+      `Invalid typeUrl name provided: \`${typeUrl}\`, can't find prefix for \`${nameOnly}\``,
     );
   } else if (nameOnly) {
     return `/${prefixByName}.${nameOnly}`;
@@ -93,29 +93,27 @@ const fullTypeUrl = (typeUrl) => {
   }
 };
 
-const fullTypeUrls = (txOrTxs) =>
-  [].concat(txOrTxs).map(({ typeUrl }) => fullTypeUrl(typeUrl));
+const fullTypeUrls = (txOrTxs) => [].concat(txOrTxs).map(({ typeUrl }) => fullTypeUrl(typeUrl));
 
 const buildObj = (
   createDID,
   updateDID,
   deactivateDID,
   createResource,
-  f = fullTypeUrl
-) =>
-  extendNull({
-    [f("MsgCreateDidDoc")]: createDID,
-    [f("MsgUpdateDidDoc")]: updateDID,
-    [f("MsgDeactivateDidDoc")]: deactivateDID,
-    [f("MsgCreateResource")]: createResource,
-  });
+  f = fullTypeUrl,
+) => extendNull({
+  [f('MsgCreateDidDoc')]: createDID,
+  [f('MsgUpdateDidDoc')]: updateDID,
+  [f('MsgDeactivateDidDoc')]: deactivateDID,
+  [f('MsgCreateResource')]: createResource,
+});
 
 const Prefixes = buildObj(
   didProtobufPackage,
   didProtobufPackage,
   didProtobufPackage,
   resourceProtobufPackage,
-  (key) => key
+  (key) => key,
 );
 
 export class CheqdAPI extends AbstractApiProvider {
@@ -142,23 +140,23 @@ export class CheqdAPI extends AbstractApiProvider {
     DIDModule.fees.DefaultCreateDidDocFee,
     DIDModule.fees.DefaultUpdateDidDocFee,
     DIDModule.fees.DefaultDeactivateDidDocFee,
-    ResourceModule.fees.DefaultCreateResourceDefaultFee
+    ResourceModule.fees.DefaultCreateResourceDefaultFee,
   );
 
-  static BaseGasAmounts = buildObj("150000", "500000", "500000", "500000");
+  static BaseGasAmounts = buildObj('150000', '500000', '500000', '500000');
 
   static Payloads = buildObj(
     [CheqdDIDDocument, MsgCreateDidDocPayload],
     [CheqdDIDDocument, MsgUpdateDidDocPayload],
     [CheqdDeactivateDidDocument, MsgDeactivateDidDocPayload],
-    [CheqdCreateResource, MsgCreateResourcePayload]
+    [CheqdCreateResource, MsgCreateResourcePayload],
   );
 
   static PayloadWrappers = buildObj(
     CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
     CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
     CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures,
-    CheqdCreateResourcePayloadWithTypeUrlAndSignatures
+    CheqdCreateResourcePayloadWithTypeUrlAndSignatures,
   );
 
   static BlockLimits = extendNull({
@@ -232,7 +230,7 @@ export class CheqdAPI extends AbstractApiProvider {
     } = this;
     if (Payloads == null) {
       throw new Error(
-        `Can't find payload constructor for the provided method \`${method}\``
+        `Can't find payload constructor for the provided method \`${method}\``,
       );
     }
     const [TypedPayload, Payload] = Payloads;
@@ -245,7 +243,7 @@ export class CheqdAPI extends AbstractApiProvider {
       return Payload.encode(sdkPayload).finish();
     } catch (err) {
       throw new Error(
-        `Failed to encode payload \`${maybeToJSONString(sdkPayload)}\`: ${err}`
+        `Failed to encode payload \`${maybeToJSONString(sdkPayload)}\`: ${err}`,
       );
     }
   }
@@ -262,11 +260,11 @@ export class CheqdAPI extends AbstractApiProvider {
     if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
       throw new Error(
         `Invalid network provided: \`${network}\`, expected one of \`${fmtIterable(
-          Object.values(CheqdNetwork)
-        )}\``
+          Object.values(CheqdNetwork),
+        )}\``,
       );
     } else if (wallet == null) {
-      throw new Error("`wallet` must be provided");
+      throw new Error('`wallet` must be provided');
     }
 
     this.ensureNotInitialized();
@@ -309,8 +307,8 @@ export class CheqdAPI extends AbstractApiProvider {
     return String(
       fullTypeUrls(txOrTxs).reduce(
         (total, typeUrl) => total + BigInt(BaseGasAmounts[typeUrl]),
-        BigInt(0)
-      )
+        BigInt(0),
+      ),
     );
   }
 
@@ -319,12 +317,12 @@ export class CheqdAPI extends AbstractApiProvider {
 
     const amount = fullTypeUrls(txOrTxs).reduce(
       (total, typeUrl) => total + BigInt(Fees[typeUrl].amount),
-      BigInt(0)
+      BigInt(0),
     );
 
     return {
       amount: String(amount),
-      denom: "ncheq",
+      denom: 'ncheq',
     };
   }
 
@@ -355,72 +353,68 @@ export class CheqdAPI extends AbstractApiProvider {
       const strErr = String(err);
 
       if (
-        strErr.includes("fetch failed") ||
-        strErr.includes("Bad status") ||
-        strErr.includes("other side closed")
+        strErr.includes('fetch failed')
+        || strErr.includes('Bad status')
+        || strErr.includes('other side closed')
       ) {
         console.error(err);
         await this.reconnect();
 
         return continueSym;
-      } else if (strErr.includes("tx already exists in cache")) {
+      } else if (strErr.includes('tx already exists in cache')) {
         const { bodyBytes } = await this.sdk.signer.sign(
           sender,
           txJSON,
           payment,
-          memo ?? ""
+          memo ?? '',
         );
         const hash = u8aToHex(sha256.digest(bodyBytes)).slice(2).toUpperCase();
 
         return await this.txResult(hash);
-      } else if (strErr.includes("out of gas in location")) {
+      } else if (strErr.includes('out of gas in location')) {
         const gasAmount = Number(payment.gas);
         const limit = BlockLimits[this.network()];
         if (gasAmount >= limit) {
           throw new Error(
-            "Can't process transaction because it exceeds block gas limit"
+            "Can't process transaction because it exceeds block gas limit",
           );
         }
 
         // eslint-disable-next-line no-param-reassign
         payment.gas = String(Math.min(gasAmount * 2, limit));
         return continueSym;
-      } else if (strErr.includes("account sequence mismatch")) {
+      } else if (strErr.includes('account sequence mismatch')) {
         return continueSym;
       }
 
       throw err;
     };
 
-    return await this.#spawn(() =>
-      retry(
-        async () => {
-          const res = await this.sdk.signer.signAndBroadcast(
-            sender,
-            txJSON,
-            payment,
-            memo ?? ""
+    return await this.#spawn(() => retry(
+      async () => {
+        const res = await this.sdk.signer.signAndBroadcast(
+          sender,
+          txJSON,
+          payment,
+          memo ?? '',
+        );
+
+        if (res.code) {
+          console.error(res);
+
+          throw new Error(
+            JSON.stringify(res, (_, value) => (typeof value === 'bigint' ? `${value.toString()}n` : value)),
           );
-
-          if (res.code) {
-            console.error(res);
-
-            throw new Error(
-              JSON.stringify(res, (_, value) =>
-                typeof value === "bigint" ? `${value.toString()}n` : value
-              )
-            );
-          }
-
-          return res;
-        },
-        {
-          onError,
-          delay: 5e2,
-          timeLimit: 6e4,
         }
-      )
-    );
+
+        return res;
+      },
+      {
+        onError,
+        delay: 5e2,
+        timeLimit: 6e4,
+      },
+    ));
   }
 
   /**
@@ -432,7 +426,9 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {object} configuration.fee
    * @returns {Promise<*>}
    */
-  async signAndSend(tx, { from, fee, memo, gas } = {}) {
+  async signAndSend(tx, {
+    from, fee, memo, gas,
+  } = {}) {
     const sender = from ?? (await this.address());
     const txJSON = this.constructor.txToJSON(tx);
 
@@ -466,7 +462,7 @@ export class CheqdAPI extends AbstractApiProvider {
           wallet,
         });
       },
-      { delay: 5e2, timeLimit: 1e4 }
+      { delay: 5e2, timeLimit: 1e4 },
     );
   }
 
@@ -499,7 +495,7 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   methods() {
-    return ["cheqd", "dock"];
+    return ['cheqd', 'dock'];
   }
 
   // eslint-disable-next-line
@@ -531,7 +527,7 @@ export class CheqdAPI extends AbstractApiProvider {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);
-    } else if (String(id).includes(":dock:")) {
+    } else if (String(id).includes(':dock:')) {
       return true;
     }
 

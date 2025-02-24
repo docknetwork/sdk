@@ -1,5 +1,5 @@
-import { CheqdAPI } from "../api";
-import MultiSender from "./multi-sender";
+import { CheqdAPI } from '../api';
+import MultiSender from './multi-sender';
 
 export default class CheqdMultiSenderAPI extends CheqdAPI {
   constructor(params) {

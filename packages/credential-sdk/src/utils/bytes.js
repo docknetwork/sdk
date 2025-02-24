@@ -1,7 +1,7 @@
-import crypto from "crypto";
-import { applyToValue } from "./interfaces";
-import { ensureString, ensureIterable } from "./types/ensure-type";
-import { isIterable } from "./types";
+import crypto from 'crypto';
+import { applyToValue } from './interfaces';
+import { ensureString, ensureIterable } from './types/ensure-type';
+import { isIterable } from './types';
 
 /**
  * Checks that the given value is a byte (an integer between 0 and 255).
@@ -71,7 +71,7 @@ export const isBytes = (bytes) => {
  * @return {boolean} True if hex (with given size) else false
  */
 export const isHexWithGivenByteSize = (value, byteSize) => {
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return false;
   }
   const match = value.match(/^0x([0-9a-f]+$)/i);
@@ -101,8 +101,7 @@ export const isHex = (value) => isHexWithGivenByteSize(value);
  * @param {Iterable<number>} bytes
  * @returns {string}
  */
-export const u8aToHex = (bytes) =>
-  `0x${Buffer.from(ensureBytes(bytes)).toString("hex")}`;
+export const u8aToHex = (bytes) => `0x${Buffer.from(ensureBytes(bytes)).toString('hex')}`;
 
 /**
  * Creates `Uint8Array` from the supplied hex string.
@@ -112,11 +111,11 @@ export const u8aToHex = (bytes) =>
 export const hexToU8a = (str) => {
   if (!isHex(str)) {
     throw new Error(
-      `Expected valid hex string, received: \`${str}\` with type \`${typeof str}\``
+      `Expected valid hex string, received: \`${str}\` with type \`${typeof str}\``,
     );
   }
 
-  return Uint8Array.from(Buffer.from(str.slice(2), "hex"));
+  return Uint8Array.from(Buffer.from(str.slice(2), 'hex'));
 };
 
 /**
@@ -158,8 +157,7 @@ export const u8aToU8a = (bytes) => bufferToU8a(Buffer.from(ensureBytes(bytes)));
  * @param {Iterable<number>} bytes
  * @returns {string}
  */
-export const u8aToString = (bytes) =>
-  Buffer.from(ensureBytes(bytes)).toString();
+export const u8aToString = (bytes) => Buffer.from(ensureBytes(bytes)).toString();
 
 /**
  * Converts supplied string containing any characters to its hex string representation.
@@ -184,8 +182,8 @@ export const normalizeToU8a = (bytes) => {
 
   throw new Error(
     `Can't convert supplied value to \`Uint8Array\`: \`${bytes}\` ${
-      bytes ? `instance of \`${bytes.constructor.name}\`` : ""
-    }`
+      bytes ? `instance of \`${bytes.constructor.name}\`` : ''
+    }`,
   );
 };
 
@@ -194,10 +192,9 @@ export const normalizeToU8a = (bytes) => {
  * @param {Uint8Array | string} bytesOrString
  * @returns {Uint8Array}
  */
-export const normalizeOrConvertStringToU8a = (bytesOrString) =>
-  typeof bytesOrString === "string" && !isHex(bytesOrString)
-    ? stringToU8a(bytesOrString)
-    : normalizeToU8a(bytesOrString);
+export const normalizeOrConvertStringToU8a = (bytesOrString) => (typeof bytesOrString === 'string' && !isHex(bytesOrString)
+  ? stringToU8a(bytesOrString)
+  : normalizeToU8a(bytesOrString));
 
 /**
  * Creates random `Uint8Array` array of supplied byte length.
@@ -219,15 +216,13 @@ export const randomAsHex = (length) => u8aToHex(randomAsU8a(length));
  * @param {*} obj
  * @returns {Uint8Array}
  */
-export const valueBytes = (value) =>
-  applyToValue(
-    (inner) =>
-      Array.isArray(inner) ||
-      inner instanceof Uint8Array ||
-      (inner && typeof inner === "object" && "bytes" in inner),
-    (inner) => normalizeToU8a(inner.bytes ?? inner),
-    value
-  );
+export const valueBytes = (value) => applyToValue(
+  (inner) => Array.isArray(inner)
+      || inner instanceof Uint8Array
+      || (inner && typeof inner === 'object' && 'bytes' in inner),
+  (inner) => normalizeToU8a(inner.bytes ?? inner),
+  value,
+);
 
 /**
  * Attempts to get byte representation of the supplied object.
@@ -235,19 +230,16 @@ export const valueBytes = (value) =>
  * @param {*} value
  * @returns {Uint8Array}
  */
-export const valueNumberOrBytes = (value) =>
-  applyToValue(
-    (inner) =>
-      Array.isArray(inner) ||
-      inner instanceof Uint8Array ||
-      (inner && typeof inner === "object" && "bytes" in inner) ||
-      typeof inner === "number",
-    (inner) =>
-      typeof inner === "number"
-        ? stringToU8a(String(inner))
-        : normalizeToU8a(inner.bytes ?? inner),
-    value
-  );
+export const valueNumberOrBytes = (value) => applyToValue(
+  (inner) => Array.isArray(inner)
+      || inner instanceof Uint8Array
+      || (inner && typeof inner === 'object' && 'bytes' in inner)
+      || typeof inner === 'number',
+  (inner) => (typeof inner === 'number'
+    ? stringToU8a(String(inner))
+    : normalizeToU8a(inner.bytes ?? inner)),
+  value,
+);
 
 /**
  * Normalizes the given input to hex. Expects a Uint8Array or a hex string
@@ -256,9 +248,9 @@ export const valueNumberOrBytes = (value) =>
  */
 export function normalizeToHex(data) {
   if (
-    data instanceof Uint8Array ||
-    data instanceof Buffer ||
-    Array.isArray(data)
+    data instanceof Uint8Array
+    || data instanceof Buffer
+    || Array.isArray(data)
   ) {
     return u8aToHex(data);
   } else if (isHex(data)) {
@@ -266,6 +258,6 @@ export function normalizeToHex(data) {
   }
 
   throw new Error(
-    `Expected a hex string or a byte array, received \`${data}\` with type \`${typeof data}\``
+    `Expected a hex string or a byte array, received \`${data}\` with type \`${typeof data}\``,
   );
 }

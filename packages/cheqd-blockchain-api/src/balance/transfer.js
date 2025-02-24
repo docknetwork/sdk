@@ -1,15 +1,14 @@
-import { checkBalance } from "@cheqd/sdk";
-import { ensureString } from "@docknetwork/credential-sdk/utils";
-import { DEFAULT_TRANSFER_FEE } from "./constants";
+import { ensureString } from '@docknetwork/credential-sdk/utils';
+import { DEFAULT_TRANSFER_FEE } from './constants';
 
 export const createTransfer = (from, to, ncheq) => ({
-  typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+  typeUrl: '/cosmos.bank.v1beta1.MsgSend',
   value: {
     fromAddress: ensureString(from),
     toAddress: ensureString(to),
     amount: [
       {
-        denom: "ncheq",
+        denom: 'ncheq',
         amount: String(ncheq),
       },
     ],
@@ -20,7 +19,7 @@ export async function sendNcheq(
   api,
   recipientOrRecipients,
   amountPerRecipient,
-  { fee = DEFAULT_TRANSFER_FEE, memo = "" } = {}
+  { fee = DEFAULT_TRANSFER_FEE, memo = '' } = {},
 ) {
   const recipients = [].concat(recipientOrRecipients);
 
@@ -31,12 +30,10 @@ export async function sendNcheq(
   }
   const from = await api.address();
 
-  const txs = recipients.map((to) =>
-    createTransfer(from, to, amountPerRecipient)
-  );
+  const txs = recipients.map((to) => createTransfer(from, to, amountPerRecipient));
   const feeObj = {
     amount: [
-      { denom: "ncheq", amount: String(Number(fee) * recipients.length) },
+      { denom: 'ncheq', amount: String(Number(fee) * recipients.length) },
     ], // Fee amount in ncheq
     gas: String(200000 * recipients.length), // Gas limit
     payer: from,

@@ -344,7 +344,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {Array<object>} txJSON
    * @param {object} payment
    * @param {?string} memo
-   * @returns
+   * @returns {Promise<object>}
    */
   async signAndBroadcast(sender, txJSON, { ...payment }, memo) {
     const { BlockLimits } = this.constructor;

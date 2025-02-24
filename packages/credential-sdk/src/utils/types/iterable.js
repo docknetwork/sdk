@@ -17,7 +17,7 @@ export const fmtIterable = (iter) => `[${[...ensureIterable(iter)].map(String).j
  *
  * @template T - The type of the input value
  * @param {T} value - The value to convert into an iterable
- * @returns {Iterable<keyof T | T>} - An iterable version of the input value
+ * @returns {Iterable<T>} - An iterable version of the input value
  * @throws {Error} If the value is null, undefined, or neither an iterable nor an object
  */
 export const toIterable = (value) => {
@@ -37,7 +37,7 @@ export const toIterable = (value) => {
  *
  * @template T - The type of the input value
  * @param {T} value - The value to convert into an iterator
- * @returns {IterableIterator<keyof T | T>} - An iterator version of the input value
+ * @returns {IterableIterator<T>} - An iterator version of the input value
  * @throws {Error} If the value is null, undefined, or neither an iterable nor an object
  */
 export const toIterator = (value) => toIterable(value)[Symbol.iterator]();

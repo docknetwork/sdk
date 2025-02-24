@@ -5,8 +5,8 @@ import { toIterable } from '../types';
  * The properties are merged into an accumulated object, with later ones overwriting earlier duplicates if keys conflict.
  *
  * @template T
- * @param {Iterable<Promise<{ [key: string]: T }>>} objectPromises - An iterable of promises where each promise resolves to an object.
- * @returns {Promise<{ [key: string]: T }>} The accumulated merged object containing properties from all resolved objects. If duplicate keys exist,
+ * @param {Iterable<Promise<Object<string, T>>>} objectPromises - An iterable of promises where each promise resolves to an object.
+ * @returns {Promise<Object<string, T>>} The accumulated merged object containing properties from all resolved objects. If duplicate keys exist,
  *                    later values overwrite earlier ones.
  * @throws {Error} If any promise does not resolve to an object or rejects, this function will throw an error.
  */

@@ -7,7 +7,7 @@
 - Updated dependencies
   - @docknetwork/dock-blockchain-modules@0.27.0
   - @docknetwork/dock-blockchain-api@0.21.0
-  - @docknetwork/credential-sdk@0.45.0
+  - @docknetwork/credential-sdk@0.47.0
 
 ## 0.18.2
 

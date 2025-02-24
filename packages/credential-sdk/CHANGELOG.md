@@ -1,6 +1,6 @@
 # @docknetwork/credential-sdk
 
-## 0.45.0
+## 0.47.0
 
 ### Minor Changes
 

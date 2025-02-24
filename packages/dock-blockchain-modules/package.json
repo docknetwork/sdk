@@ -32,7 +32,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@docknetwork/credential-sdk": "0.45.0"
+    "@docknetwork/credential-sdk": "0.47.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",

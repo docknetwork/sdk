@@ -9,7 +9,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @docknetwork/credential-sdk@0.45.0
+  - @docknetwork/credential-sdk@0.47.0
 
 ## 0.20.2
 

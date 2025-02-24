@@ -330,7 +330,7 @@ testingKeys.forEach((testKey) => {
       const credential = new VerifiableCredential(sampleId);
       expect(() => {
         credential.addContext(123);
-      }).toThrowError("needs to be a string.");
+      }).toThrowError(/needs to be a string/);
 
       expect(() => {
         credential.setStatus({ some: "value", type: "something" });
@@ -430,10 +430,10 @@ testingKeys.forEach((testKey) => {
       const vp = new VerifiablePresentation(sampleId);
       expect(() => {
         vp.addContext(123);
-      }).toThrowError("needs to be a string.");
+      }).toThrowError(/needs to be a string/);
       expect(() => {
         vp.addContext("123");
-      }).toThrowError("needs to be a valid URI.");
+      }).toThrowError(/needs to be a valid URI/);
 
       expect(() => {
         vp.addCredential({ some: "value" });

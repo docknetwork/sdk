@@ -1,5 +1,5 @@
 /* eslint-disable  max-classes-per-file */
-import { fmtIter } from '../../utils/generic';
+import { fmtIterable } from '../../utils';
 import {
   isEqualToOrPrototypeOf,
   withExtendedStaticProperties,
@@ -215,7 +215,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
         }
 
         throw new Error(
-          `Unexpected json in \`${this}\`: \`${json}\`, expected one of ${fmtIter(
+          `Unexpected json in \`${this}\`: \`${json}\`, expected one of ${fmtIterable(
             new Set([...this.Variants].flatMap((v) => [v.JsonType, v.Type])),
           )}`,
         );
@@ -225,7 +225,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
     const keys = Object.keys(json);
     if (keys.length !== 1) {
       throw new Error(
-        `Expected object with 1 key, received \`${json}\` with keys: ${fmtIter(
+        `Expected object with 1 key, received \`${json}\` with keys: ${fmtIterable(
           keys,
         )} by ${this.name}`,
       );
@@ -248,7 +248,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
       }
 
       throw new Error(
-        `Invalid key \`${key}\`, expected one of ${fmtIter(
+        `Invalid key \`${key}\`, expected one of ${fmtIterable(
           new Set([...this.Variants].flatMap((v) => [v.JsonType, v.Type])),
         )} by \`${this.name}\``,
       );
@@ -275,7 +275,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
     throw new Error(
       `Invalid object received: \`${maybeToJSONString(
         obj,
-      )}\`, expected to build an instance of ${fmtIter(
+      )}\`, expected to build an instance of ${fmtIterable(
         this.Variants.map((v) => v.Type),
       )} by \`${this.name}\``,
     );

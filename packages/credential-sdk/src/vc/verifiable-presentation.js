@@ -5,9 +5,9 @@ import {
   ensureString,
   ensureURI,
   isObject,
+  getUniqueElementsFromArray,
 } from '../utils';
 
-import { getUniqueElementsFromArray } from '../utils/misc';
 import VerifiableCredential from './verifiable-credential';
 // import DIDResolver from "../resolver/did/did-resolver"; // eslint-disable-line
 

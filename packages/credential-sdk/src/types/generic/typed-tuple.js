@@ -1,10 +1,9 @@
 import { withExtendedStaticProperties } from '../../utils/inheritance';
 import { maybeEq, maybeFrom } from '../../utils/interfaces';
-import { ArrayWithoutPrototypeMethods } from '../../utils/generic';
+import { ArrayWithoutPrototypeMethods, ensureArrayLike } from '../../utils';
 import withBase from './with-base';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
-import { ensureArrayLike } from '../../utils';
 
 class TypedTuple extends withBase(ArrayWithoutPrototypeMethods) {
   /**

@@ -3,7 +3,7 @@
 import { u8aToHex } from "@polkadot/util";
 import { connect, keypair } from "../helpers";
 import { DockDidOrDidMethodKey } from "../../src/did";
-import { getStateChange } from "../../src/utils/misc";
+import { getStateChange } from "../../src/utils";
 
 require("dotenv").config();
 

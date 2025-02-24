@@ -1,5 +1,5 @@
 import { encode, decode } from '@subsquid/ss58-codec';
-import { normalizeToU8a, u8aToHex } from './bytes';
+import { normalizeToU8a, u8aToHex } from '../bytes';
 
 /**
  * Encodes an address in SS58 format, which includes a network prefix.

@@ -9,7 +9,7 @@ class CheqdApiProvider extends AbstractApiProvider {
   }
 
   get sdk() {
-    return this.cheqd.ensureInitialized().sdk;
+    return this.cheqd.sdk;
   }
 
   types() {

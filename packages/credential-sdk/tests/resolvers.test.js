@@ -131,6 +131,8 @@ describe("Resolvers", () => {
       removeDocumentTx() {}
     })(
       new (class Api extends AbstractApiProvider {
+        async init() {}
+        async disconnect() {}
         methods() {
           return ["dock"];
         }
@@ -140,8 +142,8 @@ describe("Resolvers", () => {
         supportsIdentifier() {
           return true;
         }
-        stateChangeBytes() {}
-        signAndSend() {}
+        async stateChangeBytes() {}
+        async signAndSend() {}
       })()
     );
 

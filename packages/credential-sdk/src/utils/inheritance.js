@@ -1,4 +1,5 @@
-import { fmtIter } from './generic';
+import { fmtIterable } from './types/iterable';
+import { ensureNoIntersection } from './types/set';
 
 /**
  * Enhances the provided class with the given list of static properties to require
@@ -14,7 +15,9 @@ import { fmtIter } from './generic';
  */
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export function withExtendedStaticProperties(properties, parentClass) {
-  const name = `withExtStatics(${parentClass.name}, ${fmtIter(properties)})`;
+  const name = `withExtStatics(${parentClass.name}, ${fmtIterable(
+    properties,
+  )})`;
 
   const extendedClass = {
     [name]: class extends parentClass {
@@ -83,7 +86,7 @@ export function withExtendedStaticProperties(properties, parentClass) {
  * @returns {T}
  */
 export function withExtendedPrototypeProperties(properties, parentClass) {
-  const name = `withExtProto(${parentClass.name}, ${fmtIter(properties)})`;
+  const name = `withExtProto(${parentClass.name}, ${fmtIterable(properties)})`;
 
   const extendedClass = {
     [name]: class extends parentClass {
@@ -114,24 +117,22 @@ export function withExtendedPrototypeProperties(properties, parentClass) {
   return extendedClass[name];
 }
 
-export const ensurePropertiesAreUnique = (reservedFields, fields) => {
-  for (const field of fields) {
-    if (reservedFields.has(field)) {
-      throw new Error(`Property \`${field}\` is reserved`);
-    }
-  }
-};
-
 const ObjectProperties = new WeakMap();
 
-export const allProperties = (obj) => {
+/**
+ * Returns a Set containing all properties of the given object and its prototype chain.
+ *
+ * @param {Object} obj - The object to retrieve properties from.
+ * @returns {Set} - A set of properties.
+ */
+export const allObjectPropertiesIncludingPrototypes = (obj) => {
   if (obj == null) return new Set();
 
   let props = ObjectProperties.get(obj);
   if (props == null) {
     props = new Set([
       ...Object.getOwnPropertyNames(obj),
-      ...allProperties(Object.getPrototypeOf(obj)),
+      ...allObjectPropertiesIncludingPrototypes(Object.getPrototypeOf(obj)),
     ]);
     ObjectProperties.set(obj, props);
   }
@@ -139,21 +140,110 @@ export const allProperties = (obj) => {
   return props;
 };
 
-export const validateProperties = (obj) => ensurePropertiesAreUnique(
+/**
+ * Validates that object properties don't intersect with prototype properties.
+ *
+ * @param {Object} obj - The object to validate.
+ */
+export const validateProperties = (obj) => ensureNoIntersection(
   new Set(Object.getOwnPropertyNames(obj)),
-  allProperties(Object.getPrototypeOf(obj)),
+  allObjectPropertiesIncludingPrototypes(Object.getPrototypeOf(obj)),
 );
 
+/**
+ * Checks if an object is the prototype of another object.
+ *
+ * @param {Object} proto - The prototype object.
+ * @param {Object} obj - The object to check against.
+ * @returns {boolean} - Whether the object is the prototype.
+ */
 export const isPrototypeOf = (proto, obj) => Object.isPrototypeOf.call(proto, obj);
 
+/**
+ * Checks if an object is equal to or a prototype of another object.
+ *
+ * @param {Object} proto - The prototype object.
+ * @param {Object} obj - The object to check.
+ * @returns {boolean} - Whether the object is equal to or a prototype of the other.
+ */
 export const isEqualToOrPrototypeOf = (proto, obj) => Object.is(proto, obj) || isPrototypeOf(proto, obj);
 
+/**
+ * Ensures an object is equal to or a prototype of another object.
+ *
+ * @param {Object} proto - The prototype object to check against.
+ * @param {Object} obj - The object to validate.
+ * @returns {Object} - The validated object if it meets the requirement.
+ * @throws {Error} - If the object doesn't match the prototype.
+ */
 export const ensureEqualToOrPrototypeOf = (proto, obj) => {
-  if (!isEqualToOrPrototypeOf(proto, obj)) {
-    throw new Error(
-      `Expected \`${proto.name}\` to be equal to or a prototype of \`${obj.name}\``,
-    );
+  if (isEqualToOrPrototypeOf(proto, obj)) {
+    return obj;
   }
 
-  return obj;
+  throw new Error(
+    `Expected \`${proto.name}\` to be equal to or a prototype of \`${obj.name}\``,
+  );
+};
+
+/**
+ * Creates a new class that extends the given class but hides prototype functions from
+ * the original class on its own prototype. The resulting class will not have any
+ * enumerable functions from the original class except for those explicitly ignored.
+ *
+ * @param {Function} klass - The original class to extend
+ * @param {Set<string>} ignore - Optional set of member names to keep visible
+ * @returns {Function} The new extended class without prototype functions
+ */
+export const withoutPrototypeFunctions = (klass, ignore = new Set()) => {
+  const name = `withoutPrototypeFunctions(${klass.name})`;
+
+  const obj = {
+    [name]: class extends klass {},
+  };
+
+  for (const member of Object.getOwnPropertyNames(klass.prototype)) {
+    if (!ignore.has(member) && typeof klass.prototype[member] === 'function') {
+      Object.defineProperty(obj[name].prototype, member, {
+        enumerable: false,
+      });
+    }
+  }
+
+  return obj[name];
+};
+
+/**
+ * Ensures that the given value is an instance of the specified class. Throws an error with details if not.
+ *
+ * @param {*} value - The value to check.
+ * @param {Function} klass - The constructor or class to check against.
+ * @throws If value is not a Uint8Array.
+ * @returns {*} - The original value if it's an instance of the class.
+ */
+export const ensureInstanceOf = (value, klass) => {
+  if (value instanceof klass) {
+    return value;
+  }
+
+  throw new Error(
+    `Expected \`${value}\` with constructor \`${value?.constructor.name}\` to be an instance of \`${klass.name}\``,
+  );
+};
+
+/**
+ * Ensures that the given prototype is that of the value. Throws an error with a message if not.
+ *
+ * @param {object} proto - The expected prototype.
+ * @param {*} value - The value to check.
+ * @returns {*} - The original value if it has the correct prototype.
+ */
+export const ensurePrototypeOf = (proto, value) => {
+  if (isPrototypeOf(proto, value)) {
+    return value;
+  }
+
+  throw new Error(
+    `Expected \`${proto.name}\` to be a prototype of \`${value}\``,
+  );
 };

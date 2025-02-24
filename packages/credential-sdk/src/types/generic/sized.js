@@ -1,4 +1,7 @@
-import { allProperties, withExtendedStaticProperties } from '../../utils';
+import {
+  allObjectPropertiesIncludingPrototypes,
+  withExtendedStaticProperties,
+} from '../../utils';
 
 /**
  * Extends supplied class to check that its itstance lenght is always equal to the `static Size` property
@@ -11,7 +14,9 @@ import { allProperties, withExtendedStaticProperties } from '../../utils';
  */
 export default function sized(klass, getSize = ({ length }) => length) {
   const name = `Sized<${klass.name}>`;
-  const methods = [...allProperties(klass.prototype)].filter(
+  const methods = [
+    ...allObjectPropertiesIncludingPrototypes(klass.prototype),
+  ].filter(
     (prop) => typeof klass.prototype[prop] === 'function' && prop !== 'constructor',
   );
 

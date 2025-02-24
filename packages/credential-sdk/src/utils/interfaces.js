@@ -1,3 +1,5 @@
+import { MustBeCalledOnce } from './assert';
+
 /**
  * Attempts to call `value.toJSON()`, returns `JSON.parse(JSON.stringify(value))` if method doesn't exist.
  * @template T
@@ -86,55 +88,6 @@ export const maybeNew = (Class, args) => (!Class[NotAConstructor] ? new Class(..
 export const maybeFrom = (klass, obj) => (typeof klass.from === 'function' ? klass.from(obj) : maybeNew(klass, [obj]));
 
 /**
- * Error thrown when the provided function was executed more than once or wasn't executed at all.
- */
-export class MustBeExecutedOnce extends Error {
-  constructor(fn) {
-    super(`Function must be executed exactly once: \`${fn}\``);
-  }
-
-  static ensure(fn, call) {
-    let executed = false;
-    const willExecute = () => {
-      if (executed) {
-        throw new this(fn);
-      }
-
-      executed = true;
-    };
-    const wasExecuted = () => {
-      if (!executed) {
-        throw new this(fn);
-      }
-    };
-
-    const name = `mustBeExecutedOnce(${fn.name})`;
-    const obj = {
-      [name](...args) {
-        let res; let
-          err;
-
-        willExecute();
-        try {
-          res = fn.apply(this, args);
-        } catch (e) {
-          err = e;
-        } finally {
-          wasExecuted();
-        }
-
-        if (err != null) {
-          throw err;
-        }
-        return res;
-      },
-    };
-
-    return call(obj[name]);
-  }
-}
-
-/**
  * Applies function to the first value of the provided object that passes the check.
  * @template T
  * @template I
@@ -149,7 +102,7 @@ export const applyToValue = (check, fn, value) => {
     return fn(value);
   } else if (typeof value?.apply === 'function') {
     let res;
-    MustBeExecutedOnce.ensure(
+    MustBeCalledOnce.ensure(
       (obj) => {
         res = applyToValue(check, fn, obj);
       },

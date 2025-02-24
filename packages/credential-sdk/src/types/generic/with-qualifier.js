@@ -5,7 +5,7 @@ import {
 } from '../../utils/inheritance';
 import { maybeFrom } from '../../utils/interfaces';
 import withFrom from './with-from';
-import { fmtIter } from '../../utils';
+import { fmtIterable } from '../../utils';
 import TypedString from './typed-string';
 
 /**
@@ -59,7 +59,7 @@ export default function withQualifier(klass, wrapper = false) {
           }
 
           throw new Error(
-            `Unsupported qualified string: \`${value}\`, expected with either prefix: ${fmtIter(
+            `Unsupported qualified string: \`${value}\`, expected with either prefix: ${fmtIterable(
               this.Qualifiers
             )}`
           );
@@ -124,7 +124,7 @@ export default function withQualifier(klass, wrapper = false) {
         throw new Error(
           `Value has a different qualifier: \`${
             value.constructor.Qualifier
-          }\` while expected one of \`${fmtIter(this.Qualifiers)}\` by \`${
+          }\` while expected one of \`${fmtIterable(this.Qualifiers)}\` by \`${
             this.name
           }\``
         );

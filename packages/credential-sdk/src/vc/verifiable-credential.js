@@ -10,8 +10,8 @@ import {
   ensureString,
   ensureURI,
   ensureValidDatetime,
+  getUniqueElementsFromArray,
 } from '../utils';
-import { getUniqueElementsFromArray } from '../utils/misc';
 
 /**
  * @typedef {object} VerifiableCredentialVerificationResult The credential verification result

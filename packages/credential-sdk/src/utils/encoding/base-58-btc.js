@@ -1,29 +1,7 @@
-import bs58 from 'bs58';
 import { base58btc } from 'multiformats/bases/base58';
 import varint from 'varint';
-import { ensureString } from './type-helpers';
-import { normalizeToU8a, u8aToU8a } from './bytes';
-
-/**
- * Encodes supplied bytes as base58 string.
- * @param {Uint8Array} bytes
- * @returns {string}
- */
-export const encodeAsBase58 = (bytes) => bs58.encode(normalizeToU8a(bytes));
-/**
- * Decodes bytes of the supplied base58 string.
- * @param {string} string
- * @returns {Uint8Array}
- */
-export const decodeFromBase58 = (string) => {
-  try {
-    return bs58.decode(ensureString(string));
-  } catch (err) {
-    err.message = `Failed to decode base58 string \`${string}\`:\n${err.message}`;
-
-    throw err;
-  }
-};
+import { ensureString } from '../types/ensure-type';
+import { normalizeToU8a } from '../bytes';
 
 /**
  * Encodes supplied bytes as base58btc string using given prefix.
@@ -53,7 +31,7 @@ export const encodeAsBase58btc = (prefix, value) => {
  */
 export const decodeFromBase58btc = (string) => {
   try {
-  // Decode base58btc multibase string
+    // Decode base58btc multibase string
     const decoded = base58btc.decode(ensureString(string));
     varint.decode(decoded); // Decode to get byte length
     return decoded.slice(varint.decode.bytes);
@@ -63,16 +41,3 @@ export const decodeFromBase58btc = (string) => {
     throw err;
   }
 };
-
-/**
- * Encodes supplied bytes as base64 string.
- * @param {Uint8Array} bytes
- * @returns {string}
- */
-export const encodeAsBase64 = (bytes) => Buffer.from(normalizeToU8a(bytes)).toString('base64');
-/**
- * Decodes bytes of the supplied base64 string.
- * @param {string} string
- * @returns {Uint8Array}
- */
-export const decodeFromBase64 = (string) => u8aToU8a(Buffer.from(ensureString(string), 'base64'));

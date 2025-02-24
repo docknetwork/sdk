@@ -1,6 +1,6 @@
 import dock from "../src/index";
 import { DockDid } from "../src/did";
-import { getPublicKeyFromKeyringPair } from "../src/utils/misc";
+import { getPublicKeyFromKeyringPair } from "../src/utils";
 import { median } from "./helpers";
 import { DidKey, VerificationRelationship } from "../src/public-keys";
 import { Ed25519Keypair } from "@docknetwork/credential-sdk/keypairs";

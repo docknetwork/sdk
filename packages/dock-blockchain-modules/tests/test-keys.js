@@ -1,7 +1,7 @@
 import {
   generateEcdsaSecp256k1Keypair,
   getPublicKeyFromKeyringPair,
-} from "../src/utils/misc";
+} from "../src/utils";
 
 const keypairEcdsaSecp256k1 = generateEcdsaSecp256k1Keypair(
   "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"

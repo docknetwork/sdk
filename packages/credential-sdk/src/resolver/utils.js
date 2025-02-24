@@ -1,4 +1,4 @@
-import { fmtIter } from '../utils/generic';
+import { fmtIterable } from '../utils';
 
 /**
  * Caches last function result and returns it if function called with the same args again.
@@ -50,7 +50,9 @@ export const ensureItemsAllowed = (items, allowed, wildcard) => {
   for (const toCheck of [itemsSet, allowedSet]) {
     if (toCheck.has(wildcard) && toCheck.size > 1) {
       throw new Error(
-        `Can't have wildcard mixed with other patterns for ${fmtIter(toCheck)}`,
+        `Can't have wildcard mixed with other patterns for ${fmtIterable(
+          toCheck,
+        )}`,
       );
     }
   }
@@ -60,7 +62,7 @@ export const ensureItemsAllowed = (items, allowed, wildcard) => {
   for (const item of itemsSet) {
     if (!allowedSet.has(item)) {
       throw new Error(
-        `Item not found in ${fmtIter(allowedSet)}: \`${item.toString()}\``,
+        `Item not found in ${fmtIterable(allowedSet)}: \`${item.toString()}\``,
       );
     }
   }

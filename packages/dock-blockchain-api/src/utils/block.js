@@ -1,9 +1,7 @@
-// import { BlockHash, BlockNumber } from "@polkadot/types/interfaces"; // eslint-disable-line
-// import { SignedBlockExtended } from "@polkadot/types/types"; // eslint-disable-line
 import { ApiPromise } from "@polkadot/api"; // eslint-disable-line
 import {
-  ReusablePromiseMap,
-  ReusablePromise,
+  MemoizedPromiseMap,
+  MemoizedPromise,
 } from '@docknetwork/credential-sdk/utils';
 
 /**
@@ -23,12 +21,12 @@ export class BlocksProvider {
     this.api = api;
     this.finalized = finalized;
 
-    this.lastHashCall = new ReusablePromise();
-    this.blockByHashCalls = new ReusablePromiseMap({
+    this.lastHashCall = new MemoizedPromise();
+    this.blockByHashCalls = new MemoizedPromiseMap({
       capacity: cacheCapacity,
       save: true,
     });
-    this.blockByNumberCalls = new ReusablePromiseMap({
+    this.blockByNumberCalls = new MemoizedPromiseMap({
       capacity: cacheCapacity,
       save: finalized,
     });

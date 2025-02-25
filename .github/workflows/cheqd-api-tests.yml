@@ -1,0 +1,35 @@
+name: Cheqd API tests
+
+on: [pull_request]
+jobs:
+  testnet:
+    runs-on: ubuntu-latest
+    env:
+      CHEQD_MNEMONIC: "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse"
+      CHEQD_IMAGE_TAG: 3.1.5
+      CHEQD_NETWORK: "testnet"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "20.x"
+      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: npm install -g turbo@2.0.5
+      - run: turbo telemetry disable
+      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK turbo run test-with-node --filter @docknetwork/cheqd-blockchain-api
+
+  mainnet:
+    runs-on: ubuntu-latest
+    env:
+      CHEQD_MNEMONIC: "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse"
+      CHEQD_IMAGE_TAG: 3.1.5
+      CHEQD_NETWORK: "mainnet"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "20.x"
+      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: npm install -g turbo@2.0.5
+      - run: turbo telemetry disable
+      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK turbo run test-with-node --filter @docknetwork/cheqd-blockchain-api

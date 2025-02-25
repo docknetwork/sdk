@@ -1,5 +1,5 @@
-import { DirectSecp256k1HdWallet } from "@docknetwork/cheqd-blockchain-api/wallet";
-import { CheqdNetwork } from "@docknetwork/cheqd-blockchain-api";
+import { DirectSecp256k1HdWallet } from "../src/wallet";
+import { CheqdNetwork } from "../src";
 
 export const faucet = {
   prefix: "cheqd",

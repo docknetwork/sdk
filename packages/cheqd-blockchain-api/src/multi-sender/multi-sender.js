@@ -1,8 +1,13 @@
 import pLimit from 'p-limit';
-import { retry } from '@docknetwork/credential-sdk/utils';
+import {
+  retry,
+  ensureInstanceOf,
+  ensureNumber,
+} from '@docknetwork/credential-sdk/utils';
+import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
 import { CheqdAPI } from '../api';
 import { DirectSecp256k1HdWallet } from '../wallet';
-import { DEFAULT_TRANSFER_FEE, sendNcheq } from '../balance';
+import { DEFAULT_TRANSFER_FEE, sendNcheq } from '../utils';
 
 export default class MultiSender {
   #rootApi;
@@ -25,10 +30,13 @@ export default class MultiSender {
     senderWallets,
     amountPerSender = 50e9 * 10, // 500 CHEQ - allows to create either 10 DID Documents or 100 DID Linked Resources
   } = {}) {
-    if (!api) throw new Error('API instance is required');
-    if (!count || count <= 0) throw new Error('Valid count is required');
+    if (ensureNumber(count) <= 0) {
+      throw new Error('Count must be greater than 0');
+    } else if (senderWallets?.length && senderWallets.length !== count) {
+      throw new Error('`senderWallets` length must be equal to count');
+    }
 
-    this.#rootApi = api;
+    this.#rootApi = ensureInstanceOf(api, AbstractApiProvider);
     this.#count = count;
     this.#senderWallets = senderWallets;
     this.#amountPerSender = amountPerSender;
@@ -44,33 +52,36 @@ export default class MultiSender {
     );
   }
 
-  async #initializeSenders() {
+  async #initializeSenders(params) {
     return await Promise.all(
       this.#senderWallets.map((wallet) => new CheqdAPI().init({
+        ...params,
         wallet,
-        network: this.#rootApi.network(),
-        url: this.#rootApi.url(),
       })),
     );
   }
 
-  async init() {
-    if (this.#shuttingDown) {
-      throw new Error('System is shutting down');
-    }
+  async init(params) {
+    this.ensureNotShuttingDown();
+    this.ensureNotInitialized();
+
     try {
+      this.#spawn = pLimit(this.count);
       this.#senderWallets ??= await this.#generateWallets();
-      this.#senders = await this.#initializeSenders();
+      this.#senders = await this.#initializeSenders(params);
 
       await sendNcheq(
         this.#rootApi,
         await Promise.all(this.#senders.map((sender) => sender.address())),
         this.#amountPerSender,
       );
-      this.#spawn = pLimit(this.count);
 
       return this;
     } catch (error) {
+      this.#spawn = void 0;
+      this.#senders = void 0;
+      this.#senderWallets = void 0;
+
       error.message = `Initialization failed: ${error.message}`;
 
       throw error;
@@ -78,17 +89,7 @@ export default class MultiSender {
   }
 
   async signAndSend(...args) {
-    if (this.#shuttingDown) {
-      throw new Error('System is shutting down');
-    }
-
-    if (
-      !this.#senders
-      || this.#senders.length !== this.#count
-      || !this.#spawn
-    ) {
-      throw new Error('Please initialize the system by calling init() first');
-    }
+    this.ensureInitialized();
 
     return await this.#spawn(async () => {
       const sender = this.#senders.pop();
@@ -120,6 +121,8 @@ export default class MultiSender {
   }
 
   async shutdown() {
+    this.ensureInitialized();
+
     try {
       this.#spawn.clearQueue();
       this.#shuttingDown = true;
@@ -158,12 +161,43 @@ export default class MultiSender {
     }
   }
 
-  // Getters for private fields if needed
   get count() {
     return this.#count;
   }
 
   get isShuttingDown() {
     return this.#shuttingDown;
+  }
+
+  get senderWallets() {
+    return this.#senderWallets;
+  }
+
+  get senders() {
+    return this.#senders;
+  }
+
+  isInitialized() {
+    return Boolean(this.#spawn);
+  }
+
+  ensureNotShuttingDown() {
+    if (this.isShuttingDown) {
+      throw new Error('System is shutting down');
+    }
+  }
+
+  ensureNotInitialized() {
+    if (this.isInitialized()) {
+      throw new Error('`MutiSender` is already initialized');
+    }
+  }
+
+  ensureInitialized() {
+    this.ensureNotShuttingDown();
+
+    if (!this.isInitialized()) {
+      throw new Error('`MutiSender` is not initialized');
+    }
   }
 }

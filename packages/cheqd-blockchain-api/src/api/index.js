@@ -64,7 +64,6 @@ import {
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 import pLimit from 'p-limit';
-import { getBalance } from '../balance';
 
 const fullTypeUrl = (typeUrl) => {
   const match = String(typeUrl).match(
@@ -491,7 +490,9 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   async balanceOf(address) {
-    return await getBalance(this.url(), address);
+    const { amount } = await this.sdk.signer.getBalance(address, 'ncheq');
+
+    return BigInt(amount);
   }
 
   methods() {

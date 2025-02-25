@@ -10,12 +10,16 @@ export default class CheqdMultiSenderAPI extends CheqdAPI {
 
   async init(...args) {
     await super.init(...args);
-    await this.sender.init();
+    await this.sender.init(...args);
+
+    return this;
   }
 
   async disconnect() {
     await this.sender.shutdown();
     await super.disconnect();
+
+    return this;
   }
 
   async signAndSend(...args) {

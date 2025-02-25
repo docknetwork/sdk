@@ -1,5 +1,6 @@
 import { ensureString } from '@docknetwork/credential-sdk/utils';
-import { DEFAULT_TRANSFER_FEE } from './constants';
+
+export const DEFAULT_TRANSFER_FEE = BigInt(1e10);
 
 export const createTransfer = (from, to, ncheq) => ({
   typeUrl: '/cosmos.bank.v1beta1.MsgSend',
@@ -33,7 +34,10 @@ export async function sendNcheq(
   const txs = recipients.map((to) => createTransfer(from, to, amountPerRecipient));
   const feeObj = {
     amount: [
-      { denom: 'ncheq', amount: String(Number(fee) * recipients.length) },
+      {
+        denom: 'ncheq',
+        amount: String(BigInt(fee) * BigInt(recipients.length)),
+      },
     ], // Fee amount in ncheq
     gas: String(200000 * recipients.length), // Gas limit
     payer: from,

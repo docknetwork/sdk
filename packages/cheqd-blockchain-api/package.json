@@ -87,6 +87,8 @@
     "watch": "rollup -c -w",
     "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
     "type-check": "tsc --allowJs --checkJs --noEmit --moduleResolution node --resolveJsonModule --target ES6 --skipLibCheck true --allowSyntheticDefaultImports true",
+    "test": "NODE_ENV=production jest --verbose --forceExit ./tests/*",
+    "test-with-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK ../../scripts/with_cheqd_docker_test_node yarn test",
     "prepublishOnly": "yarn build"
   }
 }

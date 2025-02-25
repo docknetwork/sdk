@@ -11,7 +11,7 @@ import { toIterable } from '../types';
  * @throws {Error} If any promise does not resolve to an object or rejects, this function will throw an error.
  */
 export const mergeAwait = async (objectPromises) => {
-  const res = Object.create(Object.getPrototypeOf(objectPromises));
+  const res = {};
 
   for await (const obj of toIterable(objectPromises)) {
     Object.assign(res, obj);

@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.47.0
+
+### Minor Changes
+
+- Upgrade elliptic
+
 ## 0.46.0
 
 ### Minor Changes

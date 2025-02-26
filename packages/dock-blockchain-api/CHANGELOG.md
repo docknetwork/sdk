@@ -1,5 +1,16 @@
 # @docknetwork/dock-blockchain-api
 
+## 0.21.0
+
+### Minor Changes
+
+- Upgrade elliptic
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.47.0
+
 ## 0.20.4
 
 ### Patch Changes

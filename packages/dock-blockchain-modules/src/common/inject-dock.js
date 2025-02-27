@@ -13,9 +13,8 @@ export default function injectDock(klass) {
       static DockOnly;
 
       constructor(dock) {
-        super();
+        super(new DockApiProvider(dock));
 
-        this.apiProvider = new DockApiProvider(dock);
         this.dockOnly = new this.constructor.DockOnly(this.apiProvider);
       }
 

@@ -137,12 +137,15 @@ export default class MultiSender {
           this.#spawn = undefined;
         }
         try {
+          let tx = null;
           const balance = await sender.balanceOf(await sender.address());
-          const tx = await sendNcheq(
-            sender,
-            await this.#rootApi.address(),
-            balance - BigInt(DEFAULT_TRANSFER_FEE),
-          );
+          if (balance - BigInt(DEFAULT_TRANSFER_FEE) >= 0n) {
+            tx = await sendNcheq(
+              sender,
+              await this.#rootApi.address(),
+              balance - BigInt(DEFAULT_TRANSFER_FEE),
+            );
+          }
           await sender.disconnect();
 
           return tx;

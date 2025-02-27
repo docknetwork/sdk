@@ -14,6 +14,47 @@ import {
   isAccumulatorRevocationStatus,
 } from "../src/vc/revocation";
 import { Ed25519Keypair, Secp256k1Keypair } from "../src/keypairs";
+import { chunks } from "../src/utils";
+
+describe("`chunks`", () => {
+  test("splits array into chunks of given size", () => {
+    const arr = [1, 2, 3, 4, 5];
+    const chunkSize = 2;
+    const result = chunks(arr, chunkSize);
+    expect(result).toEqual([[1, 2], [3, 4], [5]]);
+  });
+
+  test("handles empty array input", () => {
+    const arr = [];
+    const chunkSize = 2;
+    const result = chunks(arr, chunkSize);
+    expect(result).toEqual([]);
+  });
+
+  test("returns single chunk when chunk size is larger than array length", () => {
+    const arr = [1, 2];
+    const chunkSize = 3;
+    const result = chunks(arr, chunkSize);
+    expect(result).toEqual([[1, 2]]);
+  });
+
+  test("creates exactly matching chunks when array length divides evenly by chunk size", () => {
+    const arr = [1, 2, 3, 4];
+    const chunkSize = 2;
+    const result = chunks(arr, chunkSize);
+    expect(result).toEqual([
+      [1, 2],
+      [3, 4],
+    ]);
+  });
+
+  test("handles chunk size of 1 correctly", () => {
+    const arr = [1, 2, 3];
+    const chunkSize = 1;
+    const result = chunks(arr, chunkSize);
+    expect(result).toEqual([[1], [2], [3]]);
+  });
+});
 
 describe("Testing isHexWithGivenByteSize", () => {
   test("isHexWithGivenByteSize rejects strings not starting with 0x", () => {

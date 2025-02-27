@@ -6,6 +6,7 @@ import {
   maybeToCheqdPayloadOrJSON,
   retry,
   u8aToHex,
+  minBigInt,
 } from '@docknetwork/credential-sdk/utils';
 import { sha256 } from 'js-sha256';
 import {
@@ -21,12 +22,8 @@ import {
   MsgCreateDidDocPayload,
   MsgUpdateDidDocPayload,
   MsgDeactivateDidDocPayload,
-  protobufPackage as didProtobufPackage,
 } from '@cheqd/ts-proto/cheqd/did/v2/index.js';
-import {
-  MsgCreateResourcePayload,
-  protobufPackage as resourceProtobufPackage,
-} from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
+import { MsgCreateResourcePayload } from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
 import {
   DidRef,
   NamespaceDid,
@@ -64,56 +61,13 @@ import {
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 import pLimit from 'p-limit';
-
-const fullTypeUrl = (typeUrl) => {
-  const match = String(typeUrl).match(
-    /^\/(?<prefix>[^/]*?(?=\.([^/.]+)$))\.(?<name>[^/.]+)$|^(?<nameOnly>[^/.]+)$/,
-  );
-
-  if (match == null) {
-    throw new Error(`Invalid typeUrl provided: \`${typeUrl}\``);
-  }
-  const {
-    groups: { prefix, name, nameOnly },
-  } = match;
-
-  // eslint-disable-next-line no-use-before-define
-  const prefixByName = Prefixes[nameOnly ?? name];
-  if (!prefixByName) {
-    throw new Error(
-      `Invalid typeUrl name provided: \`${typeUrl}\`, can't find prefix for \`${nameOnly}\``,
-    );
-  } else if (nameOnly) {
-    return `/${prefixByName}.${nameOnly}`;
-  } else if (prefix !== prefixByName) {
-    throw new Error(`Prefix must be ${prefixByName}, got ${prefix}`);
-  } else {
-    return `/${prefix}.${name}`;
-  }
-};
-
-const fullTypeUrls = (txOrTxs) => [].concat(txOrTxs).map(({ typeUrl }) => fullTypeUrl(typeUrl));
-
-const buildObj = (
-  createDID,
-  updateDID,
-  deactivateDID,
-  createResource,
-  f = fullTypeUrl,
-) => extendNull({
-  [f('MsgCreateDidDoc')]: createDID,
-  [f('MsgUpdateDidDoc')]: updateDID,
-  [f('MsgDeactivateDidDoc')]: deactivateDID,
-  [f('MsgCreateResource')]: createResource,
-});
-
-const Prefixes = buildObj(
-  didProtobufPackage,
-  didProtobufPackage,
-  didProtobufPackage,
-  resourceProtobufPackage,
-  (key) => key,
-);
+import { buildTypeUrlObject, fullTypeUrl, fullTypeUrls } from './type-url';
+import {
+  createOrUpdateDIDDocGas,
+  createResourceGas,
+  deactivateDIDDocGas,
+  gasAmountForBatch,
+} from './gas';
 
 export class CheqdAPI extends AbstractApiProvider {
   #sdk;
@@ -135,23 +89,28 @@ export class CheqdAPI extends AbstractApiProvider {
     return this.ensureInitialized().#sdk;
   }
 
-  static Fees = buildObj(
+  static Fees = buildTypeUrlObject(
     DIDModule.fees.DefaultCreateDidDocFee,
     DIDModule.fees.DefaultUpdateDidDocFee,
     DIDModule.fees.DefaultDeactivateDidDocFee,
     ResourceModule.fees.DefaultCreateResourceDefaultFee,
   );
 
-  static BaseGasAmounts = buildObj('150000', '500000', '500000', '500000');
+  static BaseGasAmounts = buildTypeUrlObject(
+    createOrUpdateDIDDocGas,
+    createOrUpdateDIDDocGas,
+    deactivateDIDDocGas,
+    createResourceGas,
+  );
 
-  static Payloads = buildObj(
+  static Payloads = buildTypeUrlObject(
     [CheqdDIDDocument, MsgCreateDidDocPayload],
     [CheqdDIDDocument, MsgUpdateDidDocPayload],
     [CheqdDeactivateDidDocument, MsgDeactivateDidDocPayload],
     [CheqdCreateResource, MsgCreateResourcePayload],
   );
 
-  static PayloadWrappers = buildObj(
+  static PayloadWrappers = buildTypeUrlObject(
     CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
     CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
     CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures,
@@ -159,8 +118,8 @@ export class CheqdAPI extends AbstractApiProvider {
   );
 
   static BlockLimits = extendNull({
-    [CheqdNetwork.Testnet]: 3e7,
-    [CheqdNetwork.Mainnet]: 3e7,
+    [CheqdNetwork.Testnet]: BigInt(3e7),
+    [CheqdNetwork.Mainnet]: BigInt(3e7),
   });
 
   static Types = extendNull({
@@ -300,23 +259,38 @@ export class CheqdAPI extends AbstractApiProvider {
     return this.#sdk != null;
   }
 
+  /**
+   * Estimates gas value for the provided transaction(s). The estimate is not accurate as it's based on static value.
+   *
+   * @param {object|Array<object>} txOrTxs
+   * @returns {Promise<BigInt>}
+   */
   async estimateGas(txOrTxs) {
-    const { BaseGasAmounts } = this.constructor;
+    const { BaseGasAmounts, BlockLimits } = this.constructor;
 
-    return String(
-      fullTypeUrls(txOrTxs).reduce(
-        (total, typeUrl) => total + BigInt(BaseGasAmounts[typeUrl]),
-        BigInt(0),
-      ),
+    const txs = this.constructor.txToJSON(txOrTxs);
+    const limit = BlockLimits[this.network()];
+
+    const estimated = txs.reduce(
+      (total, { typeUrl, value }) => minBigInt(total + BigInt(BaseGasAmounts[typeUrl](value)), limit),
+      0n,
     );
+
+    return String(gasAmountForBatch(estimated, txs.length));
   }
 
+  /**
+   * Calculate fee for the provided transaction(s).
+   *
+   * @param {object|Array<object>} txOrTxs
+   * @returns {BigInt}
+   */
   calculateFee(txOrTxs) {
     const { Fees } = this.constructor;
 
     const amount = fullTypeUrls(txOrTxs).reduce(
       (total, typeUrl) => total + BigInt(Fees[typeUrl].amount),
-      BigInt(0),
+      0n,
     );
 
     return {
@@ -360,7 +334,7 @@ export class CheqdAPI extends AbstractApiProvider {
         await this.reconnect();
 
         return continueSym;
-      } else if (strErr.includes('tx already exists in cache')) {
+      } else if (strErr.includes('exists')) {
         const { bodyBytes } = await this.sdk.signer.sign(
           sender,
           txJSON,
@@ -371,7 +345,7 @@ export class CheqdAPI extends AbstractApiProvider {
 
         return await this.txResult(hash);
       } else if (strErr.includes('out of gas in location')) {
-        const gasAmount = Number(payment.gas);
+        const gasAmount = BigInt(payment.gas);
         const limit = BlockLimits[this.network()];
         if (gasAmount >= limit) {
           throw new Error(
@@ -380,7 +354,7 @@ export class CheqdAPI extends AbstractApiProvider {
         }
 
         // eslint-disable-next-line no-param-reassign
-        payment.gas = String(Math.min(gasAmount * 2, limit));
+        payment.gas = String(minBigInt(gasAmount * 2n, limit));
         return continueSym;
       } else if (strErr.includes('account sequence mismatch')) {
         return continueSym;
@@ -411,7 +385,7 @@ export class CheqdAPI extends AbstractApiProvider {
       {
         onError,
         delay: 5e2,
-        timeLimit: 6e4,
+        timeLimit: 18e3,
       },
     ));
   }
@@ -469,6 +443,12 @@ export class CheqdAPI extends AbstractApiProvider {
     const { Types } = this.constructor;
 
     return Types[this.network()];
+  }
+
+  blockLimit() {
+    const { BlockLimits } = this.constructor;
+
+    return BlockLimits[this.network()];
   }
 
   network() {

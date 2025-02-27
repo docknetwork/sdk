@@ -1,4 +1,5 @@
 import {
+  isBigInt,
   isIterable,
   isMap,
   isNumber,
@@ -7,6 +8,20 @@ import {
   isSet,
   isString,
 } from './is-type';
+
+/**
+ * Ensures that the given value is a BigInt. If not, throws an error.
+ *
+ * @param {*} value - The value to check.
+ * @returns {BigInt} - The value as a BigInt.
+ */
+export function ensureBigInt(value) {
+  if (isBigInt(value)) {
+    return value;
+  }
+
+  throw new TypeError(`${value} needs to be a BigInt`);
+}
 
 /**
  * Ensures that the given value is a string. If not, throws an error with an optional context message.

@@ -1,4 +1,4 @@
-import { ensureString } from '@docknetwork/credential-sdk/utils';
+import { minBigInt, ensureString } from '@docknetwork/credential-sdk/utils';
 
 export const DEFAULT_TRANSFER_FEE = BigInt(1e10);
 
@@ -26,8 +26,10 @@ export async function sendNcheq(
 
   if (recipients.length === 0) {
     throw new Error("Can't send CHEQ: no recipients provided");
-  } else if (BigInt(amountPerRecipient) === BigInt(0)) {
-    throw new Error("Can't send CHEQ: amount is zero");
+  } else if (BigInt(amountPerRecipient) <= fee) {
+    throw new Error(
+      `Can't send CHEQ: amount must be greater than transfer fee, received: ${amountPerRecipient}`,
+    );
   }
   const from = await api.address();
 
@@ -39,7 +41,9 @@ export async function sendNcheq(
         amount: String(BigInt(fee) * BigInt(recipients.length)),
       },
     ], // Fee amount in ncheq
-    gas: String(200000 * recipients.length), // Gas limit
+    gas: String(
+      minBigInt(api.blockLimit(), BigInt(12e4) * BigInt(recipients.length)),
+    ), // Gas limit
     payer: from,
   };
 

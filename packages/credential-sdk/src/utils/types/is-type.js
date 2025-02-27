@@ -1,4 +1,13 @@
 /**
+ * Return true if the given value is a BigInt.
+ * @param {*} value - The value to check
+ * @returns {boolean} - True if the value is a BigInt, false otherwise
+ */
+export function isBigInt(value) {
+  return typeof value === 'bigint';
+}
+
+/**
  * Return true if the given value is a string.
  * @param value
  * @returns {boolean}

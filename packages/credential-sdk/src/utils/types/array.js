@@ -15,6 +15,21 @@ export function getUniqueElementsFromArray(array, mapItem) {
 }
 
 /**
+ * Splits array into chunks of the given size.
+ *
+ * @template T
+ * @param {Array<T>} arr
+ * @param {number} chunkSize
+ * @returns {Array<Array<T>>}
+ */
+export const chunks = (arr, chunkSize) => arr.reduce((acc, item, idx) => {
+  if (idx % chunkSize === 0) acc.push([item]);
+  else acc[acc.length - 1].push(item);
+
+  return acc;
+}, new Array(Math.ceil(arr.length / chunkSize)));
+
+/**
  * Class extending `Array` with all prototype methods set to `undefined`.
  */
 export class ArrayWithoutPrototypeMethods extends withoutPrototypeFunctions(

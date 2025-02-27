@@ -70,7 +70,7 @@ export const AbstractCoreModules = withExtendedStaticProperties(
     };
 
     constructor(...args) {
-      super(...args);
+      super();
 
       for (const [prop, key] of Object.entries(this.constructor.ModuleMap)) {
         this.attachModule(prop, key, args);

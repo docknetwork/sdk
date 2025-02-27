@@ -269,7 +269,7 @@ async function main(size) {
   const sendersCount = (300 / size) | 0;
   const cheqd = await new CheqdMultiSenderAPI({
     count: sendersCount,
-    amountPerSender: 50e9 * 500,
+    amountPerSender: ((50e9 * 1000) / sendersCount) * 1.5,
   }).init({
     url: process.env.CHEQD_ENDPOINT,
     network: process.env.CHEQD_NETWORK,
@@ -418,6 +418,6 @@ function trackTPS(prefix, promises, total) {
   });
 }
 
-for (const size of [10, 25, 50, 100]) {
+for (const size of [1, 10, 25, 50, 100]) {
   await main(size);
 }

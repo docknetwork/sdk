@@ -1,4 +1,4 @@
-import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
+import { AbstractApiProvider } from "@docknetwork/credential-sdk/modules/abstract/common";
 import {
   maybeToJSONString,
   fmtIterable,
@@ -7,8 +7,8 @@ import {
   retry,
   u8aToHex,
   minBigInt,
-} from '@docknetwork/credential-sdk/utils';
-import { sha256 } from 'js-sha256';
+} from "@docknetwork/credential-sdk/utils";
+import { sha256 } from "js-sha256";
 import {
   DIDModule,
   ResourceModule,
@@ -17,13 +17,13 @@ import {
   FeemarketModule,
   // eslint-disable-next-line no-unused-vars
   CheqdSDK,
-} from '@cheqd/sdk';
+} from "@cheqd/sdk";
 import {
   MsgCreateDidDocPayload,
   MsgUpdateDidDocPayload,
   MsgDeactivateDidDocPayload,
-} from '@cheqd/ts-proto/cheqd/did/v2/index.js';
-import { MsgCreateResourcePayload } from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
+} from "@cheqd/ts-proto/cheqd/did/v2/index.js";
+import { MsgCreateResourcePayload } from "@cheqd/ts-proto/cheqd/resource/v2/index.js";
 import {
   DidRef,
   NamespaceDid,
@@ -58,16 +58,16 @@ import {
   CheqdMainnetAccumulatorCommon,
   CheqdMainnetOffchainSignaturePublicKeyValue,
   CheqdTestnetOffchainSignaturePublicKeyValue,
-} from '@docknetwork/credential-sdk/types';
-import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
-import pLimit from 'p-limit';
-import { buildTypeUrlObject, fullTypeUrl, fullTypeUrls } from './type-url';
+} from "@docknetwork/credential-sdk/types";
+import { TypedEnum } from "@docknetwork/credential-sdk/types/generic";
+import pLimit from "p-limit";
+import { buildTypeUrlObject, fullTypeUrl, fullTypeUrls } from "./type-url";
 import {
   createOrUpdateDIDDocGas,
   createResourceGas,
   deactivateDIDDocGas,
   gasAmountForBatch,
-} from './gas';
+} from "./gas";
 
 export class CheqdAPI extends AbstractApiProvider {
   #sdk;
@@ -93,28 +93,28 @@ export class CheqdAPI extends AbstractApiProvider {
     DIDModule.fees.DefaultCreateDidDocFee,
     DIDModule.fees.DefaultUpdateDidDocFee,
     DIDModule.fees.DefaultDeactivateDidDocFee,
-    ResourceModule.fees.DefaultCreateResourceDefaultFee,
+    ResourceModule.fees.DefaultCreateResourceDefaultFee
   );
 
   static BaseGasAmounts = buildTypeUrlObject(
     createOrUpdateDIDDocGas,
     createOrUpdateDIDDocGas,
     deactivateDIDDocGas,
-    createResourceGas,
+    createResourceGas
   );
 
   static Payloads = buildTypeUrlObject(
     [CheqdDIDDocument, MsgCreateDidDocPayload],
     [CheqdDIDDocument, MsgUpdateDidDocPayload],
     [CheqdDeactivateDidDocument, MsgDeactivateDidDocPayload],
-    [CheqdCreateResource, MsgCreateResourcePayload],
+    [CheqdCreateResource, MsgCreateResourcePayload]
   );
 
   static PayloadWrappers = buildTypeUrlObject(
     CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
     CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
     CheqdCheqdDeactivateDidDocumentPayloadWithTypeUrlAndSignatures,
-    CheqdCreateResourcePayloadWithTypeUrlAndSignatures,
+    CheqdCreateResourcePayloadWithTypeUrlAndSignatures
   );
 
   static BlockLimits = extendNull({
@@ -188,7 +188,7 @@ export class CheqdAPI extends AbstractApiProvider {
     } = this;
     if (Payloads == null) {
       throw new Error(
-        `Can't find payload constructor for the provided method \`${method}\``,
+        `Can't find payload constructor for the provided method \`${method}\``
       );
     }
     const [TypedPayload, Payload] = Payloads;
@@ -201,7 +201,7 @@ export class CheqdAPI extends AbstractApiProvider {
       return Payload.encode(sdkPayload).finish();
     } catch (err) {
       throw new Error(
-        `Failed to encode payload \`${maybeToJSONString(sdkPayload)}\`: ${err}`,
+        `Failed to encode payload \`${maybeToJSONString(sdkPayload)}\`: ${err}`
       );
     }
   }
@@ -218,11 +218,11 @@ export class CheqdAPI extends AbstractApiProvider {
     if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
       throw new Error(
         `Invalid network provided: \`${network}\`, expected one of \`${fmtIterable(
-          Object.values(CheqdNetwork),
-        )}\``,
+          Object.values(CheqdNetwork)
+        )}\``
       );
     } else if (wallet == null) {
-      throw new Error('`wallet` must be provided');
+      throw new Error("`wallet` must be provided");
     }
 
     this.ensureNotInitialized();
@@ -272,8 +272,9 @@ export class CheqdAPI extends AbstractApiProvider {
     const limit = BlockLimits[this.network()];
 
     const estimated = txs.reduce(
-      (total, { typeUrl, value }) => minBigInt(total + BigInt(BaseGasAmounts[typeUrl](value)), limit),
-      0n,
+      (total, { typeUrl, value }) =>
+        minBigInt(total + BigInt(BaseGasAmounts[typeUrl](value)), limit),
+      0n
     );
 
     return String(gasAmountForBatch(estimated, txs.length));
@@ -290,12 +291,12 @@ export class CheqdAPI extends AbstractApiProvider {
 
     const amount = fullTypeUrls(txOrTxs).reduce(
       (total, typeUrl) => total + BigInt(Fees[typeUrl].amount),
-      0n,
+      0n
     );
 
     return {
       amount: String(amount),
-      denom: 'ncheq',
+      denom: "ncheq",
     };
   }
 
@@ -326,16 +327,17 @@ export class CheqdAPI extends AbstractApiProvider {
       const strErr = String(err);
 
       if (
-        strErr.includes('fetch failed')
-        || strErr.includes('Bad status')
-        || strErr.includes('other side closed')
+        strErr.includes("fetch failed") ||
+        strErr.includes("Bad status") ||
+        strErr.includes("other side closed")
       ) {
         console.error(err);
         await this.reconnect();
 
         return continueSym;
-      } else if (strErr.includes('exists')) {
-        const { bodyBytes } = await this.sdk.signer.sign(
+      } else if (strErr.includes("exists")) {
+        // TODO:
+        /*const { bodyBytes } = await this.sdk.signer.sign(
           sender,
           txJSON,
           payment,
@@ -343,51 +345,56 @@ export class CheqdAPI extends AbstractApiProvider {
         );
         const hash = u8aToHex(sha256.digest(bodyBytes)).slice(2).toUpperCase();
 
-        return await this.txResult(hash);
-      } else if (strErr.includes('out of gas in location')) {
+        return await this.txResult(hash);*/
+        return null;
+      } else if (strErr.includes("out of gas in location")) {
         const gasAmount = BigInt(payment.gas);
         const limit = BlockLimits[this.network()];
         if (gasAmount >= limit) {
           throw new Error(
-            "Can't process transaction because it exceeds block gas limit",
+            "Can't process transaction because it exceeds block gas limit"
           );
         }
 
         // eslint-disable-next-line no-param-reassign
         payment.gas = String(minBigInt(gasAmount * 2n, limit));
         return continueSym;
-      } else if (strErr.includes('account sequence mismatch')) {
+      } else if (strErr.includes("account sequence mismatch")) {
         return continueSym;
       }
 
       throw err;
     };
 
-    return await this.#spawn(() => retry(
-      async () => {
-        const res = await this.sdk.signer.signAndBroadcast(
-          sender,
-          txJSON,
-          payment,
-          memo ?? '',
-        );
-
-        if (res.code) {
-          console.error(res);
-
-          throw new Error(
-            JSON.stringify(res, (_, value) => (typeof value === 'bigint' ? `${value.toString()}n` : value)),
+    return await this.#spawn(() =>
+      retry(
+        async () => {
+          const res = await this.sdk.signer.signAndBroadcast(
+            sender,
+            txJSON,
+            payment,
+            memo ?? ""
           );
-        }
 
-        return res;
-      },
-      {
-        onError,
-        delay: 5e2,
-        timeLimit: 18e3,
-      },
-    ));
+          if (res.code) {
+            console.error(res);
+
+            throw new Error(
+              JSON.stringify(res, (_, value) =>
+                typeof value === "bigint" ? `${value.toString()}n` : value
+              )
+            );
+          }
+
+          return res;
+        },
+        {
+          onError,
+          delay: 5e2,
+          timeLimit: 18e3,
+        }
+      )
+    );
   }
 
   /**
@@ -399,9 +406,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {object} configuration.fee
    * @returns {Promise<*>}
    */
-  async signAndSend(tx, {
-    from, fee, memo, gas,
-  } = {}) {
+  async signAndSend(tx, { from, fee, memo, gas } = {}) {
     const sender = from ?? (await this.address());
     const txJSON = this.constructor.txToJSON(tx);
 
@@ -435,7 +440,7 @@ export class CheqdAPI extends AbstractApiProvider {
           wallet,
         });
       },
-      { delay: 5e2, timeLimit: 1e4 },
+      { delay: 5e2, timeLimit: 1e4 }
     );
   }
 
@@ -470,13 +475,13 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   async balanceOf(address) {
-    const { amount } = await this.sdk.signer.getBalance(address, 'ncheq');
+    const { amount } = await this.sdk.signer.getBalance(address, "ncheq");
 
     return BigInt(amount);
   }
 
   methods() {
-    return ['cheqd', 'dock'];
+    return ["cheqd", "dock"];
   }
 
   // eslint-disable-next-line
@@ -508,7 +513,7 @@ export class CheqdAPI extends AbstractApiProvider {
       return this.supportsIdentifier(id[0]);
     } else if (id instanceof TypedEnum) {
       return this.supportsIdentifier(id.value);
-    } else if (String(id).includes(':dock:')) {
+    } else if (String(id).includes(":dock:")) {
       return true;
     }
 

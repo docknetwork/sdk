@@ -267,9 +267,10 @@ class DIDTransactionSender {
 async function main(size) {
   await initializeWasm();
   const sendersCount = (300 / size) | 0;
+
   const cheqd = await new CheqdMultiSenderAPI({
     count: sendersCount,
-    amountPerSender: ((50e9 * 1000) / sendersCount) * 1.5,
+    amountPerSender: 50e9 * 100 * 1.5,
   }).init({
     url: process.env.CHEQD_ENDPOINT,
     network: process.env.CHEQD_NETWORK,
@@ -290,7 +291,7 @@ async function main(size) {
       [new CheqdCoreModules(cheqd)],
       cheqd
     );
-    const dids = Array.from({ length: 1000 }, () => {
+    const dids = Array.from({ length: 100 }, () => {
       const kp = new DidKeypair(
         [CheqdTestnetDid.random(), 1],
         Ed25519Keypair.random()

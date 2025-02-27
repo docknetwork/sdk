@@ -4,7 +4,18 @@
 
 ### Minor Changes
 
+<<<<<<< HEAD
 - Introduce `CheqdMultiSenderAPI` + small refactoring
+=======
+- Upgrade elliptic
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.47.0
+
+## 0.20.4
+>>>>>>> origin/master
 
 ### Patch Changes
 

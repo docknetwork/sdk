@@ -7,10 +7,10 @@
     "bench": "babel-node src/main.js"
   },
   "dependencies": {
-    "@docknetwork/cheqd-blockchain-api": "0.32.0",
+    "@docknetwork/cheqd-blockchain-api": "0.33.0",
     "@docknetwork/cheqd-blockchain-modules": "0.32.0",
-    "@docknetwork/credential-sdk": "0.47.0",
-    "@docknetwork/dock-blockchain-api": "0.21.0",
+    "@docknetwork/credential-sdk": "0.48.0",
+    "@docknetwork/dock-blockchain-api": "0.22.0",
     "@docknetwork/dock-blockchain-modules": "0.28.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0"
   },

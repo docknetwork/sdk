@@ -1,10 +1,16 @@
 # @docknetwork/credential-sdk
 
-## 0.47.0
+## 0.48.0
 
 ### Minor Changes
 
 - Introduce `CheqdMultiSenderAPI` + small refactoring
+
+## 0.47.0
+
+### Minor Changes
+
+- Upgrade elliptic
 
 ## 0.44.0
 

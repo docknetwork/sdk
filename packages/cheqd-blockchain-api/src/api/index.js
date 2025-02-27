@@ -322,6 +322,7 @@ export class CheqdAPI extends AbstractApiProvider {
   async signAndBroadcast(sender, txJSON, { ...payment }, memo) {
     const { BlockLimits } = this.constructor;
 
+    let connectionClosed = false;
     const onError = async (err, continueSym) => {
       const strErr = String(err);
 
@@ -330,11 +331,12 @@ export class CheqdAPI extends AbstractApiProvider {
         || strErr.includes('Bad status')
         || strErr.includes('other side closed')
       ) {
+        connectionClosed = true;
         console.error(err);
         await this.reconnect();
 
         return continueSym;
-      } else if (strErr.includes('exists')) {
+      } else if (strErr.includes('exists') && connectionClosed) {
         // TODO:
         /* const { bodyBytes } = await this.sdk.signer.sign(
           sender,

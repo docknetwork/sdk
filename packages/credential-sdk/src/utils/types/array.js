@@ -27,7 +27,7 @@ export const chunks = (arr, chunkSize) => arr.reduce((acc, item, idx) => {
   else acc[acc.length - 1].push(item);
 
   return acc;
-}, new Array(Math.ceil(arr.length / chunkSize)));
+}, []);
 
 /**
  * Class extending `Array` with all prototype methods set to `undefined`.

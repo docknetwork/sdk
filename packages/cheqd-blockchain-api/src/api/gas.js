@@ -89,7 +89,7 @@ const RESOURCE_BYTE_GAS_AMOUNT = 500n;
 
 /**
  * Calculates gas required to create or update a DID document
- * @param  {{payload: {assertionMethod: string[], verificationMethod: {id: string}[]}}} params - Parameters containing payload with assertion and verification methods
+ * @param  {object} tx - Transaction JSON containing payload with assertion and verification methods
  * @returns {bigint} - Total gas amount calculated as sum of base gas plus:
  * - 25,000 per new assertion method not present in verification methods
  * - 5,000 per verification method
@@ -116,7 +116,7 @@ export const deactivateDIDDocGas = () => DEACTIVATE_DID_DOC_GAS_AMOUNT;
 
 /**
  * Calculates gas required to create a resource
- * @param  {{payload: {data: any}}} params - Parameters containing payload with data
+ * @param  {object} tx - Transaction JSON containing payload with data
  * @returns {bigint} - Maximum between base gas (150,000) and scaled amount (250 per byte of data)
  */
 export const createResourceGas = ({ payload: { data } }) => maxBigInt(

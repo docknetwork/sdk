@@ -16,6 +16,26 @@ export const createTransfer = (from, to, ncheq) => ({
   },
 });
 
+/**
+ * Sends ncheq tokens to recipient addresses through the bank module
+ * @param {any} api - The API instance used for blockchain operations
+ * @param {string | Array<string>} recipientOrRecipients - Recipient address(es)
+ * @param {bigint} amountPerRecipient - Amount of tokens to send per recipient in ncheq units
+ * @param {object} [options={}] - Optional configuration object
+ * @param {bigint} [options.fee=DEFAULT_TRANSFER_FEE] - Transaction fee for the transfer
+ * @param {string} [options.memo=''] - Memo to attach to the transaction
+ * @returns {Promise<object>} A promise that resolves when the transaction is broadcast
+ *
+ * @example
+ * // Send 100ncheq to a single recipient
+ * await sendNcheq(api, 'recipient_address', 100n);
+ *
+ * // Send 50ncheq to multiple recipients with custom fee and memo
+ * await sendNcheq(api, ['addr1', 'addr2'], 50n, {
+ *   fee: 1e10n,
+ *   memo: 'Transaction memo'
+ * });
+ */
 export async function sendNcheq(
   api,
   recipientOrRecipients,

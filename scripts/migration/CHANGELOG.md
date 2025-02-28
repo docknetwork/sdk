@@ -1,5 +1,11 @@
 # @docknetwork/migration
 
+## 0.9.0
+
+### Minor Changes
+
+- Introduce `CheqdMultiSenderAPI` + small refactoring
+
 ## 0.8.4
 
 ### Patch Changes
@@ -15,27 +21,10 @@
 ### Patch Changes
 
 - Updated dependencies
+  - @docknetwork/dock-blockchain-modules@0.28.0
   - @docknetwork/cheqd-blockchain-api@0.32.0
-
-## 0.8.2
-
-### Patch Changes
-
-- Updated dependencies
-  - @docknetwork/dock-blockchain-modules@0.27.0
-  - @docknetwork/credential-sdk@0.46.0
-  - @docknetwork/cheqd-blockchain-api@0.31.2
-  - @docknetwork/dock-blockchain-api@0.20.4
-
-## 0.8.1
-
-### Patch Changes
-
-- Updated dependencies
-  - @docknetwork/credential-sdk@0.45.0
-  - @docknetwork/cheqd-blockchain-api@0.31.1
-  - @docknetwork/dock-blockchain-api@0.20.3
-  - @docknetwork/dock-blockchain-modules@0.26.3
+  - @docknetwork/dock-blockchain-api@0.21.0
+  - @docknetwork/credential-sdk@0.47.0
 
 ## 0.8.0
 

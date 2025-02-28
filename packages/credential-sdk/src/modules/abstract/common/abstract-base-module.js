@@ -1,6 +1,16 @@
-import { withExtendedPrototypeProperties } from '../../../utils';
+import AbstractApiProvider from './abstract-api-provider';
+import {
+  ensureInstanceOf,
+  withExtendedPrototypeProperties,
+} from '../../../utils';
 
 class AbstractBaseModule {
+  constructor(apiProvider) {
+    if (apiProvider != null) {
+      this.apiProvider = ensureInstanceOf(apiProvider, AbstractApiProvider);
+    }
+  }
+
   /**
    * Signs and sends provided extrinsic.
    *

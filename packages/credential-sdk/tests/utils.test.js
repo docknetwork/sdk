@@ -1,12 +1,10 @@
 import { initializeWasm } from "@docknetwork/crypto-wasm-ts";
 
-import { ReusablePromiseMap, retry, timeout } from "../src/utils/async";
+import { MemoizedPromiseMap, retry, timeout } from "../src/utils/async";
 import {
   PublicKeyEd25519,
-  PublicKeySr25519,
   PublicKeySecp256k1,
   SignatureEd25519,
-  SignatureSr25519,
   SignatureSecp256k1,
 } from "../src/types";
 import { isHexWithGivenByteSize } from "../src/utils/bytes";
@@ -16,6 +14,47 @@ import {
   isAccumulatorRevocationStatus,
 } from "../src/vc/revocation";
 import { Ed25519Keypair, Secp256k1Keypair } from "../src/keypairs";
+import { chunks } from "../src/utils";
+
+describe("`chunks`", () => {
+  test("splits array into chunks of given size", () => {
+    const arr = [1, 2, 3, 4, 5];
+    const chunkSize = 2;
+    const result = chunks(arr, chunkSize);
+    expect(result).toEqual([[1, 2], [3, 4], [5]]);
+  });
+
+  test("handles empty array input", () => {
+    const arr = [];
+    const chunkSize = 2;
+    const result = chunks(arr, chunkSize);
+    expect(result).toEqual([]);
+  });
+
+  test("returns single chunk when chunk size is larger than array length", () => {
+    const arr = [1, 2];
+    const chunkSize = 3;
+    const result = chunks(arr, chunkSize);
+    expect(result).toEqual([[1, 2]]);
+  });
+
+  test("creates exactly matching chunks when array length divides evenly by chunk size", () => {
+    const arr = [1, 2, 3, 4];
+    const chunkSize = 2;
+    const result = chunks(arr, chunkSize);
+    expect(result).toEqual([
+      [1, 2],
+      [3, 4],
+    ]);
+  });
+
+  test("handles chunk size of 1 correctly", () => {
+    const arr = [1, 2, 3];
+    const chunkSize = 1;
+    const result = chunks(arr, chunkSize);
+    expect(result).toEqual([[1], [2], [3]]);
+  });
+});
 
 describe("Testing isHexWithGivenByteSize", () => {
   test("isHexWithGivenByteSize rejects strings not starting with 0x", () => {
@@ -84,8 +123,8 @@ describe("Testing isHexWithGivenByteSize", () => {
     );
   });
 
-  test("`ReusablePromiseMap` works properly", async () => {
-    const map = new ReusablePromiseMap();
+  test("`MemoizedPromise` works properly", async () => {
+    const map = new MemoizedPromiseMap();
 
     const results = await Promise.all([
       map.callByKey(1, () => timeout(5e2, () => 10)),
@@ -99,8 +138,8 @@ describe("Testing isHexWithGivenByteSize", () => {
     expect(map.map.size).toBe(0);
   });
 
-  test("`ReusablePromiseMap` capacity", async () => {
-    const map = new ReusablePromiseMap({ capacity: 2 });
+  test("`MemoizedPromise` capacity", async () => {
+    const map = new MemoizedPromiseMap({ capacity: 2 });
 
     const expectElapsedTimeSec = crateElapsedTimeSec();
 
@@ -116,7 +155,7 @@ describe("Testing isHexWithGivenByteSize", () => {
 
     expectElapsedTimeSec(2.5);
 
-    const mapWithBoundQueue = new ReusablePromiseMap({
+    const mapWithBoundQueue = new MemoizedPromiseMap({
       capacity: 1,
       queueCapacity: 3,
     });
@@ -155,29 +194,40 @@ describe("Testing isHexWithGivenByteSize", () => {
           const onTimeoutExceeded = jest.fn((retrySym) => retrySym);
 
           expect(
-            await retry(makeCtrFn(5), 3e2, { delay: 2e2, onTimeoutExceeded })
+            await retry(makeCtrFn(5), {
+              timeLimit: 3e2,
+              delay: 2e2,
+              onTimeoutExceeded,
+            })
           ).toBe(0);
           expectElapsedTimeSec(2.5);
 
           expect(onTimeoutExceeded).toBeCalledTimes(5);
         },
         async () => {
-          expect(await retry(makeCtrFn(5), 3e2)).toBe(0);
+          expect(await retry(makeCtrFn(5), { timeLimit: 3e2 })).toBe(0);
           expectElapsedTimeSec(1.5);
         },
         async () => {
-          expect(await retry(makeCtrFn(0), 3e2)).toBe(0);
+          expect(await retry(makeCtrFn(0), { timeLimit: 3e2 })).toBe(0);
           expectElapsedTimeSec(0);
         },
         async () => {
           await expect(() =>
-            retry(makeCtrFn(5), 3e2, { maxAttempts: 3 })
+            retry(makeCtrFn(5), {
+              timeLimit: 3e2,
+              maxAttempts: 3,
+            })
           ).rejects.toThrowErrorMatchingSnapshot();
           expectElapsedTimeSec(1.2);
         },
         async () => {
           expect(
-            await retry(makeCtrFn(5), 3e2, { maxAttempts: 5, delay: 2e2 })
+            await retry(makeCtrFn(5), {
+              timeLimit: 3e2,
+              maxAttempts: 5,
+              delay: 2e2,
+            })
           ).toBe(0);
           expectElapsedTimeSec(2.5);
         },
@@ -189,7 +239,8 @@ describe("Testing isHexWithGivenByteSize", () => {
         },
         async () => {
           expect(
-            await retry(makeCtrFn(4, Promise.reject(1)), 3e2, {
+            await retry(makeCtrFn(4, Promise.reject(1)), {
+              timeLimit: 3e2,
               onError: (_, next) => next,
             })
           ).toBe(0);
@@ -197,7 +248,8 @@ describe("Testing isHexWithGivenByteSize", () => {
         },
         async () => {
           expect(
-            await retry(makeCtrFn(4, Promise.reject(1)), 3e2, {
+            await retry(makeCtrFn(4, Promise.reject(1)), {
+              timeLimit: 3e2,
               onError: (error) => error,
             })
           ).toBe(1);
@@ -205,7 +257,8 @@ describe("Testing isHexWithGivenByteSize", () => {
         },
         async () => {
           await expect(() =>
-            retry(makeCtrFn(4, Promise.reject(1)), 3e2, {
+            retry(makeCtrFn(4, Promise.reject(1)), {
+              timeLimit: 3e2,
               onError: () => {
                 throw new Error("From `onError` callback");
               },

@@ -1,72 +1,12 @@
-/* eslint-disable max-classes-per-file */
-
+import { ensureInstanceOf } from './inheritance';
 import { maybeToJSONString } from './interfaces';
-
-/**
- * A `Map` that has a capacity.
- */
-export class MapWithCapacity extends Map {
-  /**
-   *
-   * @param {number} capacity
-   */
-  constructor(capacity, ...args) {
-    if (capacity < 1) {
-      throw new Error(`Capacity must be greater than 0, received: ${capacity}`);
-    }
-    super(...args);
-    this.capacity = capacity;
-    this.adjustSize();
-  }
-
-  /**
-   * Associates supplied value with the provided key.
-   * If the capacity was reached, earliest item added to this map will be removed.
-   * Unlike with the standard `Map`, the latest set item will always be emitted
-   * last by the iterables, even in case it was already added and then overriden.
-   *
-   * @param key
-   * @param value
-   */
-  set(key, value) {
-    // `Map` iterables produce items in the insertion order.
-    // Thus we have to remove a possibly existing item from the map to make the new entry emitted
-    // last by the iterators produced by calling `entries`/`keys`/`values` methods.
-    this.delete(key);
-
-    const res = super.set(key, value);
-    this.adjustSize();
-
-    return res;
-  }
-
-  /**
-   * Adjusts the size of the underlying map, so it will fit the capacity.
-   */
-  adjustSize() {
-    while (this.size > this.capacity) {
-      this.removeFirstAdded();
-    }
-  }
-
-  /**
-   * Removes the earliest item added to the map.
-   */
-  removeFirstAdded() {
-    const { value: key, done } = this.keys().next();
-
-    return !done && this.delete(key);
-  }
-}
-
-/**
- * Returns string containing comma-separated items of the provided iterable.
- *
- * @template V
- * @param {Iterable<V>} iter
- * @returns {string}
- */
-export const fmtIter = (iter) => `[${[...iter].map(String).join(', ')}]`;
+import {
+  ensureIterable,
+  ensureMap,
+  ensureObject,
+  fmtIterable,
+  toIterator,
+} from './types';
 
 /**
  * Pattern matching error.
@@ -144,7 +84,7 @@ export class PatternMatcher {
    * @param value
    */
   $matchValue(pattern, value) {
-    if (value !== pattern.$matchValue) {
+    if (!Object.is(value, pattern.$matchValue)) {
       throw new Error(
         `Unknown value \`${value}\`, expected ${pattern.$matchValue}`,
       );
@@ -159,10 +99,10 @@ export class PatternMatcher {
    * @param path
    */
   $matchObject(pattern, value, path) {
-    for (const key of Object.keys(value)) {
+    for (const key of Object.keys(ensureObject(value))) {
       if (!Object.hasOwnProperty.call(pattern.$matchObject, key)) {
         throw new Error(
-          `Invalid property \`${key}\`, expected keys: ${fmtIter(
+          `Invalid property \`${key}\`, expected keys: ${fmtIterable(
             Object.keys(pattern.$matchObject),
           )}`,
         );
@@ -180,17 +120,16 @@ export class PatternMatcher {
    * @param path
    */
   $matchIterable(pattern, value, path) {
-    if (typeof value[Symbol.iterator] !== 'function') {
-      throw new Error(`Iterable expected, received: ${value}`);
-    }
-    const objectIter = value[Symbol.iterator]();
+    const objectIter = toIterator(value);
 
     let idx = 0;
     for (const pat of pattern.$matchIterable) {
       const { value: item, done } = objectIter.next();
       if (done) {
         throw new Error(
-          `Value iterable is shorter than expected, received: ${fmtIter(value)}`,
+          `Value iterable is shorter than expected, received: ${fmtIterable(
+            value,
+          )}`,
         );
       }
 
@@ -205,11 +144,7 @@ export class PatternMatcher {
    * @param value
    */
   $instanceOf(pattern, value) {
-    if (!(value instanceof pattern.$instanceOf)) {
-      throw new Error(
-        `Invalid value provided, expected instance of \`${pattern.$instanceOf.name}\`, received instance of \`${value?.constructor?.name}\``,
-      );
-    }
+    ensureInstanceOf(value, pattern.$instanceOf);
   }
 
   /**
@@ -220,12 +155,8 @@ export class PatternMatcher {
    * @param path
    */
   $iterableOf(pattern, value, path) {
-    if (typeof value?.[Symbol.iterator] !== 'function') {
-      throw new Error(`Iterable expected, received \`${value}\``);
-    }
-
     let idx = 0;
-    for (const entry of value) {
+    for (const entry of ensureIterable(value)) {
       this.check(pattern.$iterableOf, entry, path.concat(idx++));
     }
   }
@@ -238,10 +169,6 @@ export class PatternMatcher {
    * @param path
    */
   $mapOf(pattern, value, path) {
-    if (typeof value?.entries !== 'function') {
-      throw new Error(`Map expected, received \`${value}\``);
-    }
-
     if (!Array.isArray(pattern.$mapOf) || pattern.$mapOf.length !== 2) {
       throw new Error(
         `\`$mapOf\` pattern should be an array with two items, received \`${maybeToJSONString(
@@ -250,7 +177,7 @@ export class PatternMatcher {
       );
     }
 
-    for (const [key, item] of value.entries()) {
+    for (const [key, item] of ensureMap(value).entries()) {
       this.check(pattern.$mapOf[0], key, path.concat(`${key}#key`));
       this.check(pattern.$mapOf[1], item, path.concat(key));
     }
@@ -296,7 +223,7 @@ export class PatternMatcher {
    * @param path
    */
   $objOf(pattern, value, path) {
-    const keys = Object.keys(value);
+    const keys = Object.keys(ensureObject(value));
     if (keys.length !== 1) {
       throw new Error('Expected a single key');
     }
@@ -304,7 +231,7 @@ export class PatternMatcher {
 
     if (!Object.hasOwnProperty.call(pattern.$objOf, key)) {
       throw new Error(
-        `Invalid value key provided, expected one of \`${fmtIter(
+        `Invalid value key provided, expected one of \`${fmtIterable(
           Object.keys(pattern.$objOf),
         )}\`, received \`${key}\``,
       );
@@ -326,24 +253,9 @@ export class PatternMatcher {
 }
 
 /**
- * Class extending `Array` with all prototype methods set to `undefined`.
+ * Ensures that provided value matches supplied pattern(s), throws an error otherwise.
+ *
+ * @param pattern
+ * @param value
  */
-export class ArrayWithoutPrototypeMethods extends Array {}
-
-const Ignore = new Set([
-  'forEach',
-  'filter',
-  'every',
-  'find',
-  'findIndex',
-  'splice',
-  'some',
-  'find',
-]);
-for (const member of Object.getOwnPropertyNames(Array.prototype)) {
-  if (!Ignore.has(member) && typeof Array.prototype[member] === 'function') {
-    Object.defineProperty(ArrayWithoutPrototypeMethods.prototype, member, {
-      enumerable: false,
-    });
-  }
-}
+export const ensureMatchesPattern = (pattern, value) => new PatternMatcher().check(pattern, value);

@@ -1,6 +1,6 @@
-import { DockDid } from "@docknetwork/credential-sdk/types";
-import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
+import { CheqdMultiSenderAPI } from "@docknetwork/cheqd-blockchain-api";
 import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
+import { DockDid } from "@docknetwork/credential-sdk/types";
 import { faucet, url, network } from "./constants";
 import { CheqdCoreModules } from "../src";
 
@@ -18,10 +18,10 @@ export const withRandomToString = (klass) => {
   return obj[name];
 };
 
-export function tests(name, generateTests, customTypes) {
+export function describeWithCheqdAPI(name, generate) {
   // eslint-disable-next-line
   describe(name, () => {
-    const cheqd = new CheqdAPI();
+    const cheqd = new CheqdMultiSenderAPI({ count: 10 });
 
     beforeAll(async () => {
       await cheqd.init({
@@ -29,26 +29,40 @@ export function tests(name, generateTests, customTypes) {
         wallet: await faucet.wallet(),
         network,
       });
-    });
+    }, 6e4);
 
     afterAll(async () => {
       await cheqd.disconnect();
     });
 
-    const core = new CheqdCoreModules(cheqd);
+    generate(
+      cheqd,
+      new CheqdCoreModules(cheqd),
+      cheqd.constructor.Types[network]
+    );
+  });
+}
+
+export function tests(name, generateTests, customTypes) {
+  // eslint-disable-next-line
+  describeWithCheqdAPI(name, (_, core, types) => {
+    const moduleSets = [core, new MultiApiCoreModules([core])];
     const didClasses = [
       null,
       DockDid,
       withRandomToString(DockDid),
-      withRandomToString(cheqd.constructor.Types[network].Did),
+      withRandomToString(types.Did),
     ];
-    for (const modules of [core, new MultiApiCoreModules([core])]) {
+
+    for (const modules of moduleSets) {
       for (const Did of didClasses) {
-        generateTests(modules, {
-          ...cheqd.constructor.Types[network],
+        const params = {
+          ...types,
           ...customTypes,
           ...(Did && { Did }),
-        });
+        };
+
+        generateTests(modules, params);
       }
     }
   });

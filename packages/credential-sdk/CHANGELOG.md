@@ -1,22 +1,16 @@
 # @docknetwork/credential-sdk
 
+## 0.48.0
+
+### Minor Changes
+
+- Introduce `CheqdMultiSenderAPI` + small refactoring
+
 ## 0.47.0
 
 ### Minor Changes
 
 - Upgrade elliptic
-
-## 0.46.0
-
-### Minor Changes
-
-- Specify accumulator keys by ID mapping not index
-
-## 0.45.0
-
-### Minor Changes
-
-- Fix VerifiablePresentation class potentially re-ordering credentials
 
 ## 0.44.0
 

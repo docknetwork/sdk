@@ -55,7 +55,7 @@ import {
   NamespaceDid,
 } from '../onchain/typed-did';
 import {
-  fmtIter,
+  fmtIterable,
   valueBytes,
   filterObj,
   ensureEqualToOrPrototypeOf,
@@ -157,7 +157,7 @@ export class VerificationMethod extends withFrom(
 
     if (bytes == null) {
       throw new Error(
-        `Expected either of ${fmtIter([
+        `Expected either of ${fmtIterable([
           'publicKeyBase58',
           'publicKeyBase64',
           'publicKeyJwk',

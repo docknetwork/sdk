@@ -3,6 +3,7 @@ import AbstractAccumulatorModule from './accumulator/module';
 import AbstractAnchorModule from './anchor/module';
 import AbstractAttestModule from './attest/module';
 import AbstractBlobModule from './blob/module';
+import { AbstractBaseModule } from './common';
 import AbstractDIDModule from './did/module';
 import AbstractOffchainSignaturesModule from './offchain-signatures/module';
 import AbstractStatusListCredentialModule from './status-list-credential/module';
@@ -25,7 +26,7 @@ export const AbstractCoreModules = withExtendedStaticProperties(
     'StatusListCredentialModule',
     'TrustRegistryModule',
   ],
-  class AbstractCoreModules {
+  class AbstractCoreModules extends AbstractBaseModule {
     static AccumulatorModule = AbstractAccumulatorModule;
 
     static AnchorModule = AbstractAnchorModule;
@@ -69,6 +70,8 @@ export const AbstractCoreModules = withExtendedStaticProperties(
     };
 
     constructor(...args) {
+      super();
+
       for (const [prop, key] of Object.entries(this.constructor.ModuleMap)) {
         this.attachModule(prop, key, args);
       }
@@ -89,6 +92,10 @@ export const AbstractCoreModules = withExtendedStaticProperties(
       this[key] = new Module(...args);
 
       return this;
+    }
+
+    methods() {
+      return this.apiProvider.methods();
     }
   },
 );

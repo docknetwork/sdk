@@ -13,9 +13,8 @@ export default function injectCheqd(klass) {
       static CheqdOnly;
 
       constructor(cheqd) {
-        super();
+        super(new CheqdAPIProvider(cheqd));
 
-        this.apiProvider = new CheqdAPIProvider(cheqd);
         this.cheqdOnly = new this.constructor.CheqdOnly(this.apiProvider);
       }
 

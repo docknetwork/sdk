@@ -11,21 +11,12 @@
 
 ### Minor Changes
 
-- Downgrade cheqd SDK to cjs
-
-## 0.31.2
+- Introduce `CheqdMultiSenderAPI` + small refactoring
 
 ### Patch Changes
 
 - Updated dependencies
-  - @docknetwork/credential-sdk@0.46.0
-
-## 0.31.1
-
-### Patch Changes
-
-- Updated dependencies
-  - @docknetwork/credential-sdk@0.45.0
+  - @docknetwork/credential-sdk@0.47.0
 
 ## 0.31.0
 

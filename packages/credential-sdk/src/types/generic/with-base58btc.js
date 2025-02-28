@@ -1,5 +1,5 @@
 import withFrom from './with-from';
-import { decodeFromBase58btc, encodeAsBase58btc } from '../../utils/base-x';
+import { decodeFromBase58btc, encodeAsBase58btc } from '../../utils/encoding';
 import { withExtendedStaticProperties } from '../../utils/inheritance';
 
 export default function withBase58btc(klass) {

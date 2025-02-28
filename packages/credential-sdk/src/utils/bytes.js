@@ -1,6 +1,68 @@
 import crypto from 'crypto';
 import { applyToValue } from './interfaces';
-import { ensureBytes, ensureString, isBytes } from './type-helpers';
+import { ensureString, ensureIterable } from './types/ensure-type';
+import { isIterable } from './types';
+
+/**
+ * Checks that the given value is a byte (an integer between 0 and 255).
+ *
+ * @param {*} byte - The value to check.
+ * @returns {boolean} - The validated byte value.
+ */
+export const isByte = (num) => Number.isInteger(num) && num >= 0 && num <= 255;
+
+/**
+ * Ensures that the given value is a byte (an integer between 0 and 255).
+ *
+ * @param {*} byte - The value to check.
+ * @throws If value is not a byte.
+ * @returns {number} - The validated byte value.
+ */
+export function ensureByte(num) {
+  if (isByte(num)) {
+    return num;
+  }
+
+  throw new Error(`Expected \`${num}\` to be an integer in range 0-255`);
+}
+
+/**
+ * Ensures that the given value is a list of bytes. If it's not a Uint8Array, converts it to one by mapping each element through `ensureByte`.
+ *
+ * @param {Uint8Array|Iterable<number>} bytes - The bytes to validate.
+ * @throws If value is not a bytes.
+ * @returns {Uint8Array} - The validated Uint8Array containing the bytes.
+ */
+export const ensureBytes = (bytes) => {
+  if (bytes instanceof Uint8Array) {
+    return bytes;
+  }
+
+  return Uint8Array.from([...ensureIterable(bytes)].map(ensureByte));
+};
+
+/**
+ * Checks that the given value is a list of bytes. If it's not a Uint8Array, validates each item using `ensureByte`.
+ *
+ * @param {Uint8Array|Iterable<number>} bytes - The bytes to validate.
+ * @throws If value is not a bytes.
+ * @returns {boolean} - The validated Uint8Array containing the bytes.
+ */
+export const isBytes = (bytes) => {
+  if (bytes instanceof Uint8Array) {
+    return true;
+  } else if (isIterable(bytes)) {
+    for (const byte of bytes) {
+      if (!isByte(byte)) {
+        return false;
+      }
+    }
+
+    return true;
+  } else {
+    return false;
+  }
+};
 
 /**
  * Check if the given input is hexadecimal or not. Optionally checks for the byte size of the hex. Case-insensitive on hex chars

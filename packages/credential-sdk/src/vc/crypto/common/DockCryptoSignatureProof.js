@@ -89,9 +89,13 @@ export default withExtendedStaticProperties(
           blindedAttributesCircomOutputs,
         } = this;
 
-        const expectedAccumulatorPKs = accumulatorPublicKeys ? new Map() : undefined;
+        const expectedAccumulatorPKs = accumulatorPublicKeys
+          ? new Map()
+          : undefined;
         if (accumulatorPublicKeys) {
-          const expectedAccumulatorPK = accumulatorPublicKeys.get(document?.credentialStatus?.id);
+          const expectedAccumulatorPK = accumulatorPublicKeys.get(
+            document?.credentialStatus?.id,
+          );
           if (expectedAccumulatorPK) {
             expectedAccumulatorPKs.set(0, expectedAccumulatorPK);
           }

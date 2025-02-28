@@ -11,19 +11,12 @@
 
 ### Minor Changes
 
-- Specify accumulator keys by ID mapping not index
+- Introduce `CheqdMultiSenderAPI` + small refactoring
 
 ### Patch Changes
 
 - Updated dependencies
-  - @docknetwork/credential-sdk@0.46.0
-
-## 0.26.3
-
-### Patch Changes
-
-- Updated dependencies
-  - @docknetwork/credential-sdk@0.45.0
+  - @docknetwork/credential-sdk@0.47.0
 
 ## 0.26.2
 

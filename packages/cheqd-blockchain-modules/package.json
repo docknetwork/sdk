@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/cheqd-blockchain-modules",
-  "version": "0.31.3",
+  "version": "0.32.0",
   "type": "module",
   "license": "MIT",
   "main": "./dist/esm/index.js",
@@ -32,7 +32,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@docknetwork/credential-sdk": "0.47.0"
+    "@docknetwork/credential-sdk": "0.48.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",
@@ -41,7 +41,7 @@
     "@babel/plugin-syntax-import-attributes": "^7.25.6",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/preset-env": "^7.24.3",
-    "@docknetwork/cheqd-blockchain-api": "0.32.1",
+    "@docknetwork/cheqd-blockchain-api": "0.33.0",
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^24.0.0",
@@ -74,7 +74,7 @@
     "lint": "eslint \"src/**/*.js\"",
     "docs": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
     "dev-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG ../../scripts/run_cheqd_node_in_docker --dev --rpc-external --ws-external --rpc-cors=all",
-    "test": "NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/*",
+    "test": "NODE_ENV=production jest --verbose --forceExit ./tests/*",
     "test-with-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK ../../scripts/with_cheqd_docker_test_node yarn test",
     "prepublishOnly": "yarn build"
   }

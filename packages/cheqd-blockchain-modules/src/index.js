@@ -10,6 +10,12 @@ import CheqdBBSPlusModule from './offchain-signatures/bbs-plus';
 import CheqdPSModule from './offchain-signatures/ps';
 
 export class CheqdCoreModules extends AbstractCoreModules {
+  constructor(apiProvider) {
+    super(apiProvider);
+
+    this.apiProvider = apiProvider;
+  }
+
   static get ModuleMap() {
     return {
       ...super.ModuleMap,

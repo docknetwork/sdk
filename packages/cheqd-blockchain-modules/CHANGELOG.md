@@ -1,5 +1,12 @@
 # @docknetwork/cheqd-blockchain-modules
 
+
+## 0.32.0
+
+### Minor Changes
+
+- Introduce `CheqdMultiSenderAPI` + small refactoring
+
 ## 0.31.3
 
 ### Patch Changes
@@ -12,14 +19,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @docknetwork/credential-sdk@0.46.0
-
-## 0.31.1
-
-### Patch Changes
-
-- Updated dependencies
-  - @docknetwork/credential-sdk@0.45.0
+  - @docknetwork/credential-sdk@0.47.0
 
 ## 0.31.0
 

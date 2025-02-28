@@ -28,7 +28,7 @@ export default {
     "^.+\\.(ts|js)$": ["babel-jest", { rootMode: "upward" }],
   },
   transformIgnorePatterns: [
-    "/node_modules/(?!@polkadot|@babel|multiformats|@docknetwork|@stablelib|@cheqd|file-type|uint8arrays|multiformats|strtok3|peek-readable|token-types|uint8array-extra)",
+    "/node_modules/(?!@polkadot|@babel|multiformats|@docknetwork|@stablelib|@cheqd|file-type|uint8arrays|multiformats|strtok3|peek-readable|token-types|uint8array-extra|p-limit|yocto-queue)",
   ],
   workerIdleMemoryLimit: "1G",
   verbose: true,

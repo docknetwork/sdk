@@ -4,8 +4,7 @@ import {
   u8aToHex,
   u8aToU8a,
 } from '../../utils/bytes';
-import { ensureByte } from '../../utils';
-import { ArrayWithoutPrototypeMethods } from '../../utils/generic';
+import { ensureByte, ArrayWithoutPrototypeMethods } from '../../utils';
 import withBase from './with-base';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';

@@ -14,7 +14,7 @@ import {
   DockStatusList2021Qualifier,
   CheqdStatusList2021Qualifier,
 } from '../../vc/constants';
-import dockDidById from '../../utils/dock-did-by-id';
+import dockDidById from '../../utils/fixtures/dock-did-by-id';
 
 export class StatusListCredentialId extends withFrom(
   withQualifier(TypedEnum, true),

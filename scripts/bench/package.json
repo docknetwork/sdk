@@ -1,0 +1,26 @@
+{
+  "name": "@docknetwork/benchmarks",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "bench": "babel-node src/main.js"
+  },
+  "dependencies": {
+    "@docknetwork/cheqd-blockchain-api": "0.33.0",
+    "@docknetwork/cheqd-blockchain-modules": "0.32.0",
+    "@docknetwork/credential-sdk": "0.48.0",
+    "@docknetwork/dock-blockchain-api": "0.22.0",
+    "@docknetwork/dock-blockchain-modules": "0.28.0",
+    "@docknetwork/crypto-wasm-ts": "^0.63.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^8.0.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^26.0.0",
+    "eslint-plugin-sonarjs": "0.5.0",
+    "eslint-plugin-unused-imports": "^3.0.0"
+  }
+}

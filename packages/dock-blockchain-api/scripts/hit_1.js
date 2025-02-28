@@ -1,7 +1,7 @@
 import { randomAsHex } from "@polkadot/util-crypto";
 import dock from "../src/index";
 import { DockDid, DidKeypair } from "../src/did";
-import { getPublicKeyFromKeyringPair } from "../src/utils/misc";
+import { getPublicKeyFromKeyringPair } from "../src/utils";
 import { sendBatch } from "./helpers";
 import { DidKey, VerificationRelationship } from "../src/public-keys";
 

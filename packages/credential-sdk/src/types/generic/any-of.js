@@ -1,4 +1,4 @@
-import { fmtIter } from '../../utils';
+import { fmtIterable } from '../../utils';
 import withFrom from './with-from';
 
 /**
@@ -11,7 +11,7 @@ import withFrom from './with-from';
  * @returns {anyOfTypes<T>} A new type that can be constructed from any of the provided types
  */
 export default function anyOf(...classes) {
-  const name = `anyOf(${fmtIter(classes.map((klass) => klass.name))})`;
+  const name = `anyOf(${fmtIterable(classes.map((klass) => klass.name))})`;
 
   const obj = {
     [name]: class extends withFrom(class NeverConstructed {}, (value) => {

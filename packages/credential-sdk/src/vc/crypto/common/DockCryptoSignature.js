@@ -11,7 +11,7 @@ import semver from 'semver/preload.js';
 import { u8aToU8a } from '../../../utils/bytes';
 import { withExtendedStaticProperties } from '../../../utils/inheritance';
 import CustomLinkedDataSignature from './CustomLinkedDataSignature';
-import { deepClone } from '../../../utils/misc';
+import { deepClone } from '../../../utils';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 

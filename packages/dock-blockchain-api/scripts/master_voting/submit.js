@@ -6,7 +6,7 @@ import { sr25519Verify } from "@polkadot/util-crypto/sr25519";
 import { u8aToHex, assert } from "@polkadot/util";
 import { keypair, connect } from "../helpers";
 import { createDidSig } from "../../src/did";
-import { getStateChange } from "../../src/utils/misc";
+import { getStateChange } from "../../src/utils";
 
 const { promises: fs } = require("fs");
 

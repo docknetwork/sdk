@@ -356,7 +356,9 @@ export class CheqdAPI extends AbstractApiProvider {
         const limit = BlockLimits[this.network()];
         if (gasAmount >= limit) {
           throw new Error(
-            "Can't process transaction because it exceeds block gas limit",
+            `Can't process transaction because it exceeds block gas limit: ${JSON.stringify(
+              txJSON,
+            )}`,
           );
         }
 

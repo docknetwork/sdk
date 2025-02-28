@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/cheqd-blockchain-api",
-  "version": "0.33.0",
+  "version": "0.34.0",
   "license": "MIT",
   "main": "./dist/esm/index.js",
   "type": "module",

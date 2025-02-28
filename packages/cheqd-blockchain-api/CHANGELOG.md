@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 0.34.0
+
+### Minor Changes
+
+- Tweaks for transaction sending flow
+
 ## 0.32.1
 
 ### Patch Changes

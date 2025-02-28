@@ -68,6 +68,7 @@ import {
   deactivateDIDDocGas,
   gasAmountForBatch,
 } from './gas';
+import { signedTxHash } from '../utils/tx';
 
 export class CheqdAPI extends AbstractApiProvider {
   #sdk;
@@ -322,6 +323,7 @@ export class CheqdAPI extends AbstractApiProvider {
   async signAndBroadcast(sender, txJSON, { ...payment }, memo) {
     const { BlockLimits } = this.constructor;
 
+    let signedTx;
     let connectionClosed = false;
     const onError = async (err, continueSym) => {
       const strErr = String(err);
@@ -337,17 +339,18 @@ export class CheqdAPI extends AbstractApiProvider {
 
         return continueSym;
       } else if (strErr.includes('exists') && connectionClosed) {
-        // TODO:
-        /* const { bodyBytes } = await this.sdk.signer.sign(
-          sender,
-          txJSON,
-          payment,
-          memo ?? '',
-        );
-        const hash = u8aToHex(sha256.digest(bodyBytes)).slice(2).toUpperCase();
+        const hash = signedTxHash(signedTx);
 
-        return await this.txResult(hash); */
-        return null;
+        const res = await this.txResult();
+        if (res == null) {
+          throw new Error(
+            `Transaction with hash ${hash} not found, but entity already exists: ${JSON.stringify(
+              txJSON,
+            )}`,
+          );
+        }
+
+        return res;
       } else if (strErr.includes('out of gas in location')) {
         const gasAmount = BigInt(payment.gas);
         const limit = BlockLimits[this.network()];
@@ -359,8 +362,10 @@ export class CheqdAPI extends AbstractApiProvider {
 
         // eslint-disable-next-line no-param-reassign
         payment.gas = String(minBigInt(gasAmount * 2n, limit));
+        signedTx = void 0;
         return continueSym;
       } else if (strErr.includes('account sequence mismatch')) {
+        signedTx = void 0;
         return continueSym;
       }
 
@@ -369,12 +374,13 @@ export class CheqdAPI extends AbstractApiProvider {
 
     return await this.#spawn(() => retry(
       async () => {
-        const res = await this.sdk.signer.signAndBroadcast(
+        signedTx ??= await this.sdk.signer.sign(
           sender,
           txJSON,
           payment,
           memo ?? '',
         );
+        const res = await this.sdk.signer.broadcastTx(signedTx);
 
         if (res.code) {
           console.error(res);

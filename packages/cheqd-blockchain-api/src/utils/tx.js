@@ -7,4 +7,4 @@ import { sha256 } from 'js-sha256';
  * @param {object} signedTx
  * @returns {string}
  */
-export const signedTxHash = ({ bodyBytes }) => u8aToHex(sha256.digest(bodyBytes)).slice(2).toUpperCase();
+export const signedTxHash = (bytes) => u8aToHex(sha256.digest(bytes)).slice(2).toUpperCase();

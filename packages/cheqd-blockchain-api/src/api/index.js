@@ -374,12 +374,9 @@ export class CheqdAPI extends AbstractApiProvider {
 
     return await this.#spawn(() => retry(
       async () => {
-        signedTx ??= await this.sdk.signer.sign(
-          sender,
-          txJSON,
-          payment,
-          memo ?? '',
-        );
+        signedTx ??= (
+          await this.sdk.signer.sign(sender, txJSON, payment, memo ?? '')
+        ).bodyBytes;
         const res = await this.sdk.signer.broadcastTx(signedTx);
 
         if (res.code) {

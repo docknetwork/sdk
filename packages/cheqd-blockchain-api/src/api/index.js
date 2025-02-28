@@ -8,6 +8,7 @@ import {
   // u8aToHex,
   minBigInt,
 } from '@docknetwork/credential-sdk/utils';
+import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 // import { sha256 } from "js-sha256";
 import {
   DIDModule,
@@ -338,10 +339,14 @@ export class CheqdAPI extends AbstractApiProvider {
         await this.reconnect();
 
         return continueSym;
-      } else if (strErr.includes('exists') && connectionClosed) {
+      } else if (
+        strErr.includes('exists')
+        && connectionClosed
+        && signedTx != null
+      ) {
         const hash = signedTxHash(signedTx);
 
-        const res = await this.txResult();
+        const res = await this.txResult(hash);
         if (res == null) {
           throw new Error(
             `Transaction with hash ${hash} not found, but entity already exists: ${JSON.stringify(
@@ -376,9 +381,9 @@ export class CheqdAPI extends AbstractApiProvider {
 
     return await this.#spawn(() => retry(
       async () => {
-        signedTx ??= (
-          await this.sdk.signer.sign(sender, txJSON, payment, memo ?? '')
-        ).bodyBytes;
+        signedTx ??= TxRaw.encode(
+          await this.sdk.signer.sign(sender, txJSON, payment, memo ?? ''),
+        ).finish();
         const res = await this.sdk.signer.broadcastTx(signedTx);
 
         if (res.code) {

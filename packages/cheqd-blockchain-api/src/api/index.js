@@ -8,6 +8,7 @@ import {
   // u8aToHex,
   minBigInt,
 } from '@docknetwork/credential-sdk/utils';
+import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 // import { sha256 } from "js-sha256";
 import {
   DIDModule,
@@ -68,6 +69,7 @@ import {
   deactivateDIDDocGas,
   gasAmountForBatch,
 } from './gas';
+import { signedTxHash } from '../utils/tx';
 
 export class CheqdAPI extends AbstractApiProvider {
   #sdk;
@@ -322,6 +324,7 @@ export class CheqdAPI extends AbstractApiProvider {
   async signAndBroadcast(sender, txJSON, { ...payment }, memo) {
     const { BlockLimits } = this.constructor;
 
+    let signedTx;
     let connectionClosed = false;
     const onError = async (err, continueSym) => {
       const strErr = String(err);
@@ -336,31 +339,40 @@ export class CheqdAPI extends AbstractApiProvider {
         await this.reconnect();
 
         return continueSym;
-      } else if (strErr.includes('exists') && connectionClosed) {
-        // TODO:
-        /* const { bodyBytes } = await this.sdk.signer.sign(
-          sender,
-          txJSON,
-          payment,
-          memo ?? '',
-        );
-        const hash = u8aToHex(sha256.digest(bodyBytes)).slice(2).toUpperCase();
+      } else if (
+        strErr.includes('exists')
+        && connectionClosed
+        && signedTx != null
+      ) {
+        const hash = signedTxHash(signedTx);
 
-        return await this.txResult(hash); */
-        return null;
+        const res = await this.txResult(hash);
+        if (res == null) {
+          throw new Error(
+            `Transaction with hash ${hash} not found, but entity already exists: ${JSON.stringify(
+              txJSON,
+            )}`,
+          );
+        }
+
+        return res;
       } else if (strErr.includes('out of gas in location')) {
         const gasAmount = BigInt(payment.gas);
         const limit = BlockLimits[this.network()];
         if (gasAmount >= limit) {
           throw new Error(
-            "Can't process transaction because it exceeds block gas limit",
+            `Can't process transaction because it exceeds block gas limit: ${JSON.stringify(
+              txJSON,
+            )}`,
           );
         }
 
         // eslint-disable-next-line no-param-reassign
         payment.gas = String(minBigInt(gasAmount * 2n, limit));
+        signedTx = void 0;
         return continueSym;
       } else if (strErr.includes('account sequence mismatch')) {
+        signedTx = void 0;
         return continueSym;
       }
 
@@ -369,12 +381,10 @@ export class CheqdAPI extends AbstractApiProvider {
 
     return await this.#spawn(() => retry(
       async () => {
-        const res = await this.sdk.signer.signAndBroadcast(
-          sender,
-          txJSON,
-          payment,
-          memo ?? '',
-        );
+        signedTx ??= TxRaw.encode(
+          await this.sdk.signer.sign(sender, txJSON, payment, memo ?? ''),
+        ).finish();
+        const res = await this.sdk.signer.broadcastTx(signedTx);
 
         if (res.code) {
           console.error(res);

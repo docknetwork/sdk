@@ -113,10 +113,10 @@ describe("DID utilities", () => {
     expect(hexDid(hex)).toBe(hex);
   });
 
-  test("On input invalid ss58 but with qualifier, hexDid throws error", () => {
+  test("On input Invalid SS58 but with qualifier, hexDid throws error", () => {
     const did = `${DockDid.Qualifier}oO12`;
     // Without the qualifier, the function tries to parse as hex
-    expect(() => hexDid(did)).toThrow(/Invalid ss58/);
+    expect(() => hexDid(did)).toThrow(/Invalid SS58/);
   });
 
   test("On input fully qualified Dock DID, hexDid returns valid hex representation", () => {
@@ -139,7 +139,7 @@ describe("DID utilities", () => {
     const ss58 = encodeAsSS58(randomAsHex(32));
     const did = `${DockDid.Qualifier}${ss58}${ss58}`;
     // Without the qualifier, the function tries to parse as hex
-    expect(() => hexDid(did)).toThrow(/Invalid ss58/);
+    expect(() => hexDid(did)).toThrow(/Invalid SS58/);
   });
 
   test("On input valid SS58 identifier but smaller than 32 bytes, validateDockDIDSS58Identifier throws error", () => {
@@ -153,7 +153,7 @@ describe("DID utilities", () => {
     const ss58 = encodeAsSS58(randomAsHex(32));
     const did = `${ss58}${ss58}`;
     expect(() => DockDid.fromQualifiedString(did)).toThrow(
-      /Invalid ss58 address/
+      /Invalid SS58 address/
     );
   });
 

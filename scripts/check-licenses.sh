@@ -40,10 +40,6 @@ for dir in "$PACKAGES_DIR"/*; do
   fi
 done
 
-# Log the final DEPENDENCIES_JSON and LICENSES_JSON to verify
-echo "Dependencies JSON: $DEPENDENCIES_JSON"
-echo "License Checker Output (combined): $LICENSES_JSON"
-
 # Step 4: Filter the license-checker output, ensuring it only shows dependencies found in DEPENDENCIES_JSON
 if [ "$ONLY_NON_MIT" == "true" ]; then
   # Only select MIT licenses if ONLY_NON_MIT is true

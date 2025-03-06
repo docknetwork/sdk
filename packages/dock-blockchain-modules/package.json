@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/dock-blockchain-modules",
-  "version": "0.28.0",
+  "version": "0.28.1",
   "license": "MIT",
   "type": "module",
   "main": "./dist/esm/index.js",
@@ -32,7 +32,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@docknetwork/credential-sdk": "0.48.0"
+    "@docknetwork/credential-sdk": "0.49.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",

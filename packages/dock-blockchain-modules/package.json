@@ -52,6 +52,7 @@
     "aws-sdk": "^2.1057.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^29.7.0",
+    "dotenv": "16.0.1",
     "eslint": "^8.0.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",

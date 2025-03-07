@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/dock-blockchain-api",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "license": "MIT",
   "main": "./dist/esm/index.js",
   "type": "module",
@@ -87,30 +87,11 @@
   "resolutions": {
     "@polkadot/api": "10.12.4"
   },
+  "peerDependencies": {
+    "@docknetwork/credential-sdk": "^0.48.0"
+  },
   "dependencies": {
-    "@docknetwork/credential-sdk": "0.48.0",
     "@docknetwork/node-types": "^0.17.0",
-    "@juanelas/base64": "^1.0.5",
-    "@polkadot/api": "10.12.4",
-    "@transmute/json-web-signature": "^0.7.0-unstable.80",
-    "base64url": "3.0.1",
-    "blake2b": "2.1.4",
-    "bs58": "5.0.0",
-    "cross-fetch": "3.1.6",
-    "deep-equal": "2.0.5",
-    "dotenv": "16.0.1",
-    "elliptic": "6.6.1",
-    "flat": "^5.0.2",
-    "js-sha256": "0.9.0",
-    "json-canonicalize": "1.0.4",
-    "json-stringify-deterministic": "^1.0.11",
-    "jsonschema": "1.4.1",
-    "key-did-resolver": "^1.4.0",
-    "mrklt": "^0.2.0",
-    "multiformats": "^9.5.4",
-    "n3": "1.16.2",
-    "pako": "^2.1.0",
-    "rify": "^0.7.1",
-    "semver": "^7.6.0"
+    "@polkadot/api": "10.12.4"
   }
 }

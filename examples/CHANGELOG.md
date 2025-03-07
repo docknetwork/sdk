@@ -1,6 +1,14 @@
 # @docknetwork/sdk-examples
 
+## 0.18.6
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/dock-blockchain-api@0.23.0
+
 ## 0.18.5
+
 =======
 
 ### Patch Changes

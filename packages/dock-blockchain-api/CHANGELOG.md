@@ -1,12 +1,18 @@
 # @docknetwork/dock-blockchain-api
 
+## 0.23.0
+
+### Minor Changes
+
+- Move `@docknetwork/credential-sdk` to `peerDependencies`
+
 ## 0.21.0
 
 ### Minor Changes
 
 <<<<<<< HEAD
-- Introduce `CheqdMultiSenderAPI` + small refactoring
-=======
+
+- # Introduce `CheqdMultiSenderAPI` + small refactoring
 - Upgrade elliptic
 
 ### Patch Changes
@@ -15,7 +21,8 @@
   - @docknetwork/credential-sdk@0.47.0
 
 ## 0.20.4
->>>>>>> origin/master
+
+> > > > > > > origin/master
 
 ### Patch Changes
 

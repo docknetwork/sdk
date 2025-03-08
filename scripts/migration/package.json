@@ -2,7 +2,7 @@
   "name": "@docknetwork/migration",
   "private": true,
   "type": "module",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "scripts": {
     "migrate": "babel-node src/index.js",
     "did-by-id": "babel-node src/did-by-id.js",
@@ -11,7 +11,7 @@
   "dependencies": {
     "@docknetwork/cheqd-blockchain-api": "0.34.0",
     "@docknetwork/credential-sdk": "0.48.0",
-    "@docknetwork/dock-blockchain-api": "0.22.0",
+    "@docknetwork/dock-blockchain-api": "0.23.0",
     "@docknetwork/dock-blockchain-modules": "0.28.0",
     "p-limit": "^6.1.0"
   },

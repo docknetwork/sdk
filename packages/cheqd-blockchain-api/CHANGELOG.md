@@ -98,7 +98,7 @@
 - Updated dependencies
   - @docknetwork/credential-sdk@0.37.0
 
-## 0.28.1
+## 0.29.0
 
 ### Patch Changes
 

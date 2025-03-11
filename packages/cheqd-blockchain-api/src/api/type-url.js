@@ -1,6 +1,4 @@
 import { extendNull } from '@docknetwork/credential-sdk/utils';
-import { protobufPackage as didProtobufPackage } from '@cheqd/ts-proto/cheqd/did/v2/index.js';
-import { protobufPackage as resourceProtobufPackage } from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
 
 export const fullTypeUrl = (typeUrl) => {
   const match = String(typeUrl).match(
@@ -43,6 +41,9 @@ export const buildTypeUrlObject = (
   [f('MsgDeactivateDidDoc')]: deactivateDID,
   [f('MsgCreateResource')]: createResource,
 });
+
+const didProtobufPackage = 'cheqd.did.v2';
+const resourceProtobufPackage = 'cheqd.resource.v2';
 
 export const PrefixesByTypeUrl = buildTypeUrlObject(
   didProtobufPackage,

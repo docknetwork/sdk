@@ -4,24 +4,23 @@
   "type": "module",
   "version": "0.18.6",
   "scripts": {
-    "bbs-dock-example": "babel-node ./bbs-dock.js",
-    "claim-deduction-example": "babel-node ./claim-deduction.js",
-    "open-badges-example": "babel-node ./open-badges.js",
-    "schema-validation-example": "babel-node ./schema-validation.js",
-    "standard-schemas-example": "babel-node ./standard-schemas.js",
-    "dock-did-example": "babel-node ./dock-did.js",
-    "did-resolver-example": "babel-node ./resolver.js",
-    "schema-example": "babel-node ./schema.js",
-    "blob-example": "babel-node ./blob.js",
-    "anchor-example": "babel-node ./anchor.js",
-    "examples": "yarn bbs-dock-example && yarn claim-deduction-example && yarn open-badges-example && yarn schema-validation-example && yarn standard-schemas-example && yarn dock-did-example && yarn did-resolver-example && yarn schema-example && yarn blob-example && yarn anchor-example",
-    "examples-with-node": "../scripts/with_dock_docker_test_node yarn examples",
-    "lint": "eslint \"*.js\""
+    "bbs-dock-example": "babel-node ./src/bbs-dock.js",
+    "claim-deduction-example": "babel-node ./src/claim-deduction.js",
+    "open-badges-example": "babel-node ./src/open-badges.js",
+    "schema-validation-example": "babel-node ./src/schema-validation.js",
+    "standard-schemas-example": "babel-node ./src/standard-schemas.js",
+    "dock-did-example": "babel-node ./src/dock-did.js",
+    "did-resolver-example": "babel-node ./src/resolver.js",
+    "schema-example": "babel-node ./src/schema.js",
+    "blob-example": "babel-node ./src/blob.js",
+    "examples": "yarn bbs-dock-example && yarn claim-deduction-example && yarn open-badges-example && yarn schema-validation-example && yarn standard-schemas-example && yarn dock-did-example && yarn did-resolver-example && yarn schema-example && yarn blob-example",
+    "examples-with-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK ../scripts/with_cheqd_docker_test_node yarn examples",
+    "lint": "eslint \"src/**/*.js\""
   },
   "dependencies": {
-    "@docknetwork/credential-sdk": "0.48.0",
-    "@docknetwork/dock-blockchain-api": "0.23.0",
-    "@docknetwork/dock-blockchain-modules": "0.28.0"
+    "@docknetwork/credential-sdk": "0.49.0",
+    "@docknetwork/cheqd-blockchain-api": "0.35.0",
+    "@docknetwork/cheqd-blockchain-modules": "0.32.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

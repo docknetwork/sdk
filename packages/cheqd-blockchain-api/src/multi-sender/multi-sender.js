@@ -62,7 +62,6 @@ export default class MultiSender {
   }
 
   async init(params) {
-    this.ensureNotShuttingDown();
     this.ensureNotInitialized();
 
     try {
@@ -79,8 +78,8 @@ export default class MultiSender {
       return this;
     } catch (error) {
       this.#spawn = void 0;
-      this.#senders = void 0;
       this.#senderWallets = void 0;
+      this.#senders = void 0;
 
       error.message = `Initialization failed: ${error.message}`;
 
@@ -89,9 +88,7 @@ export default class MultiSender {
   }
 
   async signAndSend(...args) {
-    this.ensureInitialized();
-
-    return await this.#spawn(async () => {
+    return await this.ensureInitialized().#spawn(async () => {
       const sender = this.#senders.pop();
       if (!sender) {
         throw new Error('No available senders');
@@ -188,19 +185,23 @@ export default class MultiSender {
     if (this.isShuttingDown) {
       throw new Error('System is shutting down');
     }
+
+    return this;
   }
 
   ensureNotInitialized() {
-    if (this.isInitialized()) {
+    if (this.ensureNotShuttingDown().isInitialized()) {
       throw new Error('`MutiSender` is already initialized');
     }
+
+    return this;
   }
 
   ensureInitialized() {
-    this.ensureNotShuttingDown();
-
-    if (!this.isInitialized()) {
+    if (!this.ensureNotShuttingDown().isInitialized()) {
       throw new Error('`MutiSender` is not initialized');
     }
+
+    return this;
   }
 }

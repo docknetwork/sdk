@@ -1,7 +1,7 @@
 import { CheqdMultiSenderAPI } from "@docknetwork/cheqd-blockchain-api";
 import { MultiApiCoreModules } from "@docknetwork/credential-sdk/modules";
 import { DockDid } from "@docknetwork/credential-sdk/types";
-import { faucet, url, network } from "./constants";
+import { faucet, url, network } from "./env";
 import { CheqdCoreModules } from "../src";
 
 export const withRandomToString = (klass) => {

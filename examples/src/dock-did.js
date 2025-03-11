@@ -1,26 +1,27 @@
 import {
-  DockDid,
+  CheqdDid,
   DIDDocument,
   DidKey,
   VerificationRelationship,
   LinkedDomains,
   ServiceEndpoint,
 } from '@docknetwork/credential-sdk/types';
-import { DockAPI } from '@docknetwork/dock-blockchain-api';
-import { DockDIDModule } from '@docknetwork/dock-blockchain-modules';
-
-// The following can be tweaked depending on where the node is running and what
-// account is to be used for sending the transaction.
+import { CheqdAPI } from '@docknetwork/dock-blockchain-api';
+import { CheqdDIDModule } from '@docknetwork/dock-blockchain-modules';
 import {
   Ed25519Keypair,
   DidKeypair,
 } from '@docknetwork/credential-sdk/keypairs';
+import { faucet, network, url } from './env';
+
+// The following can be tweaked depending on where the node is running and what
+// account is to be used for sending the transaction.
 
 // DID will be generated randomly
-const dockDID = DockDid.random();
+const cheqdDID = CheqdDid.random(network);
 
-const dock = new DockAPI();
-const didModule = new DockDIDModule(dock);
+const cheqd = new CheqdAPI();
+const didModule = new CheqdDIDModule(cheqd);
 
 // Generate first key with this seed. The key type is Sr25519
 const firstKeyPair = Ed25519Keypair.random();
@@ -33,9 +34,9 @@ async function removeDID() {
   console.log('Removing DID now.');
 
   // Sign the DID removal with this key pair as this is the current key of the DID
-  const pair = new DidKeypair([dockDID, 1], firstKeyPair);
+  const pair = new DidKeypair([cheqdDID, 1], firstKeyPair);
 
-  return await didModule.removeDocument(dockDID, pair);
+  return await didModule.removeDocument(cheqdDID, pair);
 }
 
 // This function assumes the DID has been written.
@@ -43,17 +44,17 @@ async function addServiceEndpoint() {
   console.log('Add new service endpoint now.');
 
   // Sign key update with this key pair as this is the current key of the DID
-  const pair = new DidKeypair([dockDID, 1], firstKeyPair);
+  const pair = new DidKeypair([cheqdDID, 1], firstKeyPair);
 
   const newEndpoint = new ServiceEndpoint(new LinkedDomains(), [
     'https://foo.example.com',
   ]);
-  const doc = await didModule.getDocument(dockDID);
+  const doc = await didModule.getDocument(cheqdDID);
 
   doc.addServiceEndpoint(
-    `${dockDID}#linked-domain`,
+    `${cheqdDID}#linked-domain`,
     newEndpoint,
-    dockDID,
+    cheqdDID,
     pair,
   );
 
@@ -65,11 +66,11 @@ async function addController() {
   console.log('Add new controller now.');
 
   // Sign key update with this key pair as this is the current key of the DID
-  const pair = new DidKeypair([dockDID, 1], firstKeyPair);
+  const pair = new DidKeypair([cheqdDID, 1], firstKeyPair);
 
-  const newController = DockDid.random();
+  const newController = CheqdDid.random();
 
-  const doc = await didModule.getDocument(dockDID);
+  const doc = await didModule.getDocument(cheqdDID);
 
   doc.addController(newController);
 
@@ -81,10 +82,10 @@ async function addKey() {
   console.log('Add new key now.');
 
   // Sign key update with this key pair as this is the current key of the DID
-  const pair = new DidKeypair([dockDID, 1], firstKeyPair);
+  const pair = new DidKeypair([cheqdDID, 1], firstKeyPair);
 
   // Update DID key to the following
-  const newPair = new DidKeypair([dockDID, 2], secondKeyPair);
+  const newPair = new DidKeypair([cheqdDID, 2], secondKeyPair);
   // the following function will figure out the correct PublicKey type from the `type` property of `newPair`
   const newPk = newPair.publicKey();
 
@@ -92,9 +93,9 @@ async function addKey() {
   vr.setAuthentication();
   const newDidKey = new DidKey(newPk, vr);
 
-  const document = await didModule.getDocument(dockDID);
+  const document = await didModule.getDocument(cheqdDID);
 
-  document.addKey([dockDID, 2], newDidKey);
+  document.addKey([cheqdDID, 2], newDidKey);
 
   return await didModule.updateDocument(document, pair);
 }
@@ -102,7 +103,7 @@ async function addKey() {
 async function getDIDDoc() {
   console.log('Getting DID now.');
   // Check if DID exists
-  const result = await didModule.getDocument(dockDID);
+  const result = await didModule.getDocument(cheqdDID);
   console.log('DID Document:', JSON.stringify(result, null, 2));
   return result;
 }
@@ -115,24 +116,20 @@ async function registerNewDID() {
     new VerificationRelationship(),
   );
 
-  console.log('Submitting new DID', dockDID, firstKeyPair.publicKey());
+  console.log('Submitting new DID', cheqdDID, firstKeyPair.publicKey());
 
-  return await didModule.createDocument(DIDDocument.create(dockDID, [didKey]));
+  return await didModule.createDocument(DIDDocument.create(cheqdDID, [didKey]));
 }
 
 // Initialize Dock API, connect to the node and start working with it
 // It will create a new DID with a key, then update the key to another one and then remove the DID
-dock
-  .init({
-    address: [process.env.FullNodeEndpoint || 'ws://127.0.0.1:9944'],
-  })
-  .then(() => {
-    const account = dock.keyring.addFromUri(
-      process.env.TestAccountURI || '//Alice',
-    );
-    dock.setAccount(account);
-    return registerNewDID();
-  })
+faucet
+  .wallet()
+  .then((wallet) => cheqd.init({
+    url,
+    wallet,
+  }))
+  .then(() => registerNewDID())
   .then(getDIDDoc)
   .then(addKey)
   .then(getDIDDoc)
@@ -142,7 +139,7 @@ dock
   .then(removeDID)
   .then(async () => {
     try {
-      await didModule.getDocument(dockDID);
+      await didModule.getDocument(cheqdDID);
       throw new Error(
         'The call to get the DID document should have failed but did not fail. This means the remove DID call has not worked.',
       );

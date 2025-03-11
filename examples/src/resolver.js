@@ -1,8 +1,8 @@
 /* eslint-disable  max-classes-per-file */
 import ethr from 'ethr-did-resolver';
-import { DockAPI } from '@docknetwork/dock-blockchain-api';
+import { CheqdAPI } from '@docknetwork/cheqd-blockchain-api';
 import {
-  DockDid,
+  CheqdDid,
   DidKey,
   DIDDocument,
 } from '@docknetwork/credential-sdk/types';
@@ -16,7 +16,7 @@ import {
   ResolverRouter,
   Resolver,
 } from '@docknetwork/credential-sdk/resolver';
-import { DockDIDModule } from '@docknetwork/dock-blockchain-modules';
+import { CheqdDIDModule } from '@docknetwork/cheqd-blockchain-modules';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
@@ -24,6 +24,7 @@ import {
   Ed25519Keypair,
   DidKeypair,
 } from '@docknetwork/credential-sdk/keypairs';
+import { faucet, network, url } from './env';
 
 const universalResolverUrl = 'https://uniresolver.io';
 
@@ -37,8 +38,8 @@ const ethereumProviderConfig = {
   ],
 };
 
-const dock = new DockAPI();
-const didModule = new DockDIDModule(dock);
+const cheqd = new CheqdAPI();
+const didModule = new CheqdDIDModule(cheqd);
 
 // Custom ethereum resolver class
 class EtherResolver extends Resolver {
@@ -62,16 +63,11 @@ class EtherResolver extends Resolver {
 }
 
 /**
- * Generate and register a new Dock DID return the DID
+ * Generate and register a new Cheqd DID return the DID
  * @returns {Promise<string>}
  */
-async function createDockDID() {
-  const account = dock.keyring.addFromUri(
-    process.env.TestAccountURI || '//Alice',
-  );
-  dock.setAccount(account);
-
-  const dockDID = DockDid.random();
+async function createCheqdDID() {
+  const dockDID = CheqdDid.random(network);
   const pair = new DidKeypair([dockDID, 1], Ed25519Keypair.random());
   await didModule.createDocument(
     DIDDocument.create(dockDID, [new DidKey(pair.publicKey())], []),
@@ -82,8 +78,9 @@ async function createDockDID() {
 async function main() {
   console.log('Connecting to the node...');
 
-  await dock.init({
-    address: process.env.FullNodeEndpoint || 'ws://127.0.0.1:9944',
+  await cheqd.init({
+    url,
+    wallet: await faucet.wallet(),
   });
 
   console.log('Creating DID resolvers...');
@@ -105,7 +102,7 @@ async function main() {
 
   console.log('Building DIDs list...');
 
-  const dockDID = await createDockDID();
+  const dockDID = await createCheqdDID();
   const didsToTest = [
     dockDID,
     'did:key:z6Mkfriq1MqLBoPWecGoDLjguo1sB9brj6wT3qZ5BxkKpuP6',

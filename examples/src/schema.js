@@ -1,15 +1,15 @@
 import { randomAsHex } from '@docknetwork/credential-sdk/utils';
 
-import { DockAPI } from '@docknetwork/dock-blockchain-api';
+import { CheqdAPI } from '@docknetwork/cheqd-blockchain-api';
 import {
-  DockDid,
+  CheqdDid,
   DIDDocument,
   DidKey,
   VerificationRelationship,
-  DockBlobId,
+  CheqdBlobId,
 } from '@docknetwork/credential-sdk/types';
 import { Schema } from '@docknetwork/credential-sdk/modules';
-import { DockCoreModules } from '@docknetwork/dock-blockchain-modules';
+import { CheqdCoreModules } from '@docknetwork/cheqd-blockchain-modules';
 import {
   VerifiableCredential,
   getKeyDoc,
@@ -24,9 +24,10 @@ import {
   CoreResolver,
   WildcardResolverRouter,
 } from '@docknetwork/credential-sdk/resolver';
+import { faucet, network, url } from './env';
 
-const dock = new DockAPI();
-const modules = new DockCoreModules(dock);
+const cheqd = new CheqdAPI();
+const modules = new CheqdCoreModules(cheqd);
 const blobModule = modules.blob;
 const didModule = modules.did;
 
@@ -41,21 +42,22 @@ async function createDID(did, pair) {
 
 async function main() {
   console.log('Connecting to the node...');
-  await dock.init({
-    address: process.env.FullNodeEndpoint || 'ws://127.0.0.1:9944',
+  await cheqd.init({
+    url,
+    wallet: await faucet.wallet(),
   });
 
   console.log('Setting sdk account...');
-  const account = dock.keyring.addFromUri(
+  const account = cheqd.keyring.addFromUri(
     process.env.TestAccountURI || '//Alice',
   );
-  dock.setAccount(account);
+  cheqd.setAccount(account);
 
   const keySeed = randomAsHex(32);
   const subjectKeySeed = randomAsHex(32);
 
   // Generate a DID to be used as author
-  const dockDID = DockDid.random();
+  const dockDID = CheqdDid.random();
   // Generate first key with this seed. The key type is Ed25519
   const pair = new DidKeypair([dockDID, 1], new Ed25519Keypair(keySeed));
   await createDID(dockDID, pair);
@@ -63,7 +65,7 @@ async function main() {
   // Properly format a keyDoc to use for signing
   const keyDoc = getKeyDoc(dockDID, pair);
 
-  const subjectDID = DockDid.random();
+  const subjectDID = CheqdDid.random(network);
   const subjectPair = new DidKeypair(
     [subjectDID, 1],
     new Ed25519Keypair(subjectKeySeed),
@@ -71,10 +73,10 @@ async function main() {
   await createDID(subjectDID, subjectPair);
 
   console.log('Creating a new schema...');
-  const schema = new Schema(DockBlobId.random());
+  const schema = new Schema(CheqdBlobId.random(subjectDID));
   await schema.setJSONSchema({
     $schema: 'http://json-schema.org/draft-07/schema#',
-    description: 'Dock Schema Example',
+    description: 'Cheqd Schema Example',
     type: 'object',
     properties: {
       id: {
@@ -152,7 +154,7 @@ async function main() {
   }
 
   console.log('All done, disconnecting...');
-  await dock.disconnect();
+  await cheqd.disconnect();
 }
 
 main()

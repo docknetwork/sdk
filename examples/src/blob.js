@@ -1,22 +1,23 @@
-import { DockAPI } from '@docknetwork/dock-blockchain-api';
-import { DockCoreModules } from '@docknetwork/dock-blockchain-modules';
+import { CheqdAPI } from '@docknetwork/dock-blockchain-api';
+import { CheqdCoreModules } from '@docknetwork/dock-blockchain-modules';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
 import {
   DidKey,
   VerificationRelationship,
-  DockBlobId,
-  DockDid,
+  CheqdBlobId,
+  CheqdDid,
   DIDDocument,
 } from '@docknetwork/credential-sdk/types';
 import {
   Ed25519Keypair,
   DidKeypair,
 } from '@docknetwork/credential-sdk/keypairs';
+import { network } from './env';
 
 async function writeAndReadBlob(blobModule, blobValue, did, pair) {
-  const blobId = DockBlobId.random();
+  const blobId = CheqdBlobId.random();
   console.log('Writing blob with id ', blobId, 'and value', blobValue);
 
   const blob = {
@@ -33,7 +34,7 @@ async function writeAndReadBlob(blobModule, blobValue, did, pair) {
 
 async function createAuthorDID(didModule, pair) {
   // Generate a DID to be used as author
-  const dockDID = DockDid.random();
+  const dockDID = CheqdDid.random(network);
   console.log('Creating new author DID', dockDID);
 
   // Create an author DID to write with
@@ -46,7 +47,7 @@ async function createAuthorDID(didModule, pair) {
 
 async function connectToNode() {
   console.log('Connecting to the node...');
-  const dock = new DockAPI();
+  const dock = new CheqdAPI();
   await dock.init({
     address: process.env.FullNodeEndpoint || 'ws://127.0.0.1:9944',
   });
@@ -62,7 +63,7 @@ async function connectToNode() {
 async function main() {
   // Connect to the node
   const dock = await connectToNode();
-  const modules = new DockCoreModules(dock);
+  const modules = new CheqdCoreModules(dock);
 
   const keyPair = Ed25519Keypair.random();
 

@@ -24,7 +24,7 @@ import {
   CoreResolver,
   WildcardResolverRouter,
 } from '@docknetwork/credential-sdk/resolver';
-import { faucet, network, url } from './env';
+import { faucet, network, url } from './env.js';
 
 const cheqd = new CheqdAPI();
 const modules = new CheqdCoreModules(cheqd);

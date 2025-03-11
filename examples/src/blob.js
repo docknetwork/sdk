@@ -14,7 +14,7 @@ import {
   Ed25519Keypair,
   DidKeypair,
 } from '@docknetwork/credential-sdk/keypairs';
-import { network } from './env';
+import { network } from './env.js';
 
 async function writeAndReadBlob(blobModule, blobValue, did, pair) {
   const blobId = CheqdBlobId.random();

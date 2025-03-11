@@ -1,58 +1,58 @@
-import proofOfHealthCoreSchema from "./proof_of_health_core.js";
+import proofOfHealthCoreSchema from './proof_of_health_core.js';
 
 const schema = {
-  $schema: "http://json-schema.org/draft-07/schema#",
-  description: "Found virus free after testing",
-  type: "object",
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  description: 'Found virus free after testing',
+  type: 'object',
   $defs: {
     uri: {
-      type: "string",
-      format: "uri",
+      type: 'string',
+      format: 'uri',
     },
   },
   properties: {
     virus: {
-      type: "array",
+      type: 'array',
       minItems: 1,
       items: {
-        type: "string",
+        type: 'string',
       },
     },
     checkTime: {
-      type: "string",
-      format: "date-time",
+      type: 'string',
+      format: 'date-time',
     },
     checkLocation: {
-      type: "string",
+      type: 'string',
     },
     checkedBy: {
-      type: "string",
+      type: 'string',
     },
     checkFacility: {
-      type: "string",
+      type: 'string',
     },
     diagnosisMethods: {
-      type: "array",
+      type: 'array',
       minItems: 1,
       items: {
-        type: "string",
+        type: 'string',
       },
     },
   },
   required: [
-    "firstName",
-    "firstInitial",
-    "lastName",
-    "lastInitial",
-    "photo",
-    "biometricTemplate",
-    "yearOfBirth",
-    "virus",
-    "checkTime",
-    "checkLocation",
-    "checkedBy",
-    "checkFacility",
-    "diagnosisMethods",
+    'firstName',
+    'firstInitial',
+    'lastName',
+    'lastInitial',
+    'photo',
+    'biometricTemplate',
+    'yearOfBirth',
+    'virus',
+    'checkTime',
+    'checkLocation',
+    'checkedBy',
+    'checkFacility',
+    'diagnosisMethods',
   ],
 };
 

@@ -24,7 +24,7 @@ import {
   Ed25519Keypair,
   DidKeypair,
 } from '@docknetwork/credential-sdk/keypairs';
-import { faucet, network, url } from './env';
+import { faucet, network, url } from './env.js';
 
 const universalResolverUrl = 'https://uniresolver.io';
 

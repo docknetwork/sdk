@@ -12,7 +12,7 @@ import {
   Ed25519Keypair,
   DidKeypair,
 } from '@docknetwork/credential-sdk/keypairs';
-import { faucet, network, url } from './env';
+import { faucet, network, url } from './env.js';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.

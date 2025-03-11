@@ -1,53 +1,53 @@
-import proofOfHealthCoreSchema from "./proof_of_health_core.js";
+import proofOfHealthCoreSchema from './proof_of_health_core.js';
 
 const schema = {
-  $schema: "http://json-schema.org/draft-07/schema#",
-  description: "Show if immunity by vaccination or testing",
-  type: "object",
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  description: 'Show if immunity by vaccination or testing',
+  type: 'object',
   $defs: {
     uri: {
-      type: "string",
-      format: "uri",
+      type: 'string',
+      format: 'uri',
     },
   },
   properties: {
     eventType: {
-      type: "string",
-      enum: ["vaccination", "antibody test"],
+      type: 'string',
+      enum: ['vaccination', 'antibody test'],
     },
     eventTime: {
-      type: "string",
-      format: "date-time",
+      type: 'string',
+      format: 'date-time',
     },
     eventBy: {
-      type: "string",
+      type: 'string',
     },
     eventFacility: {
-      type: "string",
+      type: 'string',
     },
     eventName: {
-      type: "string",
-      enum: ["X-trans-23 vaccine", "Serological Assay COVID-19"],
+      type: 'string',
+      enum: ['X-trans-23 vaccine', 'Serological Assay COVID-19'],
     },
     potencyDate: {
-      type: "string",
-      format: "date",
+      type: 'string',
+      format: 'date',
     },
   },
   required: [
-    "firstName",
-    "firstInitial",
-    "lastName",
-    "lastInitial",
-    "photo",
-    "biometricTemplate",
-    "yearOfBirth",
-    "eventType",
-    "eventTime",
-    "eventBy",
-    "eventFacility",
-    "eventName",
-    "potencyDate",
+    'firstName',
+    'firstInitial',
+    'lastName',
+    'lastInitial',
+    'photo',
+    'biometricTemplate',
+    'yearOfBirth',
+    'eventType',
+    'eventTime',
+    'eventBy',
+    'eventFacility',
+    'eventName',
+    'potencyDate',
   ],
 };
 

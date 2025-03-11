@@ -1,61 +1,61 @@
-import proofOfHealthCoreSchema from "./proof_of_health_core.js";
+import proofOfHealthCoreSchema from './proof_of_health_core.js';
 
 const schema = {
-  $schema: "http://json-schema.org/draft-07/schema#",
+  $schema: 'http://json-schema.org/draft-07/schema#',
   // TODO: Use a proper id once blob integration is done in SDK
-  description: "Diagnosis with viral infection on a particular date",
-  type: "object",
+  description: 'Diagnosis with viral infection on a particular date',
+  type: 'object',
   $defs: {
     uri: {
-      type: "string",
-      format: "uri",
+      type: 'string',
+      format: 'uri',
     },
   },
   properties: {
     diagnosisCode: {
-      type: "string",
-      enum: ["CodeA", "CodeB", "CodeC"],
+      type: 'string',
+      enum: ['CodeA', 'CodeB', 'CodeC'],
     },
     diagnosisTime: {
-      type: "string",
-      format: "date-time",
+      type: 'string',
+      format: 'date-time',
     },
     diagnosisLocation: {
-      type: "string",
+      type: 'string',
     },
     diagnosedBy: {
-      type: "string",
+      type: 'string',
     },
     diagnosisFacility: {
-      type: "string",
+      type: 'string',
     },
     diagnosisMethods: {
-      type: "array",
+      type: 'array',
       minItems: 1,
       items: {
-        type: "string",
+        type: 'string',
       },
     },
     declaredSafeDate: {
-      type: "string",
-      format: "date",
+      type: 'string',
+      format: 'date',
     },
   },
   required: [
-    "firstName",
-    "firstInitial",
-    "lastName",
-    "lastInitial",
-    "photo",
-    "biometricTemplate",
-    "yearOfBirth",
-    "diagnosisCode",
-    "diagnosisTime",
-    "diagnosisLocation",
-    "diagnosedBy",
-    "diagnosisFacility",
-    "diagnosisMethods",
-    "declaredSafeDate",
+    'firstName',
+    'firstInitial',
+    'lastName',
+    'lastInitial',
+    'photo',
+    'biometricTemplate',
+    'yearOfBirth',
+    'diagnosisCode',
+    'diagnosisTime',
+    'diagnosisLocation',
+    'diagnosedBy',
+    'diagnosisFacility',
+    'diagnosisMethods',
+    'declaredSafeDate',
   ],
 };
 

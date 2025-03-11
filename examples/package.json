@@ -14,7 +14,7 @@
     "schema-example": "babel-node ./src/schema.js",
     "blob-example": "babel-node ./src/blob.js",
     "examples": "yarn bbs-dock-example && yarn claim-deduction-example && yarn open-badges-example && yarn schema-validation-example && yarn standard-schemas-example && yarn dock-did-example && yarn did-resolver-example && yarn schema-example && yarn blob-example",
-    "examples-with-node": "../scripts/with_dock_docker_test_node yarn examples",
+    "examples-with-node": "CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK ../scripts/with_cheqd_docker_test_node yarn examples",
     "lint": "eslint \"src/**/*.js\""
   },
   "dependencies": {

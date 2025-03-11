@@ -1,11 +1,7 @@
 /* eslint-disable  max-classes-per-file */
 import ethr from 'ethr-did-resolver';
 import { CheqdAPI } from '@docknetwork/cheqd-blockchain-api';
-import {
-  CheqdDid,
-  DidKey,
-  DIDDocument,
-} from '@docknetwork/credential-sdk/types';
+import { CheqdDid, DIDDocument } from '@docknetwork/credential-sdk/types';
 import { parseDIDUrl } from '@docknetwork/credential-sdk/utils';
 import { NoDIDError } from '@docknetwork/credential-sdk/modules/abstract/did';
 import {
@@ -67,12 +63,13 @@ class EtherResolver extends Resolver {
  * @returns {Promise<string>}
  */
 async function createCheqdDID() {
-  const dockDID = CheqdDid.random(network);
-  const pair = new DidKeypair([dockDID, 1], Ed25519Keypair.random());
+  const cheqdDID = CheqdDid.random(network);
+  const pair = new DidKeypair([cheqdDID, 1], Ed25519Keypair.random());
   await didModule.createDocument(
-    DIDDocument.create(dockDID, [new DidKey(pair.publicKey())], []),
+    DIDDocument.create(cheqdDID, [pair.didKey()]),
+    pair,
   );
-  return String(dockDID);
+  return String(cheqdDID);
 }
 
 async function main() {
@@ -81,6 +78,7 @@ async function main() {
   await cheqd.init({
     url,
     wallet: await faucet.wallet(),
+    network,
   });
 
   console.log('Creating DID resolvers...');
@@ -102,9 +100,9 @@ async function main() {
 
   console.log('Building DIDs list...');
 
-  const dockDID = await createCheqdDID();
+  const cheqdDID = await createCheqdDID();
   const didsToTest = [
-    dockDID,
+    cheqdDID,
     'did:key:z6Mkfriq1MqLBoPWecGoDLjguo1sB9brj6wT3qZ5BxkKpuP6',
     'did:ethr:0xabcabc03e98e0dc2b855be647c39abe984193675',
   ];

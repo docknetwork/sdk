@@ -137,7 +137,7 @@ Writing a Schema to the Dock chain is similar to writing any other Blob. `1` is 
 
 ```javascript
 >  const formattedBlob = myNewSchema.toBlob(dockDID);
->  await myNewSchema.writeToChain(modules.blob, dockDID, keypair);
+>  await myNewSchema.writeToChain(modules.blob, keypair);
 ```
 
 ### Reading a Schema from the Dock chain

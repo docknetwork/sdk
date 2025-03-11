@@ -35,7 +35,8 @@
     "@docknetwork/credential-sdk": "^0.49.0"
   },
   "dependencies": {
-    "@cheqd/sdk": "cjs",
+    "@cheqd/sdk": "5.1.1",
+    "@cheqd/ts-proto": "4.0.1",
     "p-limit": "^6.1.0"
   },
   "devDependencies": {

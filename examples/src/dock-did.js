@@ -7,7 +7,7 @@ import {
   ServiceEndpoint,
 } from '@docknetwork/credential-sdk/types';
 import { CheqdAPI } from '@docknetwork/cheqd-blockchain-api';
-import { CheqdDIDModule } from '@docknetwork/dock-blockchain-modules';
+import { CheqdDIDModule } from '@docknetwork/cheqd-blockchain-modules';
 import {
   Ed25519Keypair,
   DidKeypair,
@@ -19,73 +19,63 @@ import { faucet, network, url } from './env.js';
 
 // DID will be generated randomly
 const cheqdDID = CheqdDid.random(network);
+const controllerDID = CheqdDid.random(network);
 
 const cheqd = new CheqdAPI();
 const didModule = new CheqdDIDModule(cheqd);
 
 // Generate first key with this seed. The key type is Sr25519
-const firstKeyPair = Ed25519Keypair.random();
+const didPair = new DidKeypair([cheqdDID, 1], Ed25519Keypair.random());
 
 // Generate second key (for update) with this seed. The key type is Ed25519
-const secondKeyPair = Ed25519Keypair.random();
+const controllerPair = new DidKeypair(
+  [controllerDID, 1],
+  Ed25519Keypair.random(),
+);
 
 // This function assumes the DID has been written.
 async function removeDID() {
   console.log('Removing DID now.');
 
-  // Sign the DID removal with this key pair as this is the current key of the DID
-  const pair = new DidKeypair([cheqdDID, 1], firstKeyPair);
-
-  return await didModule.removeDocument(cheqdDID, pair);
+  return await didModule.removeDocument(cheqdDID, [didPair, controllerPair]);
 }
 
 // This function assumes the DID has been written.
 async function addServiceEndpoint() {
   console.log('Add new service endpoint now.');
 
-  // Sign key update with this key pair as this is the current key of the DID
-  const pair = new DidKeypair([cheqdDID, 1], firstKeyPair);
-
   const newEndpoint = new ServiceEndpoint(new LinkedDomains(), [
     'https://foo.example.com',
   ]);
   const doc = await didModule.getDocument(cheqdDID);
 
-  doc.addServiceEndpoint(
-    `${cheqdDID}#linked-domain`,
-    newEndpoint,
-    cheqdDID,
-    pair,
-  );
+  doc.addServiceEndpoint(`${cheqdDID}#linked-domain`, newEndpoint);
 
-  return await didModule.updateDocument(doc, pair);
+  return await didModule.updateDocument(doc, [didPair, controllerPair]);
 }
 
 // This function assumes the DID has been written.
 async function addController() {
   console.log('Add new controller now.');
 
-  // Sign key update with this key pair as this is the current key of the DID
-  const pair = new DidKeypair([cheqdDID, 1], firstKeyPair);
-
-  const newController = CheqdDid.random();
+  await didModule.createDocument(
+    DIDDocument.create(controllerDID, [controllerPair.didKey()]),
+    controllerPair,
+  );
 
   const doc = await didModule.getDocument(cheqdDID);
 
-  doc.addController(newController);
+  doc.addController(controllerDID);
 
-  return await didModule.updateDocument(doc, pair);
+  return await didModule.updateDocument(doc, [didPair, controllerPair]);
 }
 
 // This function assumes the DID has been written.
 async function addKey() {
   console.log('Add new key now.');
 
-  // Sign key update with this key pair as this is the current key of the DID
-  const pair = new DidKeypair([cheqdDID, 1], firstKeyPair);
-
   // Update DID key to the following
-  const newPair = new DidKeypair([cheqdDID, 2], secondKeyPair);
+  const newPair = new DidKeypair([cheqdDID, 2], Ed25519Keypair.random());
   // the following function will figure out the correct PublicKey type from the `type` property of `newPair`
   const newPk = newPair.publicKey();
 
@@ -97,7 +87,7 @@ async function addKey() {
 
   document.addKey([cheqdDID, 2], newDidKey);
 
-  return await didModule.updateDocument(document, pair);
+  return await didModule.updateDocument(document, didPair);
 }
 
 async function getDIDDoc() {
@@ -110,15 +100,12 @@ async function getDIDDoc() {
 
 // Called when connected to the node
 async function registerNewDID() {
-  // The controller is same as the DID
-  const didKey = new DidKey(
-    firstKeyPair.publicKey(),
-    new VerificationRelationship(),
+  console.log('Submitting new DID', cheqdDID, didPair.publicKey());
+
+  return await didModule.createDocument(
+    DIDDocument.create(cheqdDID, [didPair.didKey()]),
+    didPair,
   );
-
-  console.log('Submitting new DID', cheqdDID, firstKeyPair.publicKey());
-
-  return await didModule.createDocument(DIDDocument.create(cheqdDID, [didKey]));
 }
 
 // Initialize Dock API, connect to the node and start working with it
@@ -128,6 +115,7 @@ faucet
   .then((wallet) => cheqd.init({
     url,
     wallet,
+    network,
   }))
   .then(() => registerNewDID())
   .then(getDIDDoc)

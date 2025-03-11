@@ -4,8 +4,6 @@ import { CheqdAPI } from '@docknetwork/cheqd-blockchain-api';
 import {
   CheqdDid,
   DIDDocument,
-  DidKey,
-  VerificationRelationship,
   CheqdBlobId,
 } from '@docknetwork/credential-sdk/types';
 import { Schema } from '@docknetwork/credential-sdk/modules';
@@ -35,9 +33,10 @@ async function createDID(did, pair) {
   console.log('Creating new author DID', did);
 
   // Create an author DID to write with
-  const publicKey = pair.publicKey();
-  const didKey = new DidKey(publicKey, new VerificationRelationship());
-  await didModule.createDocument(DIDDocument.create(did, [didKey]));
+  await didModule.createDocument(
+    DIDDocument.create(did, [pair.didKey()]),
+    pair,
+  );
 }
 
 async function main() {
@@ -45,19 +44,14 @@ async function main() {
   await cheqd.init({
     url,
     wallet: await faucet.wallet(),
+    network,
   });
-
-  console.log('Setting sdk account...');
-  const account = cheqd.keyring.addFromUri(
-    process.env.TestAccountURI || '//Alice',
-  );
-  cheqd.setAccount(account);
 
   const keySeed = randomAsHex(32);
   const subjectKeySeed = randomAsHex(32);
 
   // Generate a DID to be used as author
-  const dockDID = CheqdDid.random();
+  const dockDID = CheqdDid.random(network);
   // Generate first key with this seed. The key type is Ed25519
   const pair = new DidKeypair([dockDID, 1], new Ed25519Keypair(keySeed));
   await createDID(dockDID, pair);
@@ -97,7 +91,7 @@ async function main() {
   console.log('The schema is:', JSON.stringify(schema.toJSON(), null, 2));
   console.log('Writing schema to the chain with blob id of', schema.id, '...');
 
-  await schema.writeToChain(blobModule, dockDID, pair);
+  await schema.writeToChain(blobModule, subjectPair);
 
   console.log(`Schema written, reading from chain (${schema.id})...`);
 

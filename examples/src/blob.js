@@ -1,11 +1,9 @@
 import { CheqdAPI } from '@docknetwork/cheqd-blockchain-api';
-import { CheqdCoreModules } from '@docknetwork/dock-blockchain-modules';
+import { CheqdCoreModules } from '@docknetwork/cheqd-blockchain-modules';
 
 // The following can be tweaked depending on where the node is running and what
 // account is to be used for sending the transaction.
 import {
-  DidKey,
-  VerificationRelationship,
   CheqdBlobId,
   CheqdDid,
   DIDDocument,
@@ -14,10 +12,10 @@ import {
   Ed25519Keypair,
   DidKeypair,
 } from '@docknetwork/credential-sdk/keypairs';
-import { network } from './env.js';
+import { faucet, network, url } from './env.js';
 
-async function writeAndReadBlob(blobModule, blobValue, did, pair) {
-  const blobId = CheqdBlobId.random();
+async function writeAndReadBlob(blobModule, did, blobValue, pair) {
+  const blobId = CheqdBlobId.random(did);
   console.log('Writing blob with id ', blobId, 'and value', blobValue);
 
   const blob = {
@@ -36,49 +34,43 @@ async function createAuthorDID(didModule, pair) {
   // Generate a DID to be used as author
   const dockDID = CheqdDid.random(network);
   console.log('Creating new author DID', dockDID);
+  const kp = new DidKeypair([dockDID, 1], pair);
 
   // Create an author DID to write with
-  const publicKey = pair.publicKey();
-  const didKey = new DidKey(publicKey, new VerificationRelationship());
-  await didModule.createDocument(DIDDocument.create(dockDID, [didKey]));
+  await didModule.createDocument(
+    DIDDocument.create(dockDID, [kp.didKey()]),
+    kp,
+  );
 
-  return dockDID;
+  return [dockDID, kp];
 }
 
 async function connectToNode() {
   console.log('Connecting to the node...');
-  const dock = new CheqdAPI();
-  await dock.init({
-    address: process.env.FullNodeEndpoint || 'ws://127.0.0.1:9944',
-  });
 
-  console.log('Setting sdk account...');
-  const account = dock.keyring.addFromUri(
-    process.env.TestAccountURI || '//Alice',
-  );
-  dock.setAccount(account);
-  return dock;
+  return await new CheqdAPI().init({
+    url,
+    wallet: await faucet.wallet(),
+    network,
+  });
 }
 
 async function main() {
   // Connect to the node
-  const dock = await connectToNode();
-  const modules = new CheqdCoreModules(dock);
+  const cheqd = await connectToNode();
+  const modules = new CheqdCoreModules(cheqd);
 
   const keyPair = Ed25519Keypair.random();
 
   // Generate a DID to be used as author
-  const dockDID = await createAuthorDID(modules.did, keyPair);
-
-  // Generate keypair for DID
-  const pair = new DidKeypair([dockDID, 1], keyPair);
+  const [cheqdDID, pair] = await createAuthorDID(modules.did, keyPair);
 
   // Write blob as json
   const blobValueJSON = { jsonStorage: true };
   const chainBlobJSON = await writeAndReadBlob(
     modules.blob,
+    cheqdDID,
     blobValueJSON,
-    dockDID,
     pair,
   );
   const blobJSONFromChain = chainBlobJSON[1];
@@ -88,8 +80,8 @@ async function main() {
   const blobValue = 'hello blob storage!';
   const chainBlob = await writeAndReadBlob(
     modules.blob,
+    cheqdDID,
     blobValue,
-    dockDID,
     pair,
   );
   const blobStrFromChain = chainBlob[1].toString();
@@ -99,8 +91,8 @@ async function main() {
   const blobValueArray = new Uint8Array([1, 2, 3]);
   const chainBlobArray = await writeAndReadBlob(
     modules.blob,
+    cheqdDID,
     blobValueArray,
-    dockDID,
     pair,
   );
   const blobArrayFromChain = chainBlobArray[1];
@@ -108,7 +100,7 @@ async function main() {
 
   // Finalize
   console.log('All done, disconnecting...');
-  await dock.disconnect();
+  await cheqd.disconnect();
 }
 
 main()

@@ -5,6 +5,8 @@ import { validate } from 'jsonschema';
 import JSONSchema07 from '../../../vc/schemas/schema-draft-07';
 import jsonFetch from '../../../utils/json-fetch';
 import { Blob, BlobWithId } from '../../../types';
+import { ensureInstanceOf } from '../../../utils';
+import AbstractBlobModule from '../blob/module';
 
 export default class Schema {
   /**
@@ -82,8 +84,12 @@ export default class Schema {
    * @param params
    * @return {Promise<object>} The extrinsic to sign and send.
    */
-  async writeToChain(blobModule, targetDid, keyPair, params) {
-    return await blobModule.new(this.toBlob(), keyPair, params);
+  async writeToChain(blobModule, keyPair, params) {
+    return await ensureInstanceOf(blobModule, AbstractBlobModule).new(
+      this.toBlob(),
+      keyPair,
+      params,
+    );
   }
 
   /**

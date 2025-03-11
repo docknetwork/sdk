@@ -5,11 +5,9 @@ import {
   extendNull,
   maybeToCheqdPayloadOrJSON,
   retry,
-  // u8aToHex,
   minBigInt,
 } from '@docknetwork/credential-sdk/utils';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx.js';
-// import { sha256 } from "js-sha256";
 import {
   DIDModule,
   ResourceModule,
@@ -19,12 +17,6 @@ import {
   // eslint-disable-next-line no-unused-vars
   CheqdSDK,
 } from '@cheqd/sdk';
-import {
-  MsgCreateDidDocPayload,
-  MsgUpdateDidDocPayload,
-  MsgDeactivateDidDocPayload,
-} from '@cheqd/ts-proto/cheqd/did/v2/index.js';
-import { MsgCreateResourcePayload } from '@cheqd/ts-proto/cheqd/resource/v2/index.js';
 import {
   DidRef,
   NamespaceDid,
@@ -105,13 +97,6 @@ export class CheqdAPI extends AbstractApiProvider {
     createResourceGas,
   );
 
-  static Payloads = buildTypeUrlObject(
-    [CheqdDIDDocument, MsgCreateDidDocPayload],
-    [CheqdDIDDocument, MsgUpdateDidDocPayload],
-    [CheqdDeactivateDidDocument, MsgDeactivateDidDocPayload],
-    [CheqdCreateResource, MsgCreateResourcePayload],
-  );
-
   static PayloadWrappers = buildTypeUrlObject(
     CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
     CheqdSetDidDocumentPayloadWithTypeUrlAndSignatures,
@@ -184,7 +169,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {object} payload
    * @returns {Promise<Uint8Array>}
    */
-  static async payloadToBytes(method, payload) {
+  async payloadToBytes(method, payload) {
     const {
       Payloads: { [fullTypeUrl(method)]: Payloads },
     } = this;
@@ -228,6 +213,23 @@ export class CheqdAPI extends AbstractApiProvider {
     }
 
     this.ensureNotInitialized();
+
+    const {
+      MsgCreateDidDocPayload,
+      MsgUpdateDidDocPayload,
+      MsgDeactivateDidDocPayload,
+    } = await import('@cheqd/ts-proto/cheqd/did/v2/index.js');
+    const { MsgCreateResourcePayload } = await import(
+      '@cheqd/ts-proto/cheqd/resource/v2/index.js'
+    );
+
+    this.Payloads = buildTypeUrlObject(
+      [CheqdDIDDocument, MsgCreateDidDocPayload],
+      [CheqdDIDDocument, MsgUpdateDidDocPayload],
+      [CheqdDeactivateDidDocument, MsgDeactivateDidDocPayload],
+      [CheqdCreateResource, MsgCreateResourcePayload],
+    );
+
     const options = {
       modules: [DIDModule, ResourceModule, FeemarketModule],
       rpcUrl: url,
@@ -250,6 +252,7 @@ export class CheqdAPI extends AbstractApiProvider {
     this.ensureInitialized();
     this.#sdk = void 0;
     this.#spawn = void 0;
+    this.Payloads = void 0;
 
     return this;
   }
@@ -309,7 +312,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {Promise<Uint8Array>}
    */
   async stateChangeBytes(method, payload) {
-    return await this.constructor.payloadToBytes(method, payload);
+    return await this.payloadToBytes(method, payload);
   }
 
   /**

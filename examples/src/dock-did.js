@@ -6,7 +6,7 @@ import {
   LinkedDomains,
   ServiceEndpoint,
 } from '@docknetwork/credential-sdk/types';
-import { CheqdAPI } from '@docknetwork/dock-blockchain-api';
+import { CheqdAPI } from '@docknetwork/cheqd-blockchain-api';
 import { CheqdDIDModule } from '@docknetwork/dock-blockchain-modules';
 import {
   Ed25519Keypair,

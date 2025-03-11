@@ -8,7 +8,7 @@ import {
   // u8aToHex,
   minBigInt,
 } from '@docknetwork/credential-sdk/utils';
-import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
+import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx.js';
 // import { sha256 } from "js-sha256";
 import {
   DIDModule,

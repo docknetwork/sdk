@@ -1,4 +1,4 @@
-import { CheqdAPI } from '@docknetwork/dock-blockchain-api';
+import { CheqdAPI } from '@docknetwork/cheqd-blockchain-api';
 import { CheqdCoreModules } from '@docknetwork/dock-blockchain-modules';
 
 // The following can be tweaked depending on where the node is running and what

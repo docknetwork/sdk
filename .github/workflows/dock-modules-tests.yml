@@ -1,4 +1,4 @@
-name: Examples
+name: Dock blockchain modules tests
 
 on: [pull_request]
 jobs:
@@ -11,7 +11,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: "20.x"
-      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: yarn install --frozen-lockfile
       - run: npm install -g turbo@2.0.5
       - run: turbo telemetry disable
-      - run: turbo run examples-with-node
+      - run: turbo run test-with-node --filter @docknetwork/dock-blockchain-modules

@@ -1,5 +1,10 @@
+import TypedBytes from './typed-bytes';
 import TypedArray from './typed-array';
 import TypedBytesArray from './typed-bytes-array';
+
+export class TypedArrayOfTypedBytes extends TypedArray {
+  static Class = TypedBytes;
+}
 
 export class TypedArrayOfBytesArrays extends TypedArray {
   static Class = TypedBytesArray;

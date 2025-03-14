@@ -22,15 +22,11 @@ class TypedNumber extends withBase(class NumberBase {}) {
   }
 
   inc() {
-    ++this.value;
-
-    return this;
+    return new this.constructor(++this.value);
   }
 
   dec() {
-    --this.value;
-
-    return this;
+    return new this.constructor(--this.value);
   }
 
   toJSON() {

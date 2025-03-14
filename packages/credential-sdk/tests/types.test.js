@@ -42,8 +42,13 @@ describe("TypedNumber", () => {
 
   test("should increment/decrement for stake amounts", () => {
     const stake = new TypedNumber(1000);
-    expect(+stake.inc()).toEqual(1001);
-    expect(+stake.dec()).toEqual(1000);
+    const inc = stake.inc();
+    expect(+inc).toEqual(1001);
+    expect(+inc.inc()).toEqual(1002);
+    expect(+stake).toEqual(1001);
+    const dec = stake.dec();
+    expect(+stake).toEqual(1000);
+    expect(+dec.dec()).toEqual(999);
   });
 
   test("should convert to JSON for balance", () => {

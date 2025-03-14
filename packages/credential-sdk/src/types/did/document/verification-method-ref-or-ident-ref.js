@@ -1,14 +1,8 @@
 import { VerificationMethodRef } from './verification-method-ref';
 import IdentRef from './ident-ref';
-import { withFrom } from '../../generic';
+import { anyOf } from '../../generic';
 
-export default class VerificationMethodRefOrIdentRef extends withFrom(
+export default class VerificationMethodRefOrIdentRef extends anyOf(
   VerificationMethodRef,
-  (value, from) => {
-    try {
-      return from(value);
-    } catch (err) {
-      return IdentRef.from(value);
-    }
-  },
+  IdentRef,
 ) {}

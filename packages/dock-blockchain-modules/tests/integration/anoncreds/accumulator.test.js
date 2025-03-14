@@ -24,7 +24,7 @@ import {
   TestKeyringOpts,
 } from "../../test-constants";
 import { DockDid, DockAccumulatorId } from "@docknetwork/credential-sdk/types";
-import { ArrayOfByteArrays } from "@docknetwork/credential-sdk/types/generic";
+import { TypedArrayOfBytesArrays } from "@docknetwork/credential-sdk/types/generic";
 
 import { AccumulatorType } from "@docknetwork/credential-sdk/modules/abstract/accumulator";
 import { AbstractAccumulatorModule } from "@docknetwork/credential-sdk/modules";
@@ -536,12 +536,12 @@ describe("Accumulator Module", () => {
         accum3.lastModified
       );
       expect(updates2[0].newAccumulated.value).toEqual(accumulated3);
-      expect(updates2[0].additions.eq(ArrayOfByteArrays.from(additions1))).toBe(
-        true
-      );
-      expect(updates2[0].removals.eq(ArrayOfByteArrays.from(removals1))).toBe(
-        true
-      );
+      expect(
+        updates2[0].additions.eq(TypedArrayOfBytesArrays.from(additions1))
+      ).toBe(true);
+      expect(
+        updates2[0].removals.eq(TypedArrayOfBytesArrays.from(removals1))
+      ).toBe(true);
       expect(updates2[0].witnessUpdateInfo.value).toEqual(witUpd1);
 
       const events2 = (
@@ -558,9 +558,9 @@ describe("Accumulator Module", () => {
         accum4.lastModified
       );
       expect(updates3[0].newAccumulated.value).toEqual(accumulated4);
-      expect(updates3[0].additions.eq(ArrayOfByteArrays.from(additions2))).toBe(
-        true
-      );
+      expect(
+        updates3[0].additions.eq(TypedArrayOfBytesArrays.from(additions2))
+      ).toBe(true);
       expect(updates3[0].removals).toEqual(null);
       expect(updates3[0].witnessUpdateInfo.value).toEqual(witUpd2);
 
@@ -570,9 +570,9 @@ describe("Accumulator Module", () => {
       );
       expect(updates4[0].newAccumulated.value).toEqual(accumulated5);
       expect(updates4[0].additions).toEqual(null);
-      expect(updates4[0].removals.eq(ArrayOfByteArrays.from(removals3))).toBe(
-        true
-      );
+      expect(
+        updates4[0].removals.eq(TypedArrayOfBytesArrays.from(removals3))
+      ).toBe(true);
       expect(updates4[0].witnessUpdateInfo.value).toEqual(witUpd3);
     }
 

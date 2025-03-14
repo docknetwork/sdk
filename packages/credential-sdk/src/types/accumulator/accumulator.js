@@ -2,8 +2,8 @@ import {
   TypedStruct,
   TypedNumber,
   option,
-  ArrayOfByteArrays,
-  ByteArray,
+  TypedArrayOfBytesArrays,
+  TypedBytesArray,
   TypedUUID,
   withProp,
   TypedArray,
@@ -23,10 +23,10 @@ class TypedUUIDOrTypedNumber extends anyOf(TypedUUID, TypedNumber) {}
 export class AccumulatorUpdate extends TypedStruct {
   static Classes = {
     id: TypedUUIDOrTypedNumber,
-    accumulated: ByteArray,
-    additions: option(ArrayOfByteArrays),
-    removals: option(ArrayOfByteArrays),
-    witnessUpdateInfo: option(ByteArray),
+    accumulated: TypedBytesArray,
+    additions: option(TypedArrayOfBytesArrays),
+    removals: option(TypedArrayOfBytesArrays),
+    witnessUpdateInfo: option(TypedBytesArray),
   };
 }
 
@@ -138,9 +138,9 @@ export const [
 export class CheqdStoredAccumulator extends TypedStruct {
   static Classes = {
     accumulator: CheqdAccumulator,
-    additions: option(ArrayOfByteArrays),
-    removals: option(ArrayOfByteArrays),
-    witnessUpdateInfo: option(ByteArray),
+    additions: option(TypedArrayOfBytesArrays),
+    removals: option(TypedArrayOfBytesArrays),
+    witnessUpdateInfo: option(TypedBytesArray),
   };
 
   set accumulated(newAccumulated) {

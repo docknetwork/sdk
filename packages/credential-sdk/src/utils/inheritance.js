@@ -1,3 +1,4 @@
+import { ensureObjectWithAnyConstructor } from './types/object';
 import { fmtIterable } from './types/iterable';
 import { ensureNoIntersection } from './types/set';
 
@@ -222,7 +223,7 @@ export const withoutPrototypeFunctions = (klass, ignore = new Set()) => {
  * @returns {*} - The original value if it's an instance of the class.
  */
 export const ensureInstanceOf = (value, klass) => {
-  if (value instanceof klass) {
+  if (ensureObjectWithAnyConstructor(value) instanceof klass) {
     return value;
   }
 

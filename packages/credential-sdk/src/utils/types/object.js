@@ -1,10 +1,19 @@
 /**
- * Return true if a value is an object
+ * Return true if a value is an object with Object constructor.
  * @param value
  * @returns {boolean}
  */
 export function isObject(value) {
-  return value && typeof value === 'object' && value.constructor === Object;
+  return isObjectWithAnyConstructor(value) && value.constructor === Object;
+}
+
+/**
+ * Return true if a value is an object.
+ * @param value
+ * @returns {boolean}
+ */
+export function isObjectWithAnyConstructor(value) {
+  return value && typeof value === 'object';
 }
 
 /**
@@ -17,6 +26,24 @@ export function isObject(value) {
  */
 export function ensureObject(value) {
   if (isObject(value)) {
+    return value;
+  }
+
+  throw new TypeError(
+    `${value} needs to be an object with Object constructor.`,
+  );
+}
+
+/**
+ * Ensures that the given value is an object. If not, throws an error explaining why.
+ *
+ * @template T
+ * @param {T} value - The value to check.
+ * @throws If value is not an object.
+ * @returns {T}
+ */
+export function ensureObjectWithAnyConstructor(value) {
+  if (isObjectWithAnyConstructor(value)) {
     return value;
   }
 

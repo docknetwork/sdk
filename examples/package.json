@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "@docknetwork/credential-sdk": "0.50.0",
-    "@docknetwork/cheqd-blockchain-api": "1.0.0",
-    "@docknetwork/cheqd-blockchain-modules": "1.0.0"
+    "@docknetwork/cheqd-blockchain-api": "0.36.0",
+    "@docknetwork/cheqd-blockchain-modules": "0.33.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

@@ -1,5 +1,6 @@
 import {
   allObjectPropertiesIncludingPrototypes,
+  ensureNumber,
   withExtendedStaticProperties,
 } from '../../utils';
 
@@ -12,7 +13,7 @@ import {
  * @param {function(*): number} getSize
  * @returns {C}
  */
-export default function sized(klass, getSize = ({ length }) => length) {
+export default function sized(klass) {
   const name = `Sized<${klass.name}>`;
   const methods = [
     ...allObjectPropertiesIncludingPrototypes(klass.prototype),
@@ -30,6 +31,10 @@ export default function sized(klass, getSize = ({ length }) => length) {
         this.ensureValidSize();
       }
 
+      getSize() {
+        return ensureNumber(this.length);
+      }
+
       ensureValidSize() {
         const { Size } = this.constructor;
 
@@ -39,7 +44,7 @@ export default function sized(klass, getSize = ({ length }) => length) {
           );
         }
 
-        const size = getSize(this);
+        const size = this.getSize();
 
         if (size !== Size) {
           throw new Error(

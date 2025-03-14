@@ -1,5 +1,33 @@
-import { ensureIterable } from './ensure-type';
-import { isIterable, isObject } from './is-type';
+import { isObject } from './object';
+
+/**
+ * Return true if a value is iterable.
+ * @param value
+ * @returns {boolean}
+ */
+export function isIterable(value) {
+  // Check if it's an object and has Symbol.iterator property
+  return (
+    value != null
+    && (typeof value === 'object' || typeof value === 'function')
+    && Symbol.iterator in Object(value)
+  );
+}
+
+/**
+ * Ensures that the given value is iterable. Throws an error with an optional context message if not.
+ *
+ * @param {*} value - The value to check for iterability.
+ * @throws If value is not an iterable.
+ * @returns {Iterable} - The original iterable value.
+ */
+export function ensureIterable(value) {
+  if (isIterable(value)) {
+    return value;
+  }
+
+  throw new TypeError(`${value} needs to be an iterable.`);
+}
 
 /**
  * Returns string containing comma-separated items of the provided iterable.

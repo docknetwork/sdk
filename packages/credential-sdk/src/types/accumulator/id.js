@@ -11,7 +11,7 @@ import {
 import withFromDockId, {
   patchWithFromDock,
 } from '../generic/with-from-dock-id';
-import dockDidById from '../../utils/fixtures/dock-did-by-id';
+import dockDidById from '../../utils/mappings/dock-did-by-id';
 
 export class DockAccumulatorIdValue extends sized(TypedBytes) {
   static Size = 32;

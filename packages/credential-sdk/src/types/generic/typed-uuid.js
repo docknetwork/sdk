@@ -7,7 +7,15 @@ import { normalizeOrConvertStringToU8a, valueNumberOrBytes } from '../../utils';
 
 export default class TypedUUID extends TypedBytes {
   constructor(id) {
-    super(validate(id) ? parse(id) : id);
+    if (typeof id === 'string') {
+      if (!validate(id)) {
+        throw new Error(`Invalid UUID: \`${id}\``);
+      }
+
+      super(parse(id));
+    } else {
+      super(id);
+    }
 
     if (!validate(this.value)) {
       throw new Error(`Invalid UUID: ${this.value}`);

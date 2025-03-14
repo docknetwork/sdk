@@ -1,10 +1,62 @@
-// deep copy a json serializable object
-export function deepClone(obj) {
-  return Object.setPrototypeOf(
-    JSON.parse(JSON.stringify(obj)),
-    Object.getPrototypeOf(obj),
-  );
+/**
+ * Return true if a value is an object
+ * @param value
+ * @returns {boolean}
+ */
+export function isObject(value) {
+  return value && typeof value === 'object' && value.constructor === Object;
 }
+
+/**
+ * Ensures that the given value is an object. If not, throws an error explaining why.
+ *
+ * @template T
+ * @param {T} value - The value to check.
+ * @throws If value is not an object.
+ * @returns {T}
+ */
+export function ensureObject(value) {
+  if (isObject(value)) {
+    return value;
+  }
+
+  throw new TypeError(`${value} needs to be an object.`);
+}
+
+/**
+ * Ensures that the given object has a specific key as a property. Throws an error with a message if not.
+ *
+ * @param {object} value - The object to check.
+ * @param {string} key - The required property to look for.
+ * @param {string} name - Name of the object used in constructing the error message.
+ * @returns {object} - The original object if it contains the specified key.
+ */
+export function ensureObjectWithKey(value, key, name) {
+  if (key in ensureObject(value)) {
+    return value;
+  }
+
+  throw new Error(`"${name}" must include the '${key}' property.`);
+}
+
+/**
+ * Ensures that the given object has an 'id' property. Throws an error with a message if not.
+ *
+ * @param {object} value - The object to check.
+ * @param {string} name - Name of the object used in constructing the error message.
+ * @returns {object} - The original object if it contains the 'id' property.
+ */
+export function ensureObjectWithId(value, name) {
+  return ensureObjectWithKey(value, 'id', name);
+}
+
+/**
+ * Clones supplied object using `JSON.parse(JSON.stringify(...))`.
+ * @template O
+ * @param {O} obj
+ * @returns {O}
+ */
+export const deepClone = (obj) => JSON.parse(JSON.stringify(ensureObject(obj)));
 
 /**
  * Filters properties of the object according to the supplied `filter`.

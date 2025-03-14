@@ -1,7 +1,8 @@
 import crypto from 'crypto';
-import { applyToValue } from './interfaces';
-import { ensureString, ensureIterable } from './types/ensure-type';
-import { isIterable } from './types';
+import { applyToValue } from '../interfaces';
+import { ensureString } from './string';
+import { ensureIterable, isIterable } from './iterable';
+import { ensureInstanceOf } from '../inheritance';
 
 /**
  * Checks that the given value is a byte (an integer between 0 and 255).
@@ -42,6 +43,21 @@ export const ensureBytes = (bytes) => {
 };
 
 /**
+ * Ensures that the given value is an instance of Uint8Array. Throws an error if not.
+ *
+ * @param {*} bytes - The value to check.
+ * @throws If value is not a Uint8Array.
+ * @returns {Uint8Array} - The original Uint8Array value.
+ */
+export const ensureUint8Array = (bytes) => {
+  if (bytes instanceof Uint8Array) {
+    return bytes;
+  }
+
+  throw new TypeError('Expected instance of `Uint8Array`');
+};
+
+/**
  * Checks that the given value is a list of bytes. If it's not a Uint8Array, validates each item using `ensureByte`.
  *
  * @param {Uint8Array|Iterable<number>} bytes - The bytes to validate.
@@ -51,7 +67,7 @@ export const ensureBytes = (bytes) => {
 export const isBytes = (bytes) => {
   if (bytes instanceof Uint8Array) {
     return true;
-  } else if (isIterable(bytes)) {
+  } else if (isIterable(bytes) && typeof bytes !== 'string') {
     for (const byte of bytes) {
       if (!isByte(byte)) {
         return false;
@@ -137,13 +153,7 @@ export const stringToU8a = (str) => Uint8Array.from(stringToBuffer(str));
  * @param {Buffer} buffer
  * @returns {Uint8Array}
  */
-export const bufferToU8a = (buffer) => {
-  if (!(buffer instanceof Buffer)) {
-    throw new Error(`Expected instance of \`Buffer\`, received: \`${buffer}\``);
-  }
-
-  return Uint8Array.from(buffer);
-};
+export const bufferToU8a = (buffer) => Uint8Array.from(ensureInstanceOf(buffer, Buffer));
 
 /**
  * Converts supplied bytes to `Uint8Array` representation.
@@ -180,11 +190,7 @@ export const normalizeToU8a = (bytes) => {
     return hexToU8a(bytes);
   }
 
-  throw new Error(
-    `Can't convert supplied value to \`Uint8Array\`: \`${bytes}\` ${
-      bytes ? `instance of \`${bytes.constructor.name}\`` : ''
-    }`,
-  );
+  throw new Error("Can't convert supplied value to `Uint8Array`");
 };
 
 /**
@@ -226,6 +232,7 @@ export const valueBytes = (value) => applyToValue(
 
 /**
  * Attempts to get byte representation of the supplied object.
+ * In case if the number is found, it will be converted to bytes using `String(number)`.
  * Throws an error in case if it's not possible.
  * @param {*} value
  * @returns {Uint8Array}
@@ -257,7 +264,5 @@ export function normalizeToHex(data) {
     return data;
   }
 
-  throw new Error(
-    `Expected a hex string or a byte array, received \`${data}\` with type \`${typeof data}\``,
-  );
+  throw new Error('Expected a hex string or a byte array');
 }

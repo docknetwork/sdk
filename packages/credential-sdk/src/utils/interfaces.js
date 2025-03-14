@@ -111,7 +111,5 @@ export const applyToValue = (check, fn, value) => {
     return res;
   }
 
-  throw new Error(
-    `\`fn\` can't be applied because value \`${value}\` didn't pass the check \`${check}\``,
-  );
+  throw new Error("`fn` can't be applied because value didn't pass the check");
 };

@@ -9,7 +9,7 @@ import {
 import { option, withProp } from '@docknetwork/credential-sdk/types/generic';
 import { AbstractAccumulatorModule } from '@docknetwork/credential-sdk/modules/abstract';
 import CheqdInternalAccumulatorModule from './internal';
-import { injectCheqd, withParams, withPublicKeys } from '../common';
+import { withCheqd, withParams, withPublicKeys } from '../common';
 
 export const AccumulatorType = {
   VBPos: 0,
@@ -19,7 +19,7 @@ export const AccumulatorType = {
 
 /** Class to manage accumulators on chain */
 export default class CheqdAccumulatorModule extends withParams(
-  withPublicKeys(injectCheqd(AbstractAccumulatorModule)),
+  withPublicKeys(withCheqd(AbstractAccumulatorModule)),
 ) {
   static CheqdOnly = CheqdInternalAccumulatorModule;
 

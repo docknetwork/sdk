@@ -8,7 +8,7 @@ import jsigs from 'jsonld-signatures';
 
 import stringify from 'json-stringify-deterministic';
 import semver from 'semver/preload.js';
-import { u8aToU8a } from '../../../utils/bytes';
+import { u8aToU8a } from '../../../utils/types/bytes';
 import { withExtendedStaticProperties } from '../../../utils/inheritance';
 import CustomLinkedDataSignature from './CustomLinkedDataSignature';
 import { deepClone } from '../../../utils';

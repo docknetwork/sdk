@@ -23,6 +23,11 @@ export default function sized(klass) {
 
   const obj = {
     [name]: class extends klass {
+      /**
+       * @static
+       * @type {number}
+       * Size of the underlying data.
+       */
       static Size;
 
       constructor(...args) {

@@ -6,7 +6,10 @@ import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
 
 /**
- * An `Array` of items where each item is an instance of the associated `Class`.
+ * An Array of items where each item is an instance of the associated Class.
+ * The array enforces type consistency by converting items to the specified Class
+ * during construction, push, and unshift operations. It provides additional utilities
+ * for equality checks and difference calculations between arrays.
  */
 class TypedArray extends withBase(ArrayWithoutPrototypeMethods) {
   /**

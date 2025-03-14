@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { KBUniversalAccumulatorValue } from '@docknetwork/crypto-wasm-ts';
-import { normalizeToHex, normalizeToU8a } from '../../../utils/bytes';
+import { normalizeToHex, normalizeToU8a } from '../../../utils/types/bytes';
 import {
   AbstractBaseModule,
   withAbstractParams,

@@ -7,7 +7,7 @@ import {
   SignatureEd25519,
   SignatureSecp256k1,
 } from "../src/types";
-import { isHexWithGivenByteSize } from "../src/utils/bytes";
+import { isHexWithGivenByteSize } from "../src/utils/types/bytes";
 import { expandJSONLD } from "../src/vc";
 import {
   getCredentialStatus,

@@ -1,5 +1,6 @@
-import { ensureString } from '../types/ensure-type';
-import { normalizeToU8a, u8aToU8a } from '../bytes';
+import { ensureString } from '../types/string';
+import { normalizeToU8a, u8aToU8a } from '../types/bytes';
+import { catchFnErrorWith } from '../error';
 
 /**
  * Encodes supplied bytes as base64 string.
@@ -12,4 +13,7 @@ export const encodeAsBase64 = (bytes) => Buffer.from(normalizeToU8a(bytes)).toSt
  * @param {string} string
  * @returns {Uint8Array}
  */
-export const decodeFromBase64 = (string) => u8aToU8a(Buffer.from(ensureString(string), 'base64'));
+export const decodeFromBase64 = catchFnErrorWith(
+  'Invalid base64 string',
+  (string) => u8aToU8a(Buffer.from(ensureString(string), 'base64')),
+);

@@ -1,6 +1,6 @@
 import b58 from 'bs58';
 import * as base64 from '@juanelas/base64';
-import { u8aToU8a } from '../../utils/bytes';
+import { u8aToU8a } from '../../utils/types/bytes';
 import { EcdsaSecp256k1VerKeyName } from './constants';
 import Secp256k1Keypair from '../../keypairs/keypair-secp256k1';
 

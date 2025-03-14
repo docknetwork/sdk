@@ -42,27 +42,35 @@ The Credential SDK provides a flexible and extensible set of typed structures th
 
 ### Available Types
 
-- **TypedString**: Represents string data. Internally managed as `Array` to handle binary data conversion seamlessly. Provides various methods for equality check and conversion between hexadecimal and string representations.
+- **TypedBytes**: Represents binary data as `Uint8Array`. It provides methods for conversion between base58, base64, and hexadecimal formats, facilitating seamless handling of raw bytes across different encodings.
 
-- **TypedNumber**: Ensures reliable number handling by enforcing numerical checks during instantiation. Supports conversion from different inputs and API structures, offering consistent JSON integration.
+- **TypedString**: Represents string data. Internally managed as a UTF-8 encoded byte array to handle string manipulation efficiently. Provides methods for serialization, encoding conversions (base58, base64), and equality checks.
 
-- **TypedEnum**: Facilitates the representation of enumeration types with extensible variants. Ensures strict type conformity when dealing with potential multiple representations of a single conceptual state.
+- **TypedNumber**: Ensures reliable numerical handling by enforcing strict type checks during instantiation. It supports conversion from different input formats, including strings, and provides consistent JSON integration.
 
-- **TypedArray**: Provides abstraction over JavaScript arrays, allowing for uniform handling of a single item type. Equipped with methods that maintain type integrity while offering array operations like `push`, `unshift`, and `equality check`.
+- **TypedEnum**: Facilitates the representation of enumeration types with extensible variants. This class ensures strict type conformity when dealing with multiple possible representations of a single conceptual state, making it ideal for state management in applications.
 
-- **TypedMap**: Extends the Map structure, offering consistent key/value type management and conversion capabilities. Includes support for serialization to JSON and deserialization from API responses.
+- **TypedArray**: Provides an abstraction over JavaScript arrays, allowing uniform handling of a single item type. It includes methods for array operations like `push`, `unshift`, and equality checks, ensuring that type integrity is maintained throughout all operations.
 
-- **TypedUUID**: Specially tailored for handling UUIDs, including validation, parsing, and generation of random UUIDs.
+- **TypedMap**: Extends the native `Map` structure to provide consistent key/value type management and conversion capabilities. This class supports serialization to JSON and deserialization from API responses, making it suitable for handling complex data structures in networked applications.
 
-- **TypedStruct**: Represents structured, dictionary-like data with predefined keys and types, facilitating robust data manipulation and JSON compatibility.
+- **TypedSet**: Extends the native `Set` structure to provide consistent unique values management and conversion capabilities. This class supports serialization to JSON and deserialization from API responses, making it suitable for handling complex data structures in networked applications.
 
-- **TypedTuple**: Enforces a fixed-size collection of elements, each having a specified type. Essential for maintaining order and type checks in tuple-based data structures.
+- **TypedUUID**: Tailored specifically for handling UUIDs, this class includes validation checks, parsing methods, and generation of random UUIDs. It ensures that any UUID operations within the application are robust and compliant with UUID standards.
 
-- **Any**: Acts as a catch-all, capable of holding any value or object. It is useful in scenarios where type flexibility is essential, such as interfacing with dynamic data sources or when type restrictions are not suitable.
+- **TypedStruct**: Represents structured, dictionary-like data with predefined keys and types. This class facilitates robust data manipulation by enforcing type constraints on each key and provides seamless JSON integration for serialization/deserialization.
 
-- **Null**: Acts as a `null` allowing to have some field initialized to `null`.
+- **TypedTuple**: Enforces a fixed-size collection of elements, where each element has a specified type. This is essential for maintaining order and type checks in tuple-based data structures, ensuring that the data remains consistent across different parts of an application.
+
+- **TypedNull**: Placeholder type that can be used when an empty value is expected.
 
 ### Utility Mixins
+
+- **anyOf**: Creates a type that can be constructed from any of the provided types by attempting them in sequence until one succeeds or all fail, ensuring flexible and ordered type construction.
+
+- **option**: Extends a class to handle optional values by allowing `null` instead of throwing errors when encountering `null` or `None`, enabling graceful handling of missing data.
+
+- **sized**: Enforces that instances of a class maintain a specific size, as defined by the `Size` property, ensuring consistent and valid data structures through size validation checks during construction and method calls.
 
 - **withBase**: A foundational mixin that adds basic methods like `from`, `toJSON`, and equality checks to a class.
 
@@ -72,13 +80,13 @@ The Credential SDK provides a flexible and extensible set of typed structures th
 
 - **withFrom**: Facilitates custom instantiation logic for classes, particularly useful when dealing with various input forms that require specialized initialization.
 
-- **withQualifier**: Extends classes to handle prefixed string identifiers and encoding, suitable for scenarios involving qualified identifiers (e.g., DID systems).
-
 - **option**: Allows to pass `null` to `from` method returning `null` in this case.
 
 - **withNullIfNotAVariant**: A class decorator for types extending `TypedEnum`. It ensures that instantiation from JSON or API data returns `null` if the provided value doesn't match any defined variant type. This mixin helps enforce strict type conformity.
 
 - **withProp**: Extends classes derived from `TypedStruct` or `TypedEnum` by adding or overriding properties. It facilitates dynamic property management, allowing for seamless integration of new fields or modifications without altering base classes.
+
+- **withProps**: Extends classes derived from `TypedStruct` or `TypedEnum` by adding or overriding properties. It facilitates dynamic property management, allowing for seamless integration of new fields or modifications without altering base classes.
 
 - **withQualifier**: Adds functionality for dealing with qualified strings, such as those used in decentralized identifiers (DIDs). This mixin supports operations involving strings with specific prefixes or encoding requirements.
 

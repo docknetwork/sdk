@@ -1,7 +1,8 @@
 import { base58btc } from 'multiformats/bases/base58';
 import varint from 'varint';
-import { ensureString } from '../types/ensure-type';
-import { normalizeToU8a } from '../bytes';
+import { ensureString } from '../types/string';
+import { normalizeToU8a } from '../types/bytes';
+import { catchFnErrorWith } from '../error';
 
 /**
  * Encodes supplied bytes as base58btc string using given prefix.
@@ -29,15 +30,12 @@ export const encodeAsBase58btc = (prefix, value) => {
  * @param {string} string
  * @returns {Uint8Array}
  */
-export const decodeFromBase58btc = (string) => {
-  try {
+export const decodeFromBase58btc = catchFnErrorWith(
+  'Invalid base58btc string',
+  (string) => {
     // Decode base58btc multibase string
     const decoded = base58btc.decode(ensureString(string));
     varint.decode(decoded); // Decode to get byte length
     return decoded.slice(varint.decode.bytes);
-  } catch (err) {
-    err.message = `Failed to decode base58btc string \`${string}\`:\n${err.message}`;
-
-    throw err;
-  }
-};
+  },
+);

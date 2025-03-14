@@ -4,10 +4,10 @@ import {
 } from '@docknetwork/credential-sdk/modules/abstract/did';
 import { DIDDocument } from '@docknetwork/credential-sdk/types';
 import { CheqdDIDModuleInternal } from './internal';
-import injectCheqd from '../common/inject-cheqd';
+import withCheqd from '../common/with-cheqd';
 import CheqdAttestModule from '../attest/module';
 
-export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
+export default class CheqdDIDModule extends withCheqd(AbstractDIDModule) {
   static CheqdOnly = CheqdDIDModuleInternal;
 
   constructor(...args) {
@@ -30,9 +30,9 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
   async updateDocumentTx(document, didSigners) {
     const didDocument = DIDDocument.from(document);
     if (didDocument.attests != null) {
-      const currentDocument = await this.getDocument(didDocument.id);
+      const currentAttest = await this.attest.getAttests(didDocument.id);
 
-      if (!didDocument.attests.eq(currentDocument.attests)) {
+      if (!didDocument.attests.eq(currentAttest)) {
         throw new Error(
           '`attests` modifications are not supported in the `updateDocument` transaction.',
         );

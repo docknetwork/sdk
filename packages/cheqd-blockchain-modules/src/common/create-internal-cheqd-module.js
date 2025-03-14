@@ -1,9 +1,14 @@
 import { ensureInstanceOf } from '@docknetwork/credential-sdk/utils';
 import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
-import CheqdApiProvider from './cheqd-api-provider';
+import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract';
 
 /**
- * Creates DID transaction constructor.
+ * Creates a transaction constructor for DID operations.
+ * This function generates an async method that constructs and signs transactions
+ * for DID-related operations, handling payload creation, signing, and resource construction.
+ *
+ * @param {string} fnName - The name of the function to create as a transaction constructor
+ * @returns {Function} An async function that handles DID transaction construction
  */
 const createDIDMethodTx = (fnName) => {
   const obj = {
@@ -41,7 +46,12 @@ const createDIDMethodTx = (fnName) => {
 };
 
 /**
- * Creates a call.
+ * Creates an async function for handling module calls.
+ * This function generates a method that constructs transactions and sends them
+ * through the API provider, handling argument slicing and transaction sending.
+ *
+ * @param {string} fnName - The name of the function to create as a call handler
+ * @returns {Function} An async function that handles transaction construction and sending
  */
 const createCall = (fnName) => {
   const obj = {
@@ -58,16 +68,20 @@ const createCall = (fnName) => {
   return obj[fnName];
 };
 
+/**
+ * Filters out specific resource-related errors and returns a placeholder on failure.
+ * This function catches errors related to missing resources and returns a placeholder
+ * instead of throwing an error. Useful for handling cases where resources may not exist.
+ *
+ * @param {Promise} promise - The promise to await and filter errors from
+ * @param {*} placeholder - The value to return if an error is filtered
+ * @returns {*} Either the resolved promise or the placeholder
+ */
 const filterNoResourceError = async (promise, placeholder) => {
   try {
     return await promise;
   } catch (err) {
-    const strErr = String(err);
-
-    if (
-      !strErr.includes('DID Doc not found')
-      && !strErr.includes('not found: unknown request')
-    ) {
+    if (!String(err).includes('not found')) {
       throw err;
     }
   }
@@ -75,6 +89,9 @@ const filterNoResourceError = async (promise, placeholder) => {
   return placeholder;
 };
 
+/**
+ * Empty root class used as a base for payload, module, and sender classes.
+ */
 class Root {
   constructor(root) {
     this.root = root;
@@ -87,28 +104,54 @@ export default function createInternalCheqdModule(
   baseClass = class CheqdModuleBaseClass {},
 ) {
   const name = `internalCheqdModule(${baseClass.name})`;
-  class RootPayload extends (baseClass.RootPayload ?? Root) {}
-  class RootModule extends (baseClass.RootModule ?? Root) {}
-  class RootSender extends (baseClass.RootSender ?? Root) {}
 
   const obj = {
     [name]: class extends baseClass {
-      static RootPayload = RootPayload;
+      /**
+       * Root payload handling class
+       * @class
+       * @extends {Root}
+       */
+      static RootPayload = class RootPayload extends (baseClass.RootPayload
+        ?? Root) {};
 
-      static RootModule = RootModule;
+      /**
+       * Root module handling class
+       * @class
+       * @extends {Root}
+       */
+      static RootModule = class RootModule extends (baseClass.RootModule
+        ?? Root) {};
 
-      static RootSender = RootSender;
+      /**
+       * Root sender handling class
+       * @class
+       * @extends {Root}
+       */
+      static RootSender = class RootSender extends (baseClass.RootSender
+        ?? Root) {};
 
       constructor(apiProvider) {
         super(apiProvider);
 
-        this.apiProvider = ensureInstanceOf(apiProvider, CheqdApiProvider);
+        this.apiProvider = ensureInstanceOf(apiProvider, AbstractApiProvider);
       }
 
+      /**
+       * Gets the types instance from the API provider
+       * @readonly
+       * @memberof module:internalCheqdModule
+       */
       get types() {
         return this.apiProvider.types();
       }
 
+      /**
+       * Fetches multiple resources by their IDs
+       * @param {string} did - The DID identifier
+       * @param {string[]} ids - Array of resource IDs to fetch
+       * @returns {Promise<Map<string, any>>} A map of resource IDs to their corresponding resources
+       */
       async resources(did, ids) {
         const strDid = this.types.Did.from(did).toEncodedString();
 
@@ -120,6 +163,12 @@ export default function createInternalCheqdModule(
         return new Map(await Promise.all(queries));
       }
 
+      /**
+       * Fetches resources based on a condition
+       * @param {string} did - The DID identifier
+       * @param {Function} cond - Filtering function to determine which metadata to include
+       * @returns {Promise<Map<string, any>>} A map of resource IDs to their corresponding resources
+       */
       async resourcesBy(did, cond) {
         const metas = await this.resourcesMetadataBy(did, cond);
 
@@ -129,6 +178,12 @@ export default function createInternalCheqdModule(
         );
       }
 
+      /**
+       * Fetches a single resource by ID and DID
+       * @param {string} did - The DID identifier
+       * @param {string} id - The resource ID
+       * @returns {any|null} The fetched resource or null if not found
+       */
       async resource(did, id) {
         const strDid = this.types.Did.from(did).toEncodedString();
         const strID = String(TypedUUID.from(id));
@@ -139,6 +194,13 @@ export default function createInternalCheqdModule(
         );
       }
 
+      /**
+       * Fetches resource metadata based on a condition with pagination support
+       * @param {string} did - The DID identifier
+       * @param {Function} cond - Filtering function to determine which metadata to include
+       * @param {Function} [stop] - Function determining when to stop fetching pages
+       * @returns {Promise<Array<Object>>} Array of resource metadata matching the condition
+       */
       async resourcesMetadataBy(did, cond, stop = (_) => false) {
         let res = [];
         let resources;
@@ -146,16 +208,14 @@ export default function createInternalCheqdModule(
         const encodedDid = this.types.Did.from(did).toEncodedString();
 
         do {
-          // eslint-disable-next-line operator-linebreak
-          ({ resources, paginationKey } =
-            // eslint-disable-next-line no-await-in-loop
-            await filterNoResourceError(
-              this.apiProvider.sdk.querier.resource.collectionResources(
-                encodedDid,
-                paginationKey,
-              ),
-              { resources: [], paginationKey: null },
-            ));
+          // eslint-disable-next-line no-await-in-loop
+          ({ resources, paginationKey } = await filterNoResourceError(
+            this.apiProvider.sdk.querier.resource.collectionResources(
+              encodedDid,
+              paginationKey,
+            ),
+            { resources: [], paginationKey: null },
+          ));
 
           res = res.concat(resources.filter(cond));
         } while (!stop(res) && paginationKey != null);
@@ -163,6 +223,12 @@ export default function createInternalCheqdModule(
         return res;
       }
 
+      /**
+       * Fetches the latest resource metadata based on a condition
+       * @param {string} did - The DID identifier
+       * @param {Function} cond - Filtering function to determine which metadata to include
+       * @returns {Array<Object>} Array of latest resource metadata matching the condition
+       */
       async latestResourcesMetadataBy(did, cond) {
         return await this.resourcesMetadataBy(
           did,
@@ -170,6 +236,12 @@ export default function createInternalCheqdModule(
         );
       }
 
+      /**
+       * Fetches the first matching latest resource metadata based on a condition
+       * @param {string} did - The DID identifier
+       * @param {Function} cond - Filtering function to determine which metadata to include
+       * @returns {Promise<Object|null>} The first matching metadata or null if none found
+       */
       async latestResourceMetadataBy(did, cond) {
         const meta = await this.resourcesMetadataBy(
           did,
@@ -180,18 +252,39 @@ export default function createInternalCheqdModule(
         return meta[0] ?? null;
       }
 
+      /**
+       * Accessor for transaction handling methods
+       * @readonly
+       * @memberof module:internalCheqdModule
+       */
       get tx() {
-        return new RootModule(this);
+        return new this.constructor.RootModule(this);
       }
 
+      /**
+       * Accessor for sending methods
+       * @readonly
+       * @memberof module:internalCheqdModule
+       */
       get send() {
-        return new RootSender(this);
+        return new this.constructor.RootSender(this);
       }
 
+      /**
+       * Accessor for payload handling methods
+       * @readonly
+       * @memberof module:internalCheqdModule
+       */
       get payload() {
-        return new RootPayload(this);
+        return new this.constructor.RootPayload(this);
       }
 
+      /**
+       * Signs and sends a transaction through the API provider
+       * @param {Object} extrinsic - The extrinsic to sign and send
+       * @param {Object} [params] - Additional parameters for signing
+       * @returns {Promise<*>} The result of sending the signed transaction
+       */
       async signAndSend(extrinsic, params) {
         return await this.apiProvider.signAndSend(extrinsic, params);
       }
@@ -199,9 +292,9 @@ export default function createInternalCheqdModule(
   };
 
   for (const [key, payload] of Object.entries(methods)) {
-    RootPayload.prototype[key] = payload;
-    RootModule.prototype[key] = createDIDMethodTx(key);
-    RootSender.prototype[key] = createCall(key);
+    obj[name].RootPayload.prototype[key] = payload;
+    obj[name].RootModule.prototype[key] = createDIDMethodTx(key);
+    obj[name].RootSender.prototype[key] = createCall(key);
   }
 
   return obj[name];

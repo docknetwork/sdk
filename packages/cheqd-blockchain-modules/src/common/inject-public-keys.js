@@ -19,7 +19,7 @@ const methods = {
 };
 
 export default function injectPublicKeys(klass) {
-  const name = `withInternalPublicKeys(${klass.name})`;
+  const name = `injectPublicKeys(${klass.name})`;
 
   const obj = {
     [name]: class extends createInternalCheqdModule(methods, klass) {
@@ -106,7 +106,7 @@ export default function injectPublicKeys(klass) {
   };
 
   return withExtendedStaticProperties(
-    ['PublicKeyName', 'PublicKeyType'],
+    ['PublicKeyId', 'PublicKeyName', 'PublicKeyType'],
     obj[name],
   );
 }

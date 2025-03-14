@@ -1,5 +1,5 @@
 import { encodeAsSS58, decodeFromSS58 } from '../../utils/encoding';
-import { isHex } from '../../utils/bytes';
+import { isHex } from '../../utils/types/bytes';
 import {
   TypedBytes,
   TypedEnum,
@@ -13,7 +13,7 @@ import withFromDockId, {
 } from '../generic/with-from-dock-id';
 import { CheqdBlobQualifier, DockBlobQualifier } from './const';
 import { CheqdDidRef, CheqdMainnetDid, CheqdTestnetDid } from '../did';
-import dockDidById from '../../utils/fixtures/dock-did-by-id';
+import dockDidById from '../../utils/mappings/dock-did-by-id';
 
 export class BlobId extends withFrom(
   withQualifier(TypedEnum, true),

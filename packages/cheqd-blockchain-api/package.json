@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/cheqd-blockchain-api",
-  "version": "0.35.0",
+  "version": "0.36.0",
   "license": "MIT",
   "main": "./dist/esm/index.js",
   "type": "module",
@@ -32,7 +32,7 @@
     "node": ">=20.0.0"
   },
   "peerDependencies": {
-    "@docknetwork/credential-sdk": "^0.49.0"
+    "@docknetwork/credential-sdk": "^0.50.0"
   },
   "dependencies": {
     "@cheqd/sdk": "5.1.1",
@@ -46,7 +46,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/preset-env": "^7.24.3",
     "@comunica/types": "^1.0.0",
-    "@docknetwork/credential-sdk": "^0.49.0",
+    "@docknetwork/credential-sdk": "^0.50.0",
     "@helia/strings": "^3.0.1",
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-commonjs": "^24.0.0",

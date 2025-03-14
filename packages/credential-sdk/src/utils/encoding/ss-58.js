@@ -1,8 +1,9 @@
 import bs58 from 'bs58';
 import BLAKE2b from 'blake2b';
-import { normalizeToU8a, u8aToHex } from '../bytes';
+import { normalizeToU8a, stringToU8a, u8aToHex } from '../types/bytes';
+import { catchFnErrorWith } from '../error';
 
-const SS58_PREFIX = new TextEncoder().encode('SS58PRE');
+const SS58_PREFIX = stringToU8a('SS58PRE');
 
 /**
  * Encodes prefix bytes for SS58 address.
@@ -88,8 +89,9 @@ export const encodeAsSS58 = (address, prefix = 42) => {
  * @param {string} value - The SS58 encoded address.
  * @returns {string} - The decoded address in hex format.
  */
-export const decodeFromSS58 = (value) => {
-  try {
+export const decodeFromSS58 = catchFnErrorWith(
+  'Invalid SS58 address',
+  (value) => {
     const decoded = bs58.decode(value);
 
     if (decoded.length < 6) {
@@ -106,10 +108,8 @@ export const decodeFromSS58 = (value) => {
     }
 
     return u8aToHex(addressBytes);
-  } catch (err) {
-    throw new Error(`Invalid SS58 address: ${err.message}`);
-  }
-};
+  },
+);
 
 /**
  * Convert address to Dock appropriate network address.

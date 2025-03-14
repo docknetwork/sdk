@@ -8,7 +8,7 @@ import {
   flattenObjectToKeyValuesList,
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
-import { normalizeOrConvertStringToU8a } from '../utils/bytes';
+import { normalizeOrConvertStringToU8a } from '../utils/types/bytes';
 import { ensureArray } from '../utils';
 
 import Bls12381BBSSignatureDock2022 from './crypto/Bls12381BBSSignatureDock2022';

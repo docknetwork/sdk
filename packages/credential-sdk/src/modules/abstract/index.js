@@ -113,3 +113,4 @@ export {
 
 export { default as Schema } from './schema/module';
 export { AccumulatorType } from './accumulator';
+export { AbstractApiProvider } from './common';

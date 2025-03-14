@@ -1,4 +1,27 @@
 /**
+ * Return true if the given value is a Map.
+ * @param value
+ * @returns {boolean}
+ */
+export function isMap(value) {
+  return value instanceof Map;
+}
+
+/**
+ * Ensures that the given value is a Map. Throws an error with an optional context message if not.
+ * @param {any} value - The value to check.
+ * @param {string} [message] - Optional message for the error.
+ * @returns {Map} - The value if it's a Map.
+ */
+export function ensureMap(value) {
+  if (isMap(value)) {
+    return value;
+  }
+
+  throw new TypeError(`\`${value}\` needs to be a Map.`);
+}
+
+/**
  * A `Map` that has a capacity.
  */
 export class MapWithCapacity extends Map {

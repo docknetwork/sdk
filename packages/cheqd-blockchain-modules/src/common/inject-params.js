@@ -23,7 +23,7 @@ const methods = {
 };
 
 export default function injectParams(klass) {
-  const name = `withInternalParams(${klass.name})`;
+  const name = `injectParams(${klass.name})`;
 
   const obj = {
     [name]: class extends createInternalCheqdModule(methods, klass) {
@@ -98,7 +98,7 @@ export default function injectParams(klass) {
   };
 
   return withExtendedStaticProperties(
-    ['Params', 'ParamsName', 'ParamsType'],
+    ['Params', 'ParamsId', 'ParamsName', 'ParamsType'],
     obj[name],
   );
 }

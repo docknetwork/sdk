@@ -1,6 +1,12 @@
 import { fmtIterable } from '../../utils';
 import withFrom from './with-from';
 
+class NeverInstantiated {
+  constructor() {
+    throw new Error('Should never be instantiated');
+  }
+}
+
 /**
  * Creates a new type that can be constructed from any of the provided types.
  * The resulting type will attempt to parse a value using each provided type in order,
@@ -14,7 +20,7 @@ export default function anyOf(...classes) {
   const name = `anyOf(${fmtIterable(classes.map((klass) => klass.name))})`;
 
   const obj = {
-    [name]: class extends withFrom(class NeverConstructed {}, (value) => {
+    [name]: class extends withFrom(NeverInstantiated, (value) => {
       let err;
 
       for (const klass of classes) {

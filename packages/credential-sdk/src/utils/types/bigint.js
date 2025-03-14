@@ -1,4 +1,27 @@
 /**
+ * Return true if the given value is a BigInt.
+ * @param {*} value - The value to check
+ * @returns {boolean} - True if the value is a BigInt, false otherwise
+ */
+export function isBigInt(value) {
+  return typeof value === 'bigint';
+}
+
+/**
+ * Ensures that the given value is a BigInt. If not, throws an error.
+ *
+ * @param {*} value - The value to check.
+ * @returns {BigInt} - The value as a BigInt.
+ */
+export function ensureBigInt(value) {
+  if (isBigInt(value)) {
+    return value;
+  }
+
+  throw new TypeError(`${value} needs to be a BigInt`);
+}
+
+/**
  * Returns the minimum value from a list of BigInt values.
  *
  * @param {...BigInt} bigints - One or more BigInt values to compare

@@ -19,13 +19,13 @@ export class CheqdVerificationMethodRefOrCheqdVerificationMethod extends anyOf(
   CheqdVerificationMethodRef,
 ) {}
 
-export class CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod extends anyOf(
+export class CheqdTestnetVerificationMethodOrCheqdTestnetVerificationMethodRef extends anyOf(
   CheqdTestnetVerificationMethodAssertion,
   CheqdTestnetVerificationMethodAssertionLegacy,
   CheqdTestnetVerificationMethodRef,
 ) {}
 
-export class CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod extends anyOf(
+export class CheqdMainnetVerificationMethodOrCheqdMainnetVerificationMethodRef extends anyOf(
   CheqdMainnetVerificationMethodAssertion,
   CheqdMainnetVerificationMethodAssertionLegacy,
   CheqdMainnetVerificationMethodRef,

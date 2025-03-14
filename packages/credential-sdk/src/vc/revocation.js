@@ -5,7 +5,7 @@ import {
   VB_ACCUMULATOR_22,
   KB_UNI_ACCUMULATOR_24,
 } from '@docknetwork/crypto-wasm-ts';
-import { randomAsHex, u8aToHex } from '../utils/bytes';
+import { randomAsHex, u8aToHex } from '../utils/types/bytes';
 
 import {
   RevRegType,
@@ -77,7 +77,12 @@ export function getCredentialStatus(expanded) {
   return status;
 }
 
-const ldTypeGen = (typ) => [typ, `${LD_SEC_TERM}${typ}`, `${LD_SEC_TERM_LEGACY}${typ}`, `/${typ}`];
+const ldTypeGen = (typ) => [
+  typ,
+  `${LD_SEC_TERM}${typ}`,
+  `${LD_SEC_TERM_LEGACY}${typ}`,
+  `/${typ}`,
+];
 const REV_REG_LD_TYPES = [RevRegType].flatMap(ldTypeGen);
 const ACCUMULATOR_LD_TYPES = [VB_ACCUMULATOR_22, KB_UNI_ACCUMULATOR_24].flatMap(
   ldTypeGen,

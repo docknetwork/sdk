@@ -54,13 +54,15 @@ The Credential SDK provides a flexible and extensible set of typed structures th
 
 - **TypedMap**: Extends the native `Map` structure to provide consistent key/value type management and conversion capabilities. This class supports serialization to JSON and deserialization from API responses, making it suitable for handling complex data structures in networked applications.
 
+- **TypedSet**: Extends the native `Set` structure to provide consistent unique values management and conversion capabilities. This class supports serialization to JSON and deserialization from API responses, making it suitable for handling complex data structures in networked applications.
+
 - **TypedUUID**: Tailored specifically for handling UUIDs, this class includes validation checks, parsing methods, and generation of random UUIDs. It ensures that any UUID operations within the application are robust and compliant with UUID standards.
 
 - **TypedStruct**: Represents structured, dictionary-like data with predefined keys and types. This class facilitates robust data manipulation by enforcing type constraints on each key and provides seamless JSON integration for serialization/deserialization.
 
 - **TypedTuple**: Enforces a fixed-size collection of elements, where each element has a specified type. This is essential for maintaining order and type checks in tuple-based data structures, ensuring that the data remains consistent across different parts of an application.
 
-- **TypedUUID**: Manages UUID (Universally Unique Identifier) operations with strict validation.
+- **TypedNull**: Placeholder type that can be used when an empty value is expected.
 
 ### Utility Mixins
 
@@ -78,13 +80,13 @@ The Credential SDK provides a flexible and extensible set of typed structures th
 
 - **withFrom**: Facilitates custom instantiation logic for classes, particularly useful when dealing with various input forms that require specialized initialization.
 
-- **withQualifier**: Extends classes to handle prefixed string identifiers and encoding, suitable for scenarios involving qualified identifiers (e.g., DID systems).
-
 - **option**: Allows to pass `null` to `from` method returning `null` in this case.
 
 - **withNullIfNotAVariant**: A class decorator for types extending `TypedEnum`. It ensures that instantiation from JSON or API data returns `null` if the provided value doesn't match any defined variant type. This mixin helps enforce strict type conformity.
 
 - **withProp**: Extends classes derived from `TypedStruct` or `TypedEnum` by adding or overriding properties. It facilitates dynamic property management, allowing for seamless integration of new fields or modifications without altering base classes.
+
+- **withProps**: Extends classes derived from `TypedStruct` or `TypedEnum` by adding or overriding properties. It facilitates dynamic property management, allowing for seamless integration of new fields or modifications without altering base classes.
 
 - **withQualifier**: Adds functionality for dealing with qualified strings, such as those used in decentralized identifiers (DIDs). This mixin supports operations involving strings with specific prefixes or encoding requirements.
 

@@ -96,7 +96,7 @@ export const STATUS_LIST_ID_MATCHER = new RegExp(
  * private-Status-list2021:hex-id
  */
 export const PRIVATE_STATUS_LIST_ID_MATCHER = new RegExp(
-  `^private-Status-list2021:${HEX_ID_REG_EXP_PATTERN}$`,
+  `^private-status-list2021:${HEX_ID_REG_EXP_PATTERN}$`,
 );
 
 /**

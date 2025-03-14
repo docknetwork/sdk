@@ -79,9 +79,9 @@ export function ensureObjectWithId(value, name) {
 
 /**
  * Clones supplied object using `JSON.parse(JSON.stringify(...))`.
- * @template O
- * @param {O} obj
- * @returns {O}
+ *
+ * @param {Object} obj
+ * @returns {Object}
  */
 export const deepClone = (obj) => JSON.parse(JSON.stringify(ensureObject(obj)));
 

@@ -4,7 +4,7 @@ import {
   STATUS_LIST_ID_MATCHER,
   URI_MATCHER,
 } from './matchers';
-import { ensureString } from '../types/ensure-type';
+import { ensureString } from '../types/string';
 
 /**
  * Ensures that the given string is a valid URI. If not, throws an error.

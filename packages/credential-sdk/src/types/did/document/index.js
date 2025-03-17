@@ -31,8 +31,8 @@ import {
 } from './verification-method';
 import {
   CheqdVerificationMethodRefOrCheqdVerificationMethod,
-  CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod,
-  CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod,
+  CheqdMainnetVerificationMethodOrCheqdMainnetVerificationMethodRef,
+  CheqdTestnetVerificationMethodOrCheqdTestnetVerificationMethodRef,
 } from './verification-method-ref-or-cheqd-verification-method';
 import {
   VerificationMethodRef,
@@ -130,11 +130,11 @@ class CheqdAssertionMethod extends TypedArray {
 }
 
 class CheqdTestnetAssertionMethod extends TypedArray {
-  static Class = CheqdVerificationMethodRefOrCheqdTestnetVerificationMethod;
+  static Class = CheqdTestnetVerificationMethodOrCheqdTestnetVerificationMethodRef;
 }
 
 class CheqdMainnetAssertionMethod extends TypedArray {
-  static Class = CheqdVerificationMethodRefOrCheqdMainnetVerificationMethod;
+  static Class = CheqdMainnetVerificationMethodOrCheqdMainnetVerificationMethodRef;
 }
 
 export class DIDDocument extends withFrom(

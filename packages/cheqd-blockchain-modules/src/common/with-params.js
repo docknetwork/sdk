@@ -46,14 +46,12 @@ export default function withParams(klass) {
       }
 
       async lastParamsId(targetDid) {
-        return option(TypedUUID).from(
-          (
-            await this.cheqdOnly.latestResourceMetadataBy(
-              targetDid,
-              this.cheqdOnly.filterParamsMetadata,
-            )
-          )?.id,
+        const meta = await this.cheqdOnly.latestResourceMetadataBy(
+          targetDid,
+          this.cheqdOnly.filterParamsMetadata,
         );
+
+        return option(TypedUUID).from(meta?.id);
       }
 
       async nextParamsId(_) {

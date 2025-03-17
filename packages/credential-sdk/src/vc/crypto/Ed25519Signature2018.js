@@ -1,7 +1,7 @@
 import { Ed25519SigName, Ed25519VerKeyName } from './constants';
 import Ed25519VerificationKey2018 from './Ed25519VerificationKey2018';
 import CustomLinkedDataSignature from './common/CustomLinkedDataSignature';
-import { valueBytes } from '../../utils/bytes';
+import { valueBytes } from '../../utils/types/bytes';
 
 const SUITE_CONTEXT_URL = 'https://www.w3.org/2018/credentials/v1';
 

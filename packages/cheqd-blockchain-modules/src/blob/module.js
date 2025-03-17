@@ -1,10 +1,10 @@
 import { AbstractBlobModule } from '@docknetwork/credential-sdk/modules';
 import { NoBlobError } from '@docknetwork/credential-sdk/modules/abstract/blob';
-import { NoResourceError, injectCheqd } from '../common';
+import { NoResourceError, withCheqd } from '../common';
 import CheqdInternalBlobModule from './internal';
 import { OwnerWithBlob } from './types';
 
-export default class CheqdBlobModule extends injectCheqd(AbstractBlobModule) {
+export default class CheqdBlobModule extends withCheqd(AbstractBlobModule) {
   static CheqdOnly = CheqdInternalBlobModule;
 
   /**

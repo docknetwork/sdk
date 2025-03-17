@@ -14,7 +14,7 @@ import {
   withProp,
 } from '../../generic';
 import IdentRef from './ident-ref';
-import { isBytes } from '../../../utils/bytes';
+import { isBytes } from '../../../utils/types/bytes';
 import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from '../onchain';
 
 export class ServiceEndpointId extends IdentRef {}

@@ -1,6 +1,6 @@
 import b58 from 'bs58';
 import * as base64 from '@juanelas/base64';
-import { u8aToU8a } from '../../utils/bytes';
+import { u8aToU8a } from '../../utils/types/bytes';
 import Ed25519Keypair from '../../keypairs/keypair-ed25519';
 import { Ed25519VerKeyName } from './constants';
 

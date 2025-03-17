@@ -11,8 +11,7 @@ import {
   TypedStruct,
   option,
   TypedNumber,
-  ArrayOfByteArrays,
-  ByteArray,
+  TypedArrayOfTypedBytes,
 } from '@docknetwork/credential-sdk/types/generic';
 
 export class AddAccumulator extends TypedStruct {
@@ -27,9 +26,9 @@ export class UpdateAccumulator extends TypedStruct {
   static Classes = {
     id: DockAccumulatorIdIdent,
     newAccumulated: class Accumulated extends TypedBytes {},
-    additions: option(ArrayOfByteArrays),
-    removals: option(ArrayOfByteArrays),
-    witnessUpdateInfo: option(ByteArray),
+    additions: option(TypedArrayOfTypedBytes),
+    removals: option(TypedArrayOfTypedBytes),
+    witnessUpdateInfo: option(TypedBytes),
     nonce: TypedNumber,
   };
 }

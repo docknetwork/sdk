@@ -1,4 +1,7 @@
-import { normalizeOrConvertStringToU8a, u8aToString } from '../../utils/bytes';
+import {
+  normalizeOrConvertStringToU8a,
+  u8aToString,
+} from '../../utils/types/bytes';
 import TypedBytes from './typed-bytes';
 import withCatchNull from './with-catch-null';
 

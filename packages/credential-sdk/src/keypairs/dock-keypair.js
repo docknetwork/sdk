@@ -2,7 +2,7 @@ import {
   withExtendedPrototypeProperties,
   withExtendedStaticProperties,
 } from '../utils';
-import { randomAsHex } from '../utils/bytes';
+import { randomAsHex } from '../utils/types/bytes';
 
 /**
  * Abstract keypair used to sign byte sequences of arbitrary size.

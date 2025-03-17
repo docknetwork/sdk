@@ -1,8 +1,8 @@
 import { AbstractStatusListCredentialModule } from '@docknetwork/credential-sdk/modules';
-import { injectCheqd } from '../common';
+import { withCheqd } from '../common';
 import CheqdInternalStatusListCredentialModule from './internal';
 
-export default class CheqdStatusListCredentialModule extends injectCheqd(
+export default class CheqdStatusListCredentialModule extends withCheqd(
   AbstractStatusListCredentialModule,
 ) {
   static CheqdOnly = CheqdInternalStatusListCredentialModule;

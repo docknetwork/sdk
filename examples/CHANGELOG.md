@@ -1,5 +1,12 @@
 # @docknetwork/sdk-examples
 
+## 0.18.8
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-api@0.36.1
+
 ## 0.18.7
 
 ### Patch Changes

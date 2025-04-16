@@ -32,10 +32,11 @@
         <!-- Custom theme stylesheets -->
 
 
-        <!-- Provide site root to javascript -->
+        <!-- Provide site root and default themes to javascript -->
         <script>
-            var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc.js"></script>
@@ -45,8 +46,8 @@
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
         <script>
             try {
-                var theme = localStorage.getItem('mdbook-theme');
-                var sidebar = localStorage.getItem('mdbook-sidebar');
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
 
                 if (theme.startsWith('"') && theme.endsWith('"')) {
                     localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
@@ -60,7 +61,8 @@
 
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script>
-            var theme;
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             const html = document.documentElement;
@@ -73,8 +75,8 @@
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
-            var sidebar = null;
-            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
@@ -110,6 +112,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
@@ -820,7 +823,7 @@ subject does not specify the fields <code>emailAddress</code> and <code>alumniOf
 <p>The <a href="https://www.w3.org/TR/vc-data-model/">verifiable credentials data model</a> is based on a machine comprehensible language called <a href="https://www.w3.org/TR/rdf-primer/">RDF</a>. RDF represents arbitrary semantic knowledge as <a href="https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)">graph</a>s. Computers can perform automatic deductive reasoning over RDF; given assumptions (represented as an RDF graph) and axioms (represented as logical rules), a computer can infer new conclusions and even prove them to other computers using deductive derivations (proofs).</p>
 <p>Every VCDM credential is representable as an RDF graph. So computers can reason about them, deriving new conclusions that weren't explicitly stated by the issuer.</p>
 <p>The Truvera Credential SDK exposes utilities for primitive deductive reasoning over verified credentials. The Verifier has a choice to perform deduction themself (expensive), or offload that responsibility to the Presenter of the credential[s] by accepting deductive proofs of composite claims.</p>
-<p>In RDF, if graph A is true and graph B is true, then the <a href="https://en.wikipedia.org/wiki/Union_(set_theory)">union</a> of those graphs, is also true <code>A∧B-&gt;A∪B</code> <sup class="footnote-reference"><a href="#1">1</a></sup>. Using this property we can combine multiple credentials and reason over their union.</p>
+<p>In RDF, if graph A is true and graph B is true, then the <a href="https://en.wikipedia.org/wiki/Union_(set_theory)">union</a> of those graphs, is also true <code>A∧B-&gt;A∪B</code> <sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup>. Using this property we can combine multiple credentials and reason over their union.</p>
 <h2 id="explicit-ethos"><a class="header" href="#explicit-ethos">Explicit Ethos</a></h2>
 <p>Imagine a signed credential issued by <strong>Alice</strong> claiming that <strong>Joe</strong> is a <strong>Member</strong>.</p>
 <pre><code class="language-json">{
@@ -950,10 +953,11 @@ const defaultGraph = { DefaultGraph: true };
 <li>Composite Claim: An rdf triple which was infered, rather than stated explicitly in a credential.</li>
 <li>Explicit <a href="https://en.wikipedia.org/wiki/Modes_of_persuasion#Ethos">Ethos</a> statement: A statement of the form "A claims X." where X is also a statement. Explicit Ethos is encodable in natural human languages as well as in RDF.</li>
 </ul>
-<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
-<p>If you ever decide to implement your own algorithm to merge RDF graphs, remember that <a href="https://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank nodes</a> exists and may need to be renamed depending on the type of graph representation in use.</p>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><p>The Dock Blockchain includes a module explicitly intended for proof of existence. Aside from being explicitly supported by the on-chain runtime, it works the same way you would expect. You post the hash of a document on-chain at a specific block. Later you can use that hash to prove the document existed at or before that block.</p>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p>If you ever decide to implement your own algorithm to merge RDF graphs, remember that <a href="https://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank nodes</a> exists and may need to be renamed depending on the type of graph representation in use. <a href="#fr-1-1">↩</a></p>
+</li>
+</ol><div style="break-before: page; page-break-before: always;"></div><p>The Dock Blockchain includes a module explicitly intended for proof of existence. Aside from being explicitly supported by the on-chain runtime, it works the same way you would expect. You post the hash of a document on-chain at a specific block. Later you can use that hash to prove the document existed at or before that block.</p>
 <p>The PoE module accepts arbitrary bytes as an anchor but in order to keep anchor size constant the chain stores only the blake2b256 hash of those bytes.</p>
 <p>Developers are free to use the anchoring module however they want, taloring their software to their own use case. An anchoring example can be found in the sdk examples directory. Dock Labs provides a <a href="https://fe.dock.io/#/anchor/batch">fully functioning reference client</a> for anchoring. The client even implements batching anchors into a merkle tree so you can anchor multiple documents in a single transaction.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="private-delegation"><a class="header" href="#private-delegation">Private Delegation</a></h1>

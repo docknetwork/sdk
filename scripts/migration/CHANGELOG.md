@@ -1,5 +1,12 @@
 # @docknetwork/migration
 
+## 0.9.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-api@0.36.1
+
 ## 0.9.3
 
 ### Patch Changes

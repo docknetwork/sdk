@@ -7,7 +7,6 @@ import {
   retry,
   minBigInt,
 } from '@docknetwork/credential-sdk/utils';
-import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx.js';
 import {
   DIDModule,
   ResourceModule,
@@ -55,13 +54,6 @@ import {
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 import pLimit from 'p-limit';
 import { buildTypeUrlObject, fullTypeUrl, fullTypeUrls } from './type-url';
-import {
-  createOrUpdateDIDDocGas,
-  createResourceGas,
-  deactivateDIDDocGas,
-  gasAmountForBatch,
-} from './gas';
-import { signedTxHash } from '../utils/tx';
 
 export class CheqdAPI extends AbstractApiProvider {
   #sdk;
@@ -88,13 +80,6 @@ export class CheqdAPI extends AbstractApiProvider {
     DIDModule.fees.DefaultUpdateDidDocFee,
     DIDModule.fees.DefaultDeactivateDidDocFee,
     ResourceModule.fees.DefaultCreateResourceDefaultFee,
-  );
-
-  static BaseGasAmounts = buildTypeUrlObject(
-    createOrUpdateDIDDocGas,
-    createOrUpdateDIDDocGas,
-    deactivateDIDDocGas,
-    createResourceGas,
   );
 
   static PayloadWrappers = buildTypeUrlObject(
@@ -233,6 +218,7 @@ export class CheqdAPI extends AbstractApiProvider {
     const options = {
       modules: [DIDModule, ResourceModule, FeemarketModule],
       rpcUrl: url,
+      endpoint: url,
       wallet,
       network,
     };
@@ -241,6 +227,7 @@ export class CheqdAPI extends AbstractApiProvider {
     this.ensureNotInitialized();
     this.#sdk = sdk;
     this.#spawn = pLimit(1);
+    this.#sdk.signer.endpoint = options.endpoint; // HACK: cheqd SDK doesnt pass this with createCheqdSDK yet
 
     return this;
   }
@@ -270,18 +257,10 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {object|Array<object>} txOrTxs
    * @returns {Promise<BigInt>}
    */
-  async estimateGas(txOrTxs) {
-    const { BaseGasAmounts, BlockLimits } = this.constructor;
-
+  async estimateGas(txOrTxs, from) {
     const txs = this.constructor.txToJSON(txOrTxs);
-    const limit = BlockLimits[this.network()];
-
-    const estimated = txs.reduce(
-      (total, { typeUrl, value }) => minBigInt(total + BigInt(BaseGasAmounts[typeUrl](value)), limit),
-      0n,
-    );
-
-    return String(gasAmountForBatch(estimated, txs.length));
+    const simulatedGas = await this.sdk.signer.simulate(from, txs);
+    return String(simulatedGas);
   }
 
   /**
@@ -320,15 +299,13 @@ export class CheqdAPI extends AbstractApiProvider {
    *
    * @param {string} sender
    * @param {Array<object>} txJSON
-   * @param {object} payment
+   * @param {DidStdFee | 'auto' | number} payment
    * @param {?string} memo
    * @returns {Promise<object>}
    */
-  async signAndBroadcast(sender, txJSON, { ...payment }, memo) {
+  async signAndBroadcast(sender, txJSON, payment, memo) {
     const { BlockLimits } = this.constructor;
 
-    let signedTx;
-    let connectionClosed = false;
     const onError = async (err, continueSym) => {
       const strErr = String(err);
 
@@ -337,45 +314,29 @@ export class CheqdAPI extends AbstractApiProvider {
         || strErr.includes('Bad status')
         || strErr.includes('other side closed')
       ) {
-        connectionClosed = true;
         console.error(err);
         await this.reconnect();
 
         return continueSym;
-      } else if (
-        strErr.includes('exists')
-        && connectionClosed
-        && signedTx != null
-      ) {
-        const hash = signedTxHash(signedTx);
-
-        const res = await this.txResult(hash);
-        if (res == null) {
-          throw new Error(
-            `Transaction with hash ${hash} not found, but entity already exists: ${JSON.stringify(
-              txJSON,
-            )}`,
-          );
-        }
-
-        return res;
       } else if (strErr.includes('out of gas in location')) {
-        const gasAmount = BigInt(payment.gas);
-        const limit = BlockLimits[this.network()];
-        if (gasAmount >= limit) {
-          throw new Error(
-            `Can't process transaction because it exceeds block gas limit: ${JSON.stringify(
-              txJSON,
-            )}`,
-          );
-        }
+        if (payment.gas) {
+          const gasAmount = BigInt(payment.gas);
+          const limit = BlockLimits[this.network()];
+          if (gasAmount >= limit) {
+            throw new Error(
+              `Can't process transaction because it exceeds block gas limit: ${JSON.stringify(
+                txJSON,
+              )}`,
+            );
+          }
 
-        // eslint-disable-next-line no-param-reassign
-        payment.gas = String(minBigInt(gasAmount * 2n, limit));
-        signedTx = void 0;
+          // eslint-disable-next-line no-param-reassign
+          payment.gas = String(minBigInt(gasAmount * 2n, limit));
+        } else {
+          throw err;
+        }
         return continueSym;
       } else if (strErr.includes('account sequence mismatch')) {
-        signedTx = void 0;
         return continueSym;
       }
 
@@ -384,11 +345,7 @@ export class CheqdAPI extends AbstractApiProvider {
 
     return await this.#spawn(() => retry(
       async () => {
-        signedTx ??= TxRaw.encode(
-          await this.sdk.signer.sign(sender, txJSON, payment, memo ?? ''),
-        ).finish();
-        const res = await this.sdk.signer.broadcastTx(signedTx);
-
+        const res = await this.sdk.signer.signAndBroadcast(sender, txJSON, payment, memo ?? '');
         if (res.code) {
           console.error(res);
 
@@ -417,18 +374,18 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {Promise<*>}
    */
   async signAndSend(tx, {
-    from, fee, memo, gas,
+    from, fee, memo, gas, payment,
   } = {}) {
     const sender = from ?? (await this.address());
     const txJSON = this.constructor.txToJSON(tx);
 
-    const payment = {
+    const paymentObj = payment || {
       amount: [].concat(fee ?? this.calculateFee(tx)),
-      gas: gas ?? (await this.estimateGas(tx)),
+      gas: gas ?? (await this.estimateGas(tx, sender)),
       payer: sender,
     };
 
-    return await this.signAndBroadcast(sender, txJSON, payment, memo);
+    return await this.signAndBroadcast(sender, txJSON, paymentObj, memo);
   }
 
   async reconnect() {

@@ -4,6 +4,17 @@
 
 ### Minor Changes
 
+- Package cleanup
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.51.0
+
+## 1.0.0
+
+### Minor Changes
+
 - Docs and improvements
 
 ### Patch Changes

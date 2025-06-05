@@ -10,8 +10,6 @@
     "@docknetwork/cheqd-blockchain-api": "0.37.0",
     "@docknetwork/cheqd-blockchain-modules": "0.33.0",
     "@docknetwork/credential-sdk": "0.50.0",
-    "@docknetwork/dock-blockchain-api": "0.23.0",
-    "@docknetwork/dock-blockchain-modules": "0.30.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0"
   },
   "devDependencies": {

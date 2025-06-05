@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/credential-sdk",
-  "version": "0.50.0",
+  "version": "0.51.0",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -31,7 +31,6 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@comunica/query-sparql-rdfjs": "^4.0.2",
     "@digitalcredentials/vc-status-list": "^8.0.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0",
     "@juanelas/base64": "^1.1.5",
@@ -63,6 +62,7 @@
     "@babel/cli": "^7.24.1",
     "@babel/core": "^7.24.3",
     "@babel/node": "^7.23.9",
+    "@comunica/query-sparql-rdfjs": "^4.0.2",
     "@babel/plugin-syntax-import-attributes": "^7.25.6",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/preset-env": "^7.24.3",
@@ -74,7 +74,6 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-wasm": "^5.1.0",
     "@types/jest": "^29.5.12",
-    "aws-sdk": "^2.1057.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^29.7.0",
     "eslint": "^8.0.0",

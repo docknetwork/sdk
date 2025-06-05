@@ -10,8 +10,6 @@ Currently, two blockchains are supported:
 Overall, there're five packages located in the [GitHub repository](https://github.com/docknetwork/sdk):
 
 - [`@docknetwork/credential-sdk`](https://github.com/docknetwork/sdk/tree/master/packages/credential-sdk) - An API-agnostic Javascript library for working with Verifiable Credentials, DIDs, Claim Deduction, and more.
-- [`@docknetwork/dock-blockchain-api`](https://github.com/docknetwork/sdk/tree/master/packages/dock-blockchain-api) - A Javascript library built with PolkadotJS, for use with the [Dock Substrate Node](https://github.com/docknetwork/dock-substrate) or our public main/test networks.
-- [`@docknetwork/dock-blockchain-modules`](https://github.com/docknetwork/sdk/tree/master/packages/dock-blockchain-modules) - A JavaScript library designed for handling credential SDK elements (DIDS, Accumulators, etc) on the Dock blockchain.
 - [`@docknetwork/cheqd-blockchain-api`](https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-api) - A Javascript library built atop of `@cheqd/sdk` that allows to interact with the `Cheqd` blockchain.
 - [`@docknetwork/cheqd-blockchain-modules`](https://github.com/docknetwork/sdk/tree/master/packages/cheqd-blockchain-modules) - A JavaScript library created for managing credential SDK components such as DIDs, accumulators etc on the Cheqd blockchain.
 

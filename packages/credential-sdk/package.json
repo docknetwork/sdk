@@ -31,7 +31,6 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@comunica/query-sparql-rdfjs": "^4.0.2",
     "@digitalcredentials/vc-status-list": "^8.0.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0",
     "@juanelas/base64": "^1.1.5",
@@ -63,6 +62,7 @@
     "@babel/cli": "^7.24.1",
     "@babel/core": "^7.24.3",
     "@babel/node": "^7.23.9",
+    "@comunica/query-sparql-rdfjs": "^4.0.2",
     "@babel/plugin-syntax-import-attributes": "^7.25.6",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/preset-env": "^7.24.3",

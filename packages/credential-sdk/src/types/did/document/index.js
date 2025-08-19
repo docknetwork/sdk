@@ -19,7 +19,7 @@ import { VerificationRelationship } from '../onchain/verification-relationship';
 import {
   Service,
   CheqdService,
-  ServiceEndpoint,
+  createServiceEndpoint,
   CheqdTestnetService,
   CheqdMainnetService,
 } from './service-endpoint';
@@ -447,7 +447,8 @@ export class CheqdDIDDocument extends TypedStruct {
     // Convert CheqdService objects to Service objects
     const convertedServices = [...service].map((cheqdService) => {
       // Create a ServiceEndpoint object from the CheqdService data
-      const serviceEndpoint = new ServiceEndpoint(cheqdService.serviceType, cheqdService.serviceEndpoint);
+      const serviceEndpointArray = cheqdService.serviceEndpoint.toJSON();
+      const serviceEndpoint = createServiceEndpoint(cheqdService.serviceType, serviceEndpointArray);
       return Service.fromServiceEndpoint(cheqdService.id, serviceEndpoint);
     });
 

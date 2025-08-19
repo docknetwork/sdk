@@ -140,26 +140,75 @@ export class ServiceEndpoint extends TypedStruct {
   };
 
   constructor(type, origins) {
-    // Handle string types by converting them to the appropriate service type
-    let serviceType;
-    if (typeof type === 'string') {
-      switch (type) {
-        case 'LinkedDomains':
-          serviceType = new LinkedDomains();
-          break;
-        case 'DIDCommMessaging':
-          serviceType = new DIDCommMessaging();
-          break;
-        default:
-          throw new Error(`Unknown service type: ${type}`);
-      }
-    } else if (type instanceof LinkedDomains || type instanceof DIDCommMessaging) {
-      serviceType = type;
-    } else {
-      throw new Error(`Invalid service type: ${type}`);
-    }
+    super(type, origins);
+  }
+}
 
-    super(serviceType, origins);
+function createServiceType(type) {
+  if (typeof type === 'string') {
+    switch (type) {
+      case 'LinkedDomains':
+        return new LinkedDomains();
+      case 'DIDCommMessaging':
+        return new DIDCommMessaging();
+      default:
+        throw new Error(`Unknown service type: ${type}`);
+    }
+  } else if (type instanceof LinkedDomains || type instanceof DIDCommMessaging) {
+    return type;
+  } else {
+    throw new Error(`Invalid service type: ${type}`);
+  }
+}
+
+function processDIDCommOrigins(origins) {
+  if (!Array.isArray(origins)) {
+    return origins;
+  }
+
+  const processedOrigins = new ServiceEndpointOrigins();
+  origins.forEach((origin) => {
+    if (typeof origin === 'string') {
+      processedOrigins.push(new ServiceEndpointOrigin(origin));
+    } else if (origin && typeof origin === 'object') {
+      const jsonString = JSON.stringify({
+        uri: origin.uri,
+        accept: origin.accept || [],
+        routingKeys: origin.routingKeys || [],
+      });
+      processedOrigins.push(new ServiceEndpointOrigin(jsonString));
+    } else {
+      processedOrigins.push(origin);
+    }
+  });
+  return processedOrigins;
+}
+
+export function createServiceEndpoint(type, origins) {
+  const serviceType = createServiceType(type);
+
+  if (serviceType instanceof LinkedDomains) {
+    return new ServiceEndpoint(serviceType, origins);
+  }
+
+  if (serviceType instanceof DIDCommMessaging) {
+    const processedOrigins = processDIDCommOrigins(origins);
+
+    const instance = Object.create(ServiceEndpoint.prototype);
+    instance.types = serviceType;
+    instance.origins = processedOrigins;
+    Object.seal(instance);
+    return instance;
+  }
+
+  throw new Error(`Unsupported service type: ${serviceType}`);
+}
+
+function mapServiceEndpoint(endpoint) {
+  try {
+    return JSON.parse(endpoint);
+  } catch (error) {
+    return endpoint; // If it's not valid JSON, return as string
   }
 }
 
@@ -172,6 +221,72 @@ export class Service extends TypedStruct {
     },
   };
 
+  constructor(id, type, serviceEndpoint) {
+    super(id, type, serviceEndpoint);
+  }
+
+  static fromServiceEndpoint(id, serviceEndpoint) {
+    return new this(id, serviceEndpoint.types, serviceEndpoint.origins);
+  }
+
+  toJSON() {
+    const result = {
+      id: this.id.toJSON(),
+      type: this.type.toJSON(),
+      serviceEndpoint: this.serviceEndpoint.toJSON(),
+    };
+
+    if (this.type instanceof DIDCommMessaging) {
+      result.serviceEndpoint = result.serviceEndpoint.map(mapServiceEndpoint);
+    }
+
+    return result;
+  }
+
+  // eslint-disable-next-line no-use-before-define
+  toCheqd(Class = CheqdService) {
+    let processedServiceEndpoint = this.serviceEndpoint;
+
+    if (this.type instanceof DIDCommMessaging) {
+      const originalArray = this.serviceEndpoint.toJSON();
+      const serializedArray = originalArray.map((endpoint) => {
+        if (typeof endpoint === 'string') {
+          return endpoint;
+        } else if (endpoint && typeof endpoint === 'object') {
+          return JSON.stringify({
+            uri: endpoint.uri,
+            accept: endpoint.accept || [],
+            routingKeys: endpoint.routingKeys || [],
+          });
+        } else {
+          return endpoint;
+        }
+      });
+      processedServiceEndpoint = serializedArray;
+    }
+
+    // eslint-disable-next-line no-use-before-define
+    return new (ensureEqualToOrPrototypeOf(CheqdService, Class))(
+      this.id,
+      this.type,
+      processedServiceEndpoint,
+    );
+  }
+}
+
+export class DIDCommService extends TypedStruct {
+  static Classes = {
+    id: ServiceEndpointId,
+    type: ServiceEndpointType,
+    serviceEndpoint: class ServiceEndpoints extends TypedArray {
+      static Class = class ServiceEndpointString extends TypedString {};
+    },
+  };
+
+  constructor(id, type, serviceEndpoint) {
+    super(id, type, serviceEndpoint);
+  }
+
   static fromServiceEndpoint(id, serviceEndpoint) {
     return new this(id, serviceEndpoint.types, serviceEndpoint.origins);
   }
@@ -182,16 +297,6 @@ export class Service extends TypedStruct {
       type: this.type.toJSON(),
       serviceEndpoint: this.serviceEndpoint.toJSON(),
     };
-  }
-
-  // eslint-disable-next-line no-use-before-define
-  toCheqd(Class = CheqdService) {
-    // eslint-disable-next-line no-use-before-define
-    return new (ensureEqualToOrPrototypeOf(CheqdService, Class))(
-      this.id,
-      this.type,
-      this.serviceEndpoint,
-    );
   }
 }
 
@@ -217,6 +322,17 @@ export class CheqdService extends withFrom(
     }
 
     super(id, processedServiceType, serviceEndpoint);
+
+    if (processedServiceType instanceof DIDCommMessaging && Array.isArray(serviceEndpoint)) {
+      const ServiceEndpointArray = this.constructor.Classes.serviceEndpoint;
+      const processedServiceEndpoint = new ServiceEndpointArray();
+
+      serviceEndpoint.forEach((endpoint) => {
+        processedServiceEndpoint.push(endpoint);
+      });
+
+      this.serviceEndpoint = processedServiceEndpoint;
+    }
   }
 
   static fromServiceEndpoint(id, serviceEndpoint) {
@@ -224,11 +340,17 @@ export class CheqdService extends withFrom(
   }
 
   toJSON() {
-    return {
+    const result = {
       id: this.id.toJSON(),
       type: this.serviceType.toJSON(),
       serviceEndpoint: this.serviceEndpoint.toJSON(),
     };
+
+    if (this.serviceType instanceof DIDCommMessaging) {
+      result.serviceEndpoint = result.serviceEndpoint.map(mapServiceEndpoint);
+    }
+
+    return result;
   }
 }
 

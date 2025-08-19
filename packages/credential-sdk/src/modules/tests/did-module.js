@@ -7,7 +7,7 @@ import {
   BBSPlusPublicKeyValue,
   PSPublicKeyValue,
   VerificationMethodRef,
-  ServiceEndpoint,
+  createServiceEndpoint,
 } from '../../types';
 import { TypedBytes } from '../../types/generic';
 import { NoDIDError } from '../abstract/did/errors';
@@ -105,11 +105,11 @@ export default function generateDIDModuleTests(
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
-      const service1 = new ServiceEndpoint('LinkedDomains', [
-        'ServiceEndpoint#1',
+      const service1 = createServiceEndpoint('LinkedDomains', [
+        'ServiceEndpoint',
       ]);
-      const service2 = new ServiceEndpoint('DIDCommMessaging', [
-        'ServiceEndpoint#2',
+      const service2 = createServiceEndpoint('DIDCommMessaging', [
+        'https://ServiceEndpoint#2',
       ]);
 
       const document = DIDDocument.create(did, [didKeypair.didKey()], [], {
@@ -122,16 +122,64 @@ export default function generateDIDModuleTests(
       expect((await module.getDocument(did)).eq(document)).toBe(true);
     });
 
+    test('Creates `DIDDocument` containing DIDComm services with full structure', async () => {
+      const did = Did.random();
+
+      const keyPair = Ed25519Keypair.random();
+      const didKeypair = new DidKeypair([did, 1], keyPair);
+
+      // Test DIDComm service with full object structure
+      const expectedServiceData = {
+        uri: 'https://example.com/path',
+        accept: [
+          'didcomm/v2',
+          'didcomm/aip2;env=rfc587',
+        ],
+        routingKeys: ['did:example:somemediator#somekey'],
+      };
+
+      const didCommService = createServiceEndpoint('DIDCommMessaging', [expectedServiceData]);
+
+      const document = DIDDocument.create(did, [didKeypair.didKey()], [], {
+        didcomm: didCommService,
+      });
+
+      await module.createDocument(document, didKeypair);
+
+      // Verify the document equality
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
+
+      // Verify the DIDComm service data structure is preserved
+      const retrievedDocument = await module.getDocument(did);
+      const retrievedJSON = retrievedDocument.toJSON();
+
+      // Find the DIDComm service in the retrieved document
+      const didCommServiceInRetrieved = retrievedJSON.service.find((service) => service.type === 'DIDCommMessaging');
+
+      expect(didCommServiceInRetrieved).toBeDefined();
+      expect(didCommServiceInRetrieved.serviceEndpoint).toHaveLength(1);
+
+      const retrievedServiceEndpoint = didCommServiceInRetrieved.serviceEndpoint[0];
+
+      // Verify each field individually
+      expect(retrievedServiceEndpoint.uri).toBe(expectedServiceData.uri);
+      expect(retrievedServiceEndpoint.accept).toEqual(expectedServiceData.accept);
+      expect(retrievedServiceEndpoint.routingKeys).toEqual(expectedServiceData.routingKeys);
+
+      // Also verify the entire object matches
+      expect(retrievedServiceEndpoint).toEqual(expectedServiceData);
+    });
+
     test('Updates `DIDDocument` containing services', async () => {
       const did = Did.random();
 
       const keyPair = Ed25519Keypair.random();
       const didKeypair = new DidKeypair([did, 1], keyPair);
 
-      const service1 = new ServiceEndpoint('LinkedDomains', [
-        'ServiceEndpoint#1',
+      const service1 = createServiceEndpoint('LinkedDomains', [
+        'ServiceEndpoint',
       ]);
-      const service2 = new ServiceEndpoint('DIDCommMessaging', [
+      const service2 = createServiceEndpoint('DIDCommMessaging', [
         'ServiceEndpoint#2',
       ]);
 

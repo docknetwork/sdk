@@ -1,5 +1,18 @@
 # @docknetwork/benchmarks
 
+## 0.3.0
+
+### Minor Changes
+
+- Fix didcomm service endpoint type for latest cheqd SDK
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@3.0.0
+  - @docknetwork/cheqd-blockchain-api@3.0.0
+  - @docknetwork/credential-sdk@0.53.0
+
 ## 0.2.2
 
 ### Patch Changes

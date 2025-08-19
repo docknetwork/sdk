@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.53.0
+
+### Minor Changes
+
+- Fix didcomm service endpoint type for latest cheqd SDK
+
 ## 0.52.0
 
 ### Minor Changes

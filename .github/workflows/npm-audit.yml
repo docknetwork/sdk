@@ -17,7 +17,7 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     env:
-      NODE_VERSION: 20.x
+      NODE_VERSION: 22.x
       AVOID_LICENSES: "AGPL;GPL;AGPL-3.0"
       IGNORE_PACKAGES: ""
 

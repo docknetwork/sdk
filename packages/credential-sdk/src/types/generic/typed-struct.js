@@ -74,6 +74,15 @@ class TypedStruct extends withBase(class StructBase {}) {
   toString() {
     return JSON.stringify(this.toJSON());
   }
+
+  toJSON() {
+    const result = {};
+    for (const key of Object.keys(this)) {
+      const value = this[key];
+      result[key] = value && typeof value.toJSON === 'function' ? value.toJSON() : value;
+    }
+    return result;
+  }
 }
 
 export default withEq(

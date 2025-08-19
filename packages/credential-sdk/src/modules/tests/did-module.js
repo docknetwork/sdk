@@ -108,7 +108,7 @@ export default function generateDIDModuleTests(
       const service1 = new ServiceEndpoint('LinkedDomains', [
         'ServiceEndpoint#1',
       ]);
-      const service2 = new ServiceEndpoint('LinkedDomains', [
+      const service2 = new ServiceEndpoint('DIDCommMessaging', [
         'ServiceEndpoint#2',
       ]);
 
@@ -116,6 +116,10 @@ export default function generateDIDModuleTests(
         service1,
         service2,
       });
+
+      const documentJSON = document.toJSON();
+      console.log('document service types:', documentJSON.service.map((s) => s.type));
+      console.log('document', documentJSON);
 
       await module.createDocument(document, didKeypair);
 
@@ -131,7 +135,7 @@ export default function generateDIDModuleTests(
       const service1 = new ServiceEndpoint('LinkedDomains', [
         'ServiceEndpoint#1',
       ]);
-      const service2 = new ServiceEndpoint('LinkedDomains', [
+      const service2 = new ServiceEndpoint('DIDCommMessaging', [
         'ServiceEndpoint#2',
       ]);
 

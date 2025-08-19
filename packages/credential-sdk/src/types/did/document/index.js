@@ -19,7 +19,7 @@ import { VerificationRelationship } from '../onchain/verification-relationship';
 import {
   Service,
   CheqdService,
-  ServiceEndpointId,
+  ServiceEndpoint,
   CheqdTestnetService,
   CheqdMainnetService,
 } from './service-endpoint';
@@ -187,21 +187,15 @@ export class DIDDocument extends withFrom(
     const keysWithRefs = Array.isArray(keys)
       ? keys.map((key) => [[did, ++keyIdx], key])
       : Object.entries(keys);
-    const serviceEndpointsWithRefs = Object.entries(serviceEndpoints).map(
-      ([ref, serviceEndpoint]) => {
-        try {
-          return [ServiceEndpointId.from(ref), serviceEndpoint];
-        } catch {
-          return [ServiceEndpointId.from([did, ref]), serviceEndpoint];
-        }
-      },
-    );
 
     for (const [keyRef, didKey] of keysWithRefs) {
       doc.addKey(keyRef, didKey);
     }
-    for (const [ref, serviceEndpoint] of serviceEndpointsWithRefs) {
-      doc.addServiceEndpoint(ref, serviceEndpoint);
+    if (serviceEndpoints) {
+      for (const [id, serviceEndpoint] of Object.entries(serviceEndpoints)) {
+        const serviceId = `${did}#${id}`;
+        doc.addServiceEndpoint(serviceId, serviceEndpoint);
+      }
     }
 
     return doc;
@@ -450,6 +444,13 @@ export class CheqdDIDDocument extends TypedStruct {
       service,
     } = this;
 
+    // Convert CheqdService objects to Service objects
+    const convertedServices = [...service].map((cheqdService) => {
+      // Create a ServiceEndpoint object from the CheqdService data
+      const serviceEndpoint = new ServiceEndpoint(cheqdService.serviceType, cheqdService.serviceEndpoint);
+      return Service.fromServiceEndpoint(cheqdService.id, serviceEndpoint);
+    });
+
     const assertionMethodOffchainKeys = [...assertionMethod].filter(
       (keyRefOrKey) => keyRefOrKey.id,
     );
@@ -467,7 +468,7 @@ export class CheqdDIDDocument extends TypedStruct {
       alsoKnownAs,
       controller,
       verificationMethodWithOffchainKeys,
-      service,
+      convertedServices,
       authentication,
       assertionMethodOnlyRefs,
       keyAgreement,

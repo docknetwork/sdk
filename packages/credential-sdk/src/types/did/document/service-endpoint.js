@@ -209,8 +209,18 @@ export class CheqdService extends withFrom(
     },
   };
 
+  constructor(id, serviceType, serviceEndpoint) {
+    // Handle string serviceType values by converting them to ServiceEndpointType instances
+    let processedServiceType = serviceType;
+    if (typeof serviceType === 'string') {
+      processedServiceType = ServiceEndpointType.from(serviceType);
+    }
+
+    super(id, processedServiceType, serviceEndpoint);
+  }
+
   static fromServiceEndpoint(id, serviceEndpoint) {
-    return new this(id, serviceEndpoint.type, serviceEndpoint.origins);
+    return new this(id, serviceEndpoint.serviceType, serviceEndpoint.serviceEndpoint);
   }
 
   toJSON() {

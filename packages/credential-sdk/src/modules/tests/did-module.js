@@ -117,10 +117,6 @@ export default function generateDIDModuleTests(
         service2,
       });
 
-      const documentJSON = document.toJSON();
-      console.log('document service types:', documentJSON.service.map((s) => s.type));
-      console.log('document', documentJSON);
-
       await module.createDocument(document, didKeypair);
 
       expect((await module.getDocument(did)).eq(document)).toBe(true);

@@ -45,7 +45,7 @@
     "js-sha256": "^0.11.0",
     "json-canonicalize": "1.0.4",
     "json-stringify-deterministic": "^1.0.12",
-    "jsonld": "^5.0.0",
+    "jsonld": "^6.0.0",
     "jsonld-signatures": "^9.3.1",
     "jsonschema": "1.4.1",
     "key-did-resolver": "^1.4.0",

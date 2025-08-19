@@ -47,9 +47,21 @@ async function addServiceEndpoint() {
   const newEndpoint = new ServiceEndpoint(new LinkedDomains(), [
     'https://foo.example.com',
   ]);
+
+  // Example of using the new DIDCommMessaging service type
+  const didCommEndpoint = new ServiceEndpoint('DIDCommMessaging', [
+    'https://didcomm.example.com',
+  ]);
+
+  console.log('LinkedDomains endpoint type:', newEndpoint.types.constructor.name);
+  console.log('DIDCommMessaging endpoint type:', didCommEndpoint.types.constructor.name);
+  console.log('LinkedDomains endpoint toJSON:', newEndpoint.types.toJSON());
+  console.log('DIDCommMessaging endpoint toJSON:', didCommEndpoint.types.toJSON());
+
   const doc = await didModule.getDocument(cheqdDID);
 
   doc.addServiceEndpoint(`${cheqdDID}#linked-domain`, newEndpoint);
+  doc.addServiceEndpoint(`${cheqdDID}#didcomm`, didCommEndpoint);
 
   return await didModule.updateDocument(doc, [didPair, controllerPair]);
 }

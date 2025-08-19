@@ -1,5 +1,16 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 2.0.0
+
+### Minor Changes
+
+- Support DIDComm service endpoint
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.52.0
+
 ## 1.0.0
 
 ### Minor Changes

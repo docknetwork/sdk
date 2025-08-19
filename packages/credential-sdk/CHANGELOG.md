@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.52.0
+
+### Minor Changes
+
+- Support DIDComm service endpoint
+
 ## 0.51.0
 
 ### Minor Changes

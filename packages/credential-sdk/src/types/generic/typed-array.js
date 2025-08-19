@@ -94,6 +94,10 @@ class TypedArray extends withBase(ArrayWithoutPrototypeMethods) {
       removed: other.filter((item) => this.every((nextItem) => !maybeEq(nextItem, item))),
     };
   }
+
+  toJSON() {
+    return [...this].map((item) => (item.toJSON ? item.toJSON() : item));
+  }
 }
 
 export default withEq(

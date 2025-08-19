@@ -48,19 +48,54 @@ const LinkedDomainsPlaceholder = createPlaceholder((value) => {
   }
 });
 
+const DIDCommMessagingPlaceholder = createPlaceholder((value) => {
+  if (
+    +maybeToNumber(value) === 0b0010
+    || String(value) === 'DIDCommMessaging'
+    || value == null
+  ) {
+    return 0b0010;
+  } else {
+    throw new Error(`Unknown value \`${maybeToJSONString(value)}\``);
+  }
+});
+
 export class ServiceEndpointType extends TypedEnum {
   static fromApi(value) {
-    return new this(value);
+    return this.from(value);
   }
 
   static fromJSON(value) {
-    return new this(value);
+    return this.from(value);
   }
 
   static from(value) {
-    return new this(value);
+    // Convert string values to the appropriate variant
+    if (typeof value === 'string') {
+      switch (value) {
+        case 'LinkedDomains':
+          // eslint-disable-next-line no-use-before-define
+          return new LinkedDomains();
+        case 'DIDCommMessaging':
+          // eslint-disable-next-line no-use-before-define
+          return new DIDCommMessaging();
+        default:
+          throw new Error(`Unknown service type: ${value}`);
+      }
+    }
+
+    // If it's already an instance of a variant, return it
+    // eslint-disable-next-line no-use-before-define
+    if (value instanceof LinkedDomains || value instanceof DIDCommMessaging) {
+      return value;
+    }
+
+    // Otherwise, try to create a LinkedDomains as default
+    // eslint-disable-next-line no-use-before-define
+    return new LinkedDomains();
   }
 }
+
 export class LinkedDomains extends ServiceEndpointType {
   static Type = 'LinkedDomains';
 
@@ -75,7 +110,22 @@ export class LinkedDomains extends ServiceEndpointType {
   }
 }
 
-ServiceEndpointType.bindVariants(LinkedDomains);
+export class DIDCommMessaging extends ServiceEndpointType {
+  static Type = 'DIDCommMessaging';
+
+  static Class = DIDCommMessagingPlaceholder;
+
+  toJSON() {
+    return this.constructor.Type;
+  }
+
+  apply(fn) {
+    return fn(this.constructor.Type);
+  }
+}
+
+// Bind all variants at once to avoid conflicts
+ServiceEndpointType.bindVariants(LinkedDomains, DIDCommMessaging);
 
 export class ServiceEndpointOrigin extends TypedString {}
 
@@ -85,22 +135,53 @@ export class ServiceEndpointOrigins extends TypedArray {
 
 export class ServiceEndpoint extends TypedStruct {
   static Classes = {
-    types: LinkedDomains,
+    types: ServiceEndpointType,
     origins: ServiceEndpointOrigins,
   };
+
+  constructor(type, origins) {
+    // Handle string types by converting them to the appropriate service type
+    let serviceType;
+    if (typeof type === 'string') {
+      switch (type) {
+        case 'LinkedDomains':
+          serviceType = new LinkedDomains();
+          break;
+        case 'DIDCommMessaging':
+          serviceType = new DIDCommMessaging();
+          break;
+        default:
+          throw new Error(`Unknown service type: ${type}`);
+      }
+    } else if (type instanceof LinkedDomains || type instanceof DIDCommMessaging) {
+      serviceType = type;
+    } else {
+      throw new Error(`Invalid service type: ${type}`);
+    }
+
+    super(serviceType, origins);
+  }
 }
 
 export class Service extends TypedStruct {
   static Classes = {
     id: ServiceEndpointId,
-    type: LinkedDomains,
+    type: ServiceEndpointType,
     serviceEndpoint: class ServiceEndpoints extends TypedArray {
       static Class = class ServiceEndpointString extends TypedString {};
     },
   };
 
   static fromServiceEndpoint(id, serviceEndpoint) {
-    return new this(id, serviceEndpoint.type, serviceEndpoint.origins);
+    return new this(id, serviceEndpoint.types, serviceEndpoint.origins);
+  }
+
+  toJSON() {
+    return {
+      id: this.id.toJSON(),
+      type: this.type.toJSON(),
+      serviceEndpoint: this.serviceEndpoint.toJSON(),
+    };
   }
 
   // eslint-disable-next-line no-use-before-define
@@ -122,14 +203,32 @@ export class CheqdService extends withFrom(
 ) {
   static Classes = {
     id: CheqdServiceEndpointId,
-    serviceType: LinkedDomains,
+    serviceType: ServiceEndpointType,
     serviceEndpoint: class ServiceEndpoints extends TypedArray {
       static Class = class ServiceEndpointString extends TypedString {};
     },
   };
 
+  constructor(id, serviceType, serviceEndpoint) {
+    // Handle string serviceType values by converting them to ServiceEndpointType instances
+    let processedServiceType = serviceType;
+    if (typeof serviceType === 'string') {
+      processedServiceType = ServiceEndpointType.from(serviceType);
+    }
+
+    super(id, processedServiceType, serviceEndpoint);
+  }
+
   static fromServiceEndpoint(id, serviceEndpoint) {
-    return new this(id, serviceEndpoint.type, serviceEndpoint.origins);
+    return new this(id, serviceEndpoint.serviceType, serviceEndpoint.serviceEndpoint);
+  }
+
+  toJSON() {
+    return {
+      id: this.id.toJSON(),
+      type: this.serviceType.toJSON(),
+      serviceEndpoint: this.serviceEndpoint.toJSON(),
+    };
   }
 }
 

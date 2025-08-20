@@ -1,5 +1,24 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 4.0.1
+
+### Patch Changes
+
+- Patch TX serialize to JSON
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.1
+
+## 4.0.0
+
+### Minor Changes
+
+- Fix DIDCommMessaging serialization
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.0
+
 ## 3.0.0
 
 ### Minor Changes

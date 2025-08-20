@@ -7,6 +7,38 @@ import { CheqdDIDModuleInternal } from './internal';
 import withCheqd from '../common/with-cheqd';
 import CheqdAttestModule from '../attest/module';
 
+// We must manually fix the DIDCommMessaging service object to be in line with what cheqd expects
+// which is actually incorrect according to the DIDComm spec!
+function fixServiceInTransaction(tx) {
+  const services = tx?.value?.payload?.service;
+  if (services && Array.isArray(services)) {
+    [...services].map((service, idx) => {
+      const endpoints = [...service.serviceEndpoint];
+      if (service.serviceType.toString() === '"DIDCommMessaging"') {
+        const serviceEndpoint = endpoints[0].value;
+        if (serviceEndpoint.accept || serviceEndpoint.recipientKeys || serviceEndpoint.routingKeys || serviceEndpoint.priority) {
+          const uris = endpoints.map((endpoint) => endpoint.value.uri);
+
+          // eslint-disable-next-line no-param-reassign
+          tx.value.payload.service[idx] = {
+            id: service.id,
+            serviceType: 'DIDCommMessaging',
+            serviceEndpoint: uris,
+            recipientKeys: serviceEndpoint.recipientKeys || [],
+            routingKeys: serviceEndpoint.routingKeys || [],
+            accept: serviceEndpoint.accept || [],
+            priority: serviceEndpoint.priority || 0,
+          };
+        }
+      }
+
+      return service;
+    });
+  }
+
+  return tx;
+}
+
 export default class CheqdDIDModule extends withCheqd(AbstractDIDModule) {
   static CheqdOnly = CheqdDIDModuleInternal;
 
@@ -24,7 +56,8 @@ export default class CheqdDIDModule extends withCheqd(AbstractDIDModule) {
       );
     }
 
-    return await this.cheqdOnly.tx.createDidDocument(didDocument, didSigners);
+    const tx = await this.cheqdOnly.tx.createDidDocument(didDocument, didSigners);
+    return fixServiceInTransaction(tx);
   }
 
   async updateDocumentTx(document, didSigners) {
@@ -39,7 +72,8 @@ export default class CheqdDIDModule extends withCheqd(AbstractDIDModule) {
       }
     }
 
-    return await this.cheqdOnly.tx.updateDidDocument(didDocument, didSigners);
+    const tx = await this.cheqdOnly.tx.updateDidDocument(didDocument, didSigners);
+    return fixServiceInTransaction(tx);
   }
 
   async removeDocumentTx(document, didSigners) {

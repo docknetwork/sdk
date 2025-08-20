@@ -1,5 +1,17 @@
 # @docknetwork/credential-sdk
 
+## 0.54.1
+
+### Patch Changes
+
+- Patch TX serialize to JSON
+
+## 0.54.0
+
+### Minor Changes
+
+- Fix DIDCommMessaging serialization
+
 ## 0.53.0
 
 ### Minor Changes

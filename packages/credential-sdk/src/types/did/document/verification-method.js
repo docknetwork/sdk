@@ -263,8 +263,10 @@ export class CheqdVerificationMethod extends withFrom(
   }
 
   toVerificationMethod(VerMethod = VerificationMethod) {
+    // Convert the Cheqd-specific ID to a generic VerificationMethodRef
+    const genericId = VerificationMethodRef.from(this.id.toJSON());
     return new (ensureEqualToOrPrototypeOf(VerificationMethod, VerMethod))(
-      this.id,
+      genericId,
       this.verificationMethodType,
       this.controller,
       this.verificationMaterial,

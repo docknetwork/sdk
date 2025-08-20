@@ -18,10 +18,12 @@ import { DidKey, DidKeys } from '../onchain/did-key';
 import { VerificationRelationship } from '../onchain/verification-relationship';
 import {
   Service,
+  DIDCommService,
   CheqdService,
   createServiceEndpoint,
   CheqdTestnetService,
   CheqdMainnetService,
+  ServiceEndpointId,
 } from './service-endpoint';
 import {
   VerificationMethod,
@@ -92,7 +94,15 @@ class CheqdMainnetVerificationMethods extends TypedArray {
 }
 
 export class Services extends TypedArray {
-  static Class = Service;
+  static Class = class ServiceOrDIDCommService {
+    static from(value) {
+      if (value instanceof Service || value instanceof DIDCommService) {
+        return value;
+      }
+
+      return Service.from(value);
+    }
+  };
 }
 
 class CheqdServices extends TypedArray {
@@ -449,7 +459,9 @@ export class CheqdDIDDocument extends TypedStruct {
       // Create a ServiceEndpoint object from the CheqdService data
       const serviceEndpointArray = cheqdService.serviceEndpoint.toJSON();
       const serviceEndpoint = createServiceEndpoint(cheqdService.serviceType, serviceEndpointArray);
-      return Service.fromServiceEndpoint(cheqdService.id, serviceEndpoint);
+      // Convert the Cheqd-specific ID to a generic ID
+      const genericId = ServiceEndpointId.from(cheqdService.id.toJSON());
+      return Service.fromServiceEndpoint(genericId, serviceEndpoint);
     });
 
     const assertionMethodOffchainKeys = [...assertionMethod].filter(

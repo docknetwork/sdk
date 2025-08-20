@@ -109,7 +109,9 @@ export default function generateDIDModuleTests(
         'ServiceEndpoint',
       ]);
       const service2 = createServiceEndpoint('DIDCommMessaging', [
-        'https://ServiceEndpoint#2',
+        {
+          uri: 'https://example.com/path1',
+        },
       ]);
 
       const document = DIDDocument.create(did, [didKeypair.didKey()], [], {
@@ -136,22 +138,37 @@ export default function generateDIDModuleTests(
           'didcomm/aip2;env=rfc587',
         ],
         routingKeys: ['did:example:somemediator#somekey'],
+        recipientKeys: ['did:example:somerecipient#somekey'],
+        priority: 0,
       };
 
       const didCommService = createServiceEndpoint('DIDCommMessaging', [expectedServiceData]);
-
       const document = DIDDocument.create(did, [didKeypair.didKey()], [], {
         didcomm: didCommService,
       });
 
-      await module.createDocument(document, didKeypair);
+      const createTx = (await module.createDocumentTx(document, didKeypair)).toJSON();
 
-      // Verify the document equality
-      expect((await module.getDocument(did)).eq(document)).toBe(true);
+      expect(JSON.parse(JSON.stringify(createTx.value.payload.service[0]))).toMatchObject({
+        id: `${did.toString()}#didcomm`,
+        serviceType: 'DIDCommMessaging',
+        serviceEndpoint: [
+          expectedServiceData.uri,
+        ],
+        recipientKeys: expectedServiceData.recipientKeys,
+        routingKeys: expectedServiceData.routingKeys,
+        accept: expectedServiceData.accept,
+        priority: expectedServiceData.priority,
+      });
+
+      await module.createDocument(document, didKeypair);
 
       // Verify the DIDComm service data structure is preserved
       const retrievedDocument = await module.getDocument(did);
       const retrievedJSON = retrievedDocument.toJSON();
+
+      // Verify the document equality
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
 
       // Find the DIDComm service in the retrieved document
       const didCommServiceInRetrieved = retrievedJSON.service.find((service) => service.type === 'DIDCommMessaging');
@@ -165,6 +182,8 @@ export default function generateDIDModuleTests(
       expect(retrievedServiceEndpoint.uri).toBe(expectedServiceData.uri);
       expect(retrievedServiceEndpoint.accept).toEqual(expectedServiceData.accept);
       expect(retrievedServiceEndpoint.routingKeys).toEqual(expectedServiceData.routingKeys);
+      expect(retrievedServiceEndpoint.recipientKeys).toEqual(expectedServiceData.recipientKeys);
+      expect(retrievedServiceEndpoint.priority).toEqual(expectedServiceData.priority);
 
       // Also verify the entire object matches
       expect(retrievedServiceEndpoint).toEqual(expectedServiceData);
@@ -180,7 +199,11 @@ export default function generateDIDModuleTests(
         'ServiceEndpoint',
       ]);
       const service2 = createServiceEndpoint('DIDCommMessaging', [
-        'ServiceEndpoint#2',
+        {
+          uri: 'https://example.com/path',
+          accept: [],
+          routingKeys: [],
+        },
       ]);
 
       const document = DIDDocument.create(did, [didKeypair.didKey()]);

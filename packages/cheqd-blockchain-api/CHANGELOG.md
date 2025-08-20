@@ -1,5 +1,13 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 4.0.3
+
+### Patch Changes
+
+- Fix serialization equality
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.3
+
 ## 4.0.2
 
 ### Patch Changes

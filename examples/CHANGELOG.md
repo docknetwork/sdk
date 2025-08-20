@@ -1,5 +1,15 @@
 # @docknetwork/sdk-examples
 
+## 0.21.3
+
+### Patch Changes
+
+- Fix serialization equality
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@4.0.3
+  - @docknetwork/cheqd-blockchain-api@4.0.3
+  - @docknetwork/credential-sdk@0.54.3
+
 ## 0.21.2
 
 ### Patch Changes

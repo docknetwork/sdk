@@ -50,7 +50,9 @@ async function addServiceEndpoint() {
 
   // Example of using the new DIDCommMessaging service type
   const didCommEndpoint = new ServiceEndpoint('DIDCommMessaging', [
-    'https://didcomm.example.com',
+    {
+      uri: 'https://example.com/path1',
+    },
   ]);
 
   console.log('LinkedDomains endpoint type:', newEndpoint.types.constructor.name);

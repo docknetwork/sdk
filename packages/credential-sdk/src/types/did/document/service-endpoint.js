@@ -364,26 +364,29 @@ export class Service extends TypedStruct {
   }
 }
 
-// Specialized Service class for DIDComm services
+export class DIDCommServiceEndpointValue {
+  constructor(value) {
+    this.value = value;
+  }
+
+  toJSON() {
+    return this.value;
+  }
+
+  static from(value) {
+    return new this(value);
+  }
+}
+
+export class DIDCommServiceEndpointsArray extends TypedArray {
+  static Class = DIDCommServiceEndpointValue;
+}
+
 export class DIDCommService extends TypedStruct {
   static Classes = {
     id: ServiceEndpointId,
     type: ServiceEndpointType,
-    serviceEndpoint: class DIDCommServiceEndpointsArray extends TypedArray {
-      static Class = class DIDCommServiceEndpointValue {
-        constructor(value) {
-          this.value = value;
-        }
-
-        toJSON() {
-          return this.value;
-        }
-
-        static from(value) {
-          return new this(value);
-        }
-      };
-    },
+    serviceEndpoint: DIDCommServiceEndpointsArray,
   };
 
   constructor(id, type, serviceEndpoint) {
@@ -513,6 +516,25 @@ export class DIDCommService extends TypedStruct {
   }
 }
 
+export class ServiceEndpointValue {
+  constructor(value) {
+    // Store the value directly without any conversion
+    this.value = value;
+  }
+
+  toJSON() {
+    return this.value;
+  }
+
+  static from(value) {
+    return new this(value);
+  }
+}
+
+export class ServiceEndpointsType extends TypedArray {
+  static Class = ServiceEndpointValue;
+}
+
 export class CheqdService extends withFrom(
   TypedStruct,
   function from(value, fromFn) {
@@ -550,22 +572,7 @@ export class CheqdService extends withFrom(
   static Classes = {
     id: CheqdServiceEndpointId,
     serviceType: ServiceEndpointType,
-    serviceEndpoint: class ServiceEndpoints extends TypedArray {
-      static Class = class ServiceEndpointValue {
-        constructor(value) {
-          // Store the value directly without any conversion
-          this.value = value;
-        }
-
-        toJSON() {
-          return this.value;
-        }
-
-        static from(value) {
-          return new this(value);
-        }
-      };
-    },
+    serviceEndpoint: ServiceEndpointsType,
   };
 
   constructor(id, serviceType, serviceEndpoint) {

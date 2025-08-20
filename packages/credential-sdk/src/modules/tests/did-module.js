@@ -132,7 +132,7 @@ export default function generateDIDModuleTests(
 
       // Test DIDComm service with full object structure
       const expectedServiceData = {
-        uri: 'https://example.com/path',
+        uri: 'https://example.com/path3',
         accept: [
           'didcomm/v2',
           'didcomm/aip2;env=rfc587',
@@ -187,6 +187,36 @@ export default function generateDIDModuleTests(
 
       // Also verify the entire object matches
       expect(retrievedServiceEndpoint).toEqual(expectedServiceData);
+    });
+
+    test('Serialize and deserialize `DIDDocument` gives same result', async () => {
+      const did = Did.random();
+
+      const keyPair = Ed25519Keypair.random();
+      const didKeypair = new DidKeypair([did, 1], keyPair);
+
+      const service1 = createServiceEndpoint('LinkedDomains', [
+        'ServiceEndpoint',
+      ]);
+      const service2 = createServiceEndpoint('DIDCommMessaging', [
+        {
+          uri: 'https://example.com/path',
+          accept: [],
+          routingKeys: [],
+        },
+      ]);
+
+      const document = DIDDocument.create(did, [didKeypair.didKey()]);
+      document.addServiceEndpoint([did, 'service1'], service1);
+      document.addServiceEndpoint([did, 'service2'], service2);
+
+      const documentJSON = document.toJSON();
+
+      const restoredDocument = DIDDocument.from(documentJSON);
+      const restoredJSON = restoredDocument.toJSON();
+
+      expect(restoredJSON).toMatchObject(documentJSON);
+      expect(restoredDocument.eq(document)).toBe(true);
     });
 
     test('Updates `DIDDocument` containing services', async () => {

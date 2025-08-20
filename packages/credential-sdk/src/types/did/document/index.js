@@ -100,6 +100,11 @@ export class Services extends TypedArray {
         return value;
       }
 
+      if (value.type === 'DIDCommMessaging') {
+        const se = createServiceEndpoint(value.type, value.serviceEndpoint);
+        return Service.fromServiceEndpoint(value.id, se);
+      }
+
       return Service.from(value);
     }
   };
@@ -203,8 +208,7 @@ export class DIDDocument extends withFrom(
     }
     if (serviceEndpoints) {
       for (const [id, serviceEndpoint] of Object.entries(serviceEndpoints)) {
-        const serviceId = `${did}#${id}`;
-        doc.addServiceEndpoint(serviceId, serviceEndpoint);
+        doc.addServiceEndpoint([did, id], serviceEndpoint);
       }
     }
 

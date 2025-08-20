@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CHEQD_MNEMONIC: "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse"
-      CHEQD_IMAGE_TAG: 3.1.5
+      CHEQD_IMAGE_TAG: production-latest
       CHEQD_NETWORK: "testnet"
     steps:
       - uses: actions/checkout@v2
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CHEQD_MNEMONIC: "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse"
-      CHEQD_IMAGE_TAG: 3.1.5
+      CHEQD_IMAGE_TAG: production-latest
       CHEQD_NETWORK: "mainnet"
     steps:
       - uses: actions/checkout@v2

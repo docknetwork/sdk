@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.2
+
+### Patch Changes
+
+- Fix equality checks
+
 ## 0.54.1
 
 ### Patch Changes

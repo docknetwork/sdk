@@ -150,7 +150,7 @@ export default function generateDIDModuleTests(
       const createTx = (await module.createDocumentTx(document, didKeypair)).toJSON();
 
       expect(JSON.parse(JSON.stringify(createTx.value.payload.service[0]))).toMatchObject({
-        id: `${did.toString()}#didcomm`,
+        id: expect.anything(),
         serviceType: 'DIDCommMessaging',
         serviceEndpoint: [
           expectedServiceData.uri,

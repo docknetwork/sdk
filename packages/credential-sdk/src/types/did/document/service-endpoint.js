@@ -369,6 +369,18 @@ export class DIDCommServiceEndpointValue {
     this.value = value;
   }
 
+  eq(other) {
+    const thisJSON = JSON.stringify({
+      ...this.toJSON(),
+      id: undefined,
+    });
+    const otherJSON = JSON.stringify({
+      ...other.toJSON(),
+      id: undefined,
+    });
+    return thisJSON === otherJSON;
+  }
+
   toJSON() {
     return this.value;
   }
@@ -413,21 +425,6 @@ export class DIDCommService extends TypedStruct {
     });
 
     return new this(id, serviceEndpoint.types, convertedEndpoints);
-  }
-
-  // eslint-disable-next-line no-use-before-define
-  eq(other) {
-    // First check if the JSON representations are equal
-    const thisJSON = JSON.stringify(this.toJSON());
-    const otherJSON = JSON.stringify(other.toJSON());
-    const jsonEqual = thisJSON === otherJSON;
-
-    if (!jsonEqual) {
-      return false;
-    }
-
-    // If JSON is equal, return true (don't call parent eq method)
-    return true;
   }
 
   toCheqd(Class = CheqdService) {

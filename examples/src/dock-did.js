@@ -4,7 +4,7 @@ import {
   DidKey,
   VerificationRelationship,
   LinkedDomains,
-  ServiceEndpoint,
+  createServiceEndpoint,
 } from '@docknetwork/credential-sdk/types';
 import { CheqdAPI } from '@docknetwork/cheqd-blockchain-api';
 import { CheqdDIDModule } from '@docknetwork/cheqd-blockchain-modules';
@@ -44,13 +44,20 @@ async function removeDID() {
 async function addServiceEndpoint() {
   console.log('Add new service endpoint now.');
 
-  const newEndpoint = new ServiceEndpoint(new LinkedDomains(), [
+  const newEndpoint = createServiceEndpoint(new LinkedDomains(), [
     'https://foo.example.com',
   ]);
 
   // Example of using the new DIDCommMessaging service type
-  const didCommEndpoint = new ServiceEndpoint('DIDCommMessaging', [
-    'https://didcomm.example.com',
+  const didCommEndpoint = createServiceEndpoint('DIDCommMessaging', [
+    {
+      uri: 'https://example.com/path1',
+      accept: [
+        'didcomm/v2',
+        'didcomm/aip2;env=rfc587',
+      ],
+      routingKeys: [],
+    },
   ]);
 
   console.log('LinkedDomains endpoint type:', newEndpoint.types.constructor.name);

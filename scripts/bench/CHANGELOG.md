@@ -1,5 +1,68 @@
 # @docknetwork/benchmarks
 
+## 0.4.3
+
+### Patch Changes
+
+- Fix serialization equality
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@4.0.3
+  - @docknetwork/cheqd-blockchain-api@4.0.3
+  - @docknetwork/credential-sdk@0.54.3
+
+## 0.4.2
+
+### Patch Changes
+
+- Fix equality checks
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@4.0.2
+  - @docknetwork/cheqd-blockchain-api@4.0.2
+  - @docknetwork/credential-sdk@0.54.2
+
+## 0.4.1
+
+### Patch Changes
+
+- Patch TX serialize to JSON
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@4.0.1
+  - @docknetwork/cheqd-blockchain-api@4.0.1
+  - @docknetwork/credential-sdk@0.54.1
+
+## 0.4.0
+
+### Minor Changes
+
+- Fix DIDCommMessaging serialization
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@4.0.0
+  - @docknetwork/cheqd-blockchain-api@4.0.0
+  - @docknetwork/credential-sdk@0.54.0
+
+## 0.3.0
+
+### Minor Changes
+
+- Fix didcomm service endpoint type for latest cheqd SDK
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@3.0.0
+  - @docknetwork/cheqd-blockchain-api@3.0.0
+  - @docknetwork/credential-sdk@0.53.0
+
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-api@2.1.0
+
 ## 0.2.1
 
 ### Patch Changes

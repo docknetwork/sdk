@@ -390,8 +390,6 @@ export class CheqdAPI extends AbstractApiProvider {
         const res = await this.sdk.signer.broadcastTx(signedTx);
 
         if (res.code) {
-          console.error(res);
-
           throw new Error(
             JSON.stringify(res, (_, value) => (typeof value === 'bigint' ? `${value.toString()}n` : value)),
           );

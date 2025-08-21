@@ -23,6 +23,13 @@ import IdentRef from './ident-ref';
 import { isBytes } from '../../../utils/types/bytes';
 import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from '../onchain';
 
+function ensureIsURI(str) {
+  const uriRegex = /^[a-zA-Z][a-zA-Z0-9+.-]*:[^\s]*$/;
+  if (!uriRegex.test(str)) {
+    throw new Error(`Invalid URI: ${str}`);
+  }
+}
+
 export class ServiceEndpointId extends IdentRef {}
 
 export class CheqdServiceEndpointId extends IdentRef {
@@ -169,6 +176,7 @@ export class DIDCommServiceEndpoint extends TypedStruct {
 
   static from(value) {
     if (typeof value === 'string') {
+      ensureIsURI(value);
       return new DIDCommServiceEndpoint(value, [], []);
     } else if (value && typeof value === 'object') {
       const uri = value.uri || '';
@@ -176,6 +184,7 @@ export class DIDCommServiceEndpoint extends TypedStruct {
       const routingKeys = Array.isArray(value.routingKeys) ? value.routingKeys : [];
       const recipientKeys = Array.isArray(value.recipientKeys) ? value.recipientKeys : [];
       const priority = value.priority !== undefined ? value.priority : 0;
+      ensureIsURI(uri);
       return new DIDCommServiceEndpoint(uri, accept, routingKeys, recipientKeys, priority);
     } else {
       throw new Error(`Invalid DIDComm service endpoint: ${value}`);
@@ -337,6 +346,7 @@ export class Service extends TypedStruct {
             }
           } catch {
             // If parsing fails, return as-is
+            ensureIsURI(endpoint);
           }
           return endpoint;
         } else if (endpoint && typeof endpoint === 'object') {
@@ -449,6 +459,7 @@ export class DIDCommService extends TypedStruct {
             }
           } catch {
             // If parsing fails, return as-is
+            ensureIsURI(endpoint);
           }
           return endpoint;
         } else if (endpoint && typeof endpoint === 'object') {
@@ -484,7 +495,8 @@ export class DIDCommService extends TypedStruct {
                 };
               }
             } catch {
-            // If parsing fails, return as-is
+              // If parsing fails, return as-is
+              ensureIsURI(endpoint);
             }
             return endpoint;
           } else if (endpoint && typeof endpoint === 'object') {

@@ -53,7 +53,7 @@ import {
 } from '@docknetwork/credential-sdk/types';
 import { TypedEnum } from '@docknetwork/credential-sdk/types/generic';
 import pLimit from 'p-limit';
-import { buildTypeUrlObject, fullTypeUrl } from './type-url';
+import { buildTypeUrlObject, fullTypeUrl, fullTypeUrls } from './type-url';
 
 export class CheqdAPI extends AbstractApiProvider {
   #sdk;
@@ -264,6 +264,26 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   /**
+   * Calculate fee for the provided transaction(s).
+   *
+   * @param {object|Array<object>} txOrTxs
+   * @returns {BigInt}
+   */
+  calculateFee(txOrTxs) {
+    const { Fees } = this.constructor;
+
+    const amount = fullTypeUrls(txOrTxs).reduce(
+      (total, typeUrl) => total + BigInt(Fees[typeUrl].amount),
+      0n,
+    );
+
+    return {
+      amount: String(amount),
+      denom: 'ncheq',
+    };
+  }
+
+  /**
    * Converts payload of the supplied method to bytes.
    *
    * @param {string} method
@@ -358,7 +378,7 @@ export class CheqdAPI extends AbstractApiProvider {
     const txJSON = this.constructor.txToJSON(tx);
 
     const paymentObj = payment || {
-      amount: fee ?? 'auto',
+      amount: [].concat(fee ?? this.calculateFee(tx)),
       gas: gas ?? (await this.estimateGas(tx, sender)),
       payer: sender,
     };

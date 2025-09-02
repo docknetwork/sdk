@@ -1,5 +1,64 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 4.0.3
+
+### Patch Changes
+
+- Fix serialization equality
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.3
+
+## 4.0.2
+
+### Patch Changes
+
+- Fix equality checks
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.2
+
+## 4.0.1
+
+### Patch Changes
+
+- Patch TX serialize to JSON
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.1
+
+## 4.0.0
+
+### Minor Changes
+
+- Fix DIDCommMessaging serialization
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.0
+
+## 3.0.0
+
+### Minor Changes
+
+- Fix didcomm service endpoint type for latest cheqd SDK
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.53.0
+
+## 2.1.0
+
+### Minor Changes
+
+- Upgrade Cheqd SDK
+
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.52.0
+
 ## 1.0.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/credential-sdk",
-  "version": "0.51.0",
+  "version": "0.54.3",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -23,6 +23,11 @@
       "default": "./dist/esm/*"
     }
   },
+  "resolutions": {
+    "@digitalbazaar/http-client": "^3.4.1",
+    "jsonld/@digitalbazaar/http-client": "^3.4.1",
+    "@transmute/jsonld/jsonld/@digitalbazaar/http-client": "^3.4.1"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/docknetwork/sdk"
@@ -31,7 +36,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@digitalcredentials/vc-status-list": "^8.0.0",
+    "@digitalcredentials/vc-status-list": "^9.0.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0",
     "@juanelas/base64": "^1.1.5",
     "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.26.0",
@@ -45,7 +50,7 @@
     "js-sha256": "^0.11.0",
     "json-canonicalize": "1.0.4",
     "json-stringify-deterministic": "^1.0.12",
-    "jsonld": "^5.0.0",
+    "jsonld": "^6.0.0",
     "jsonld-signatures": "^9.3.1",
     "jsonschema": "1.4.1",
     "key-did-resolver": "^1.4.0",

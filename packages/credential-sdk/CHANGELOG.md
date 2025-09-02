@@ -1,5 +1,41 @@
 # @docknetwork/credential-sdk
 
+## 0.54.3
+
+### Patch Changes
+
+- Fix serialization equality
+
+## 0.54.2
+
+### Patch Changes
+
+- Fix equality checks
+
+## 0.54.1
+
+### Patch Changes
+
+- Patch TX serialize to JSON
+
+## 0.54.0
+
+### Minor Changes
+
+- Fix DIDCommMessaging serialization
+
+## 0.53.0
+
+### Minor Changes
+
+- Fix didcomm service endpoint type for latest cheqd SDK
+
+## 0.52.0
+
+### Minor Changes
+
+- Support DIDComm service endpoint
+
 ## 0.51.0
 
 ### Minor Changes

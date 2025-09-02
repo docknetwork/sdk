@@ -18,10 +18,12 @@ import { DidKey, DidKeys } from '../onchain/did-key';
 import { VerificationRelationship } from '../onchain/verification-relationship';
 import {
   Service,
+  DIDCommService,
   CheqdService,
-  ServiceEndpointId,
+  createServiceEndpoint,
   CheqdTestnetService,
   CheqdMainnetService,
+  ServiceEndpointId,
 } from './service-endpoint';
 import {
   VerificationMethod,
@@ -92,7 +94,20 @@ class CheqdMainnetVerificationMethods extends TypedArray {
 }
 
 export class Services extends TypedArray {
-  static Class = Service;
+  static Class = class ServiceOrDIDCommService {
+    static from(value) {
+      if (value instanceof Service || value instanceof DIDCommService) {
+        return value;
+      }
+
+      if (value.type === 'DIDCommMessaging') {
+        const se = createServiceEndpoint(value.type, value.serviceEndpoint);
+        return Service.fromServiceEndpoint(value.id, se);
+      }
+
+      return Service.from(value);
+    }
+  };
 }
 
 class CheqdServices extends TypedArray {
@@ -187,21 +202,14 @@ export class DIDDocument extends withFrom(
     const keysWithRefs = Array.isArray(keys)
       ? keys.map((key) => [[did, ++keyIdx], key])
       : Object.entries(keys);
-    const serviceEndpointsWithRefs = Object.entries(serviceEndpoints).map(
-      ([ref, serviceEndpoint]) => {
-        try {
-          return [ServiceEndpointId.from(ref), serviceEndpoint];
-        } catch {
-          return [ServiceEndpointId.from([did, ref]), serviceEndpoint];
-        }
-      },
-    );
 
     for (const [keyRef, didKey] of keysWithRefs) {
       doc.addKey(keyRef, didKey);
     }
-    for (const [ref, serviceEndpoint] of serviceEndpointsWithRefs) {
-      doc.addServiceEndpoint(ref, serviceEndpoint);
+    if (serviceEndpoints) {
+      for (const [id, serviceEndpoint] of Object.entries(serviceEndpoints)) {
+        doc.addServiceEndpoint([did, id], serviceEndpoint);
+      }
     }
 
     return doc;
@@ -450,6 +458,16 @@ export class CheqdDIDDocument extends TypedStruct {
       service,
     } = this;
 
+    // Convert CheqdService objects to Service objects
+    const convertedServices = [...service].map((cheqdService) => {
+      // Create a ServiceEndpoint object from the CheqdService data
+      const serviceEndpointArray = cheqdService.serviceEndpoint.toJSON();
+      const serviceEndpoint = createServiceEndpoint(cheqdService.serviceType, serviceEndpointArray);
+      // Convert the Cheqd-specific ID to a generic ID
+      const genericId = ServiceEndpointId.from(cheqdService.id.toJSON());
+      return Service.fromServiceEndpoint(genericId, serviceEndpoint);
+    });
+
     const assertionMethodOffchainKeys = [...assertionMethod].filter(
       (keyRefOrKey) => keyRefOrKey.id,
     );
@@ -467,7 +485,7 @@ export class CheqdDIDDocument extends TypedStruct {
       alsoKnownAs,
       controller,
       verificationMethodWithOffchainKeys,
-      service,
+      convertedServices,
       authentication,
       assertionMethodOnlyRefs,
       keyAgreement,

@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.4
+
+### Patch Changes
+
+- Use latest cheqd image tag and gas estimation
+
 ## 0.54.3
 
 ### Patch Changes

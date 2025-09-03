@@ -1,5 +1,13 @@
 # @docknetwork/cheqd-blockchain-modules
 
+## 4.0.4
+
+### Patch Changes
+
+- Use latest cheqd image tag and gas estimation
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.4
+
 ## 4.0.3
 
 ### Patch Changes

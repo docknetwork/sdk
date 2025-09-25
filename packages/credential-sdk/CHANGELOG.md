@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.5
+
+### Patch Changes
+
+- Support various DID key identifiers
+
 ## 0.54.4
 
 ### Patch Changes

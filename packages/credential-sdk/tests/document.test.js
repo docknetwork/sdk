@@ -25,6 +25,38 @@ import { hexToU8a, maybeToCheqdPayloadOrJSON } from "../src/utils";
 import { verMethodRefsEqual } from "../src/vc";
 import { CheqdTestnetVerificationMethodRef } from "../src/types/did/document/verification-method-ref";
 
+const CHEQD_TESTNET_DOC = {
+  context: [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/ed25519-2020/v1"
+  ],
+  id: "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50",
+  controller: [
+    "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50"
+  ],
+  verificationMethod: [
+    {
+      id: "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50#key-1",
+      verificationMethodType: "Ed25519VerificationKey2020",
+      verificationMaterial: "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
+      controller: "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50"
+    }
+  ],
+  authentication: [
+    "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50#key-1"
+  ],
+  service: [
+    {
+      id: "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50#organization-1",
+      type: "LinkedOrganization",
+      serviceEndpoint: [
+        "ChatGpt-45311",
+        "https://chatgpt.com"
+      ]
+    }
+  ]
+};
+
 const LEGACY_TESTNET_DOC = {
   context: ["https://www.w3.org/ns/did/v1"],
   id: "did:cheqd:testnet:ed3a581d-b968-423e-afd1-64239a086165",
@@ -328,6 +360,11 @@ describe("DID document workflow", () => {
     ).toCheqd(void 0, "47b4d97b-1ebe-4d81-a3ed-12eb63baaeb9");
 
     checkDocs(doc1, doc2, doc3);
+  });
+
+  test(`\`CheqdTestnetDIDDocument 3rd party\``, () => {
+    const thirdPartyDocument = CheqdTestnetDIDDocument.from(CHEQD_TESTNET_DOC);
+    expect(thirdPartyDocument.toJSON()).toMatchObject(CHEQD_TESTNET_DOC);
   });
 
   test(`\`CheqdTestnetDIDDocument\``, () => {

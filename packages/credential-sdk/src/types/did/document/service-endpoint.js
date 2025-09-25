@@ -49,6 +49,18 @@ export class SuffixServiceEndpointId extends withFrom(
   (value, from) => from(isBytes(value) ? value : ServiceEndpointId.from(value)[1]),
 ) {}
 
+const UnknownServicePlaceholder = createPlaceholder((value) => {
+  if (
+    +maybeToNumber(value) === 0b1000
+    || (String(value) !== 'LinkedDomains' && String(value) !== 'DIDCommMessaging')
+    || value == null
+  ) {
+    return 0b1000;
+  } else {
+    throw new Error(`Unknown value \`${maybeToJSONString(value)}\``);
+  }
+});
+
 const LinkedDomainsPlaceholder = createPlaceholder((value) => {
   if (
     +maybeToNumber(value) === 0b0001
@@ -93,19 +105,39 @@ export class ServiceEndpointType extends TypedEnum {
           // eslint-disable-next-line no-use-before-define
           return new DIDCommMessaging();
         default:
-          throw new Error(`Unknown service type: ${value}`);
+          // eslint-disable-next-line no-use-before-define
+          return new UnknownServiceEndpoint(value);
       }
     }
 
     // If it's already an instance of a variant, return it
     // eslint-disable-next-line no-use-before-define
-    if (value instanceof LinkedDomains || value instanceof DIDCommMessaging) {
+    if (value instanceof LinkedDomains || value instanceof DIDCommMessaging || value instanceof UnknownServiceEndpoint) {
       return value;
     }
 
     // Otherwise, try to create a LinkedDomains as default
     // eslint-disable-next-line no-use-before-define
     return new LinkedDomains();
+  }
+}
+
+export class UnknownServiceEndpoint extends ServiceEndpointType {
+  static Type = 'ServiceEndpoint';
+
+  static Class = UnknownServicePlaceholder;
+
+  constructor(knownType) {
+    super();
+    this.knownType = knownType;
+  }
+
+  toJSON() {
+    return this.knownType;
+  }
+
+  apply(fn) {
+    return fn(this.knownType);
   }
 }
 
@@ -137,7 +169,7 @@ export class DIDCommMessaging extends ServiceEndpointType {
   }
 }
 
-ServiceEndpointType.bindVariants(LinkedDomains, DIDCommMessaging);
+ServiceEndpointType.bindVariants(LinkedDomains, DIDCommMessaging, UnknownServiceEndpoint);
 
 export class ServiceEndpointOrigin extends TypedString {}
 
@@ -215,9 +247,9 @@ function createServiceType(type) {
       case 'DIDCommMessaging':
         return new DIDCommMessaging();
       default:
-        throw new Error(`Unknown service type: ${type}`);
+        return new UnknownServiceEndpoint(type);
     }
-  } else if (type instanceof LinkedDomains || type instanceof DIDCommMessaging) {
+  } else if (type instanceof LinkedDomains || type instanceof DIDCommMessaging || type instanceof UnknownServiceEndpoint) {
     return type;
   } else {
     throw new Error(`Invalid service type: ${type}`);
@@ -248,6 +280,10 @@ export function createServiceEndpoint(type, origins) {
   const serviceType = createServiceType(type);
 
   if (serviceType instanceof LinkedDomains) {
+    return new ServiceEndpoint(serviceType, origins);
+  }
+
+  if (serviceType instanceof UnknownServiceEndpoint) {
     return new ServiceEndpoint(serviceType, origins);
   }
 
@@ -573,6 +609,14 @@ export class CheqdService extends withFrom(
       };
 
       return fromFn(reconstructedValue);
+    }
+
+    if (value && typeof value === 'object' && !value.serviceType && value.type) {
+      return fromFn({
+        id: value.id,
+        serviceType: value.type,
+        serviceEndpoint: value.serviceEndpoint,
+      });
     }
 
     return fromFn(value);

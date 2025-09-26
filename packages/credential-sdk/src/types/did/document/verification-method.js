@@ -65,7 +65,7 @@ import {
   u8aToString,
   normalizeToU8a,
 } from '../../../utils';
-import { decodeFromMultibase } from '../../../utils/encoding/multibase';
+import { isMultibaseBytes } from '../../../utils/encoding/multibase';
 
 export class PublicKeyBase58 extends withBase58(TypedBytes) {}
 
@@ -190,7 +190,11 @@ export class VerificationMethod extends withFrom(
       );
     }
 
-    return (fullRepresentation || bytes.length === 32) ? bytes : bytes.slice(bytes.length - 32);
+    if (this.publicKeyMultibase) {
+      return (fullRepresentation || bytes.length === 32) ? bytes : bytes.slice(bytes.length - 32);
+    }
+
+    return bytes;
   }
 
   publicKeyClass() {
@@ -228,14 +232,15 @@ export class VerificationMethod extends withFrom(
     const ref = VerificationMethodRef.from(keyRef);
 
     const pkBytes = valueBytes(didKey.publicKey);
+    const isMultibaseKey = isMultibaseBytes(pkBytes);
 
     return new this(
       ref,
       didKey.publicKey.constructor.VerKeyType,
       ref[0],
-      pkBytes.length === 32 ? pkBytes : void 0,
+      !isMultibaseKey ? pkBytes : void 0,
       void 0,
-      pkBytes.length !== 32 ? pkBytes : void 0,
+      isMultibaseKey ? pkBytes : void 0,
       void 0,
       void 0,
       didKey.isOffchain() ? didKey.publicKey.value : null,
@@ -292,13 +297,14 @@ export class CheqdVerificationMethod extends withFrom(
   toVerificationMethod(VerMethod = VerificationMethod) {
     // Convert the Cheqd-specific ID to a generic VerificationMethodRef
     const genericId = VerificationMethodRef.from(this.id.toJSON());
+    const isMultibaseKey = isMultibaseBytes(this.verificationMaterial);
     return new (ensureEqualToOrPrototypeOf(VerificationMethod, VerMethod))(
       genericId,
       this.verificationMethodType,
       this.controller,
-      this.verificationMaterial.length === 32 ? this.verificationMaterial : void 0,
+      !isMultibaseKey ? this.verificationMaterial : void 0,
       void 0,
-      this.verificationMaterial.length !== 32 ? this.verificationMaterial : void 0,
+      isMultibaseKey ? this.verificationMaterial : void 0,
       void 0,
       void 0,
       this.metadata,

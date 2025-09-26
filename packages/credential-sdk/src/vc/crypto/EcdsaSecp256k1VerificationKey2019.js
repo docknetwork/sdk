@@ -3,6 +3,7 @@ import * as base64 from '@juanelas/base64';
 import { u8aToU8a } from '../../utils/types/bytes';
 import { EcdsaSecp256k1VerKeyName } from './constants';
 import Secp256k1Keypair from '../../keypairs/keypair-secp256k1';
+import { decodeFromMultibase } from '../../utils/encoding/multibase';
 
 export default class EcdsaSecp256k1VerificationKey2019 {
   constructor(publicKey) {
@@ -30,6 +31,16 @@ export default class EcdsaSecp256k1VerificationKey2019 {
 
     if (verificationMethod.publicKeyBase64) {
       return new this(base64.decode(verificationMethod.publicKeyBase64));
+    }
+
+    const multiBase = verificationMethod.publicKeyMultibase || (
+      typeof verificationMethod['sec:publicKeyMultibase'] === 'object' ?
+        verificationMethod['sec:publicKeyMultibase']['@value'] :
+        verificationMethod['sec:publicKeyMultibase']
+    );
+
+    if (multiBase) {
+      return new this(decodeFromMultibase(multiBase).slice(2));
     }
 
     throw new Error(

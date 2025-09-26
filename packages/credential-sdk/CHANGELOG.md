@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.6
+
+### Patch Changes
+
+- Better DID document handling
+
 ## 0.54.5
 
 ### Patch Changes

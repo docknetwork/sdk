@@ -1253,10 +1253,10 @@
     human-id "^4.1.1"
     prettier "^2.7.1"
 
-"@cheqd/sdk@5.3.2":
-  version "5.3.2"
-  resolved "https://registry.yarnpkg.com/@cheqd/sdk/-/sdk-5.3.2.tgz#5aa8be0135458615a171288b6a04b855c9dea025"
-  integrity sha512-JRvhj8BZllMWtQEZCO1YKs1/QhVufvZyTNmfwNLiPvNWhjwkCookxU6E8xn9Vs/tCeMgNxlfrJTkPWcdE2DlMA==
+"@cheqd/sdk@5.3.3":
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/@cheqd/sdk/-/sdk-5.3.3.tgz#a87a0677dda4b0a010df681c34b50c5818259e3f"
+  integrity sha512-KWJAzi2vDekLUHwd7jnNsaaYfcjl0yTSmcMeBrZT3QRUJASfKL0hajvuUYD0Ndyzie2QQO+c9q1OzZlJR5Hj/Q==
   dependencies:
     "@cheqd/ts-proto" "^4.1.1"
     "@cheqd/ts-proto-cjs" "npm:@cheqd/ts-proto@~2.5.0"
@@ -1309,7 +1309,7 @@
     long "^5.2.3"
     protobufjs "^7.4.0"
 
-"@cheqd/ts-proto@^4.1.0", "@cheqd/ts-proto@^4.1.1":
+"@cheqd/ts-proto@^4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@cheqd/ts-proto/-/ts-proto-4.1.1.tgz#6970d3a545e6dc14202d71969f04d68caebb94c8"
   integrity sha512-iaz1sSlyTVT6u82vbIDuTk3ytiN31CQEc62xWfKeH/XaJE8RZQXYsjbtk5sIoXKJ63pb65XoHLY7JVOsqmRhFA==
@@ -11121,7 +11121,7 @@ jsonld@5.2.0, jsonld@^5.0.0:
   resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-5.2.0.tgz#d1e8af38a334cb95edf0f2ae4e2b58baf8d2b5a9"
   integrity sha512-JymgT6Xzk5CHEmHuEyvoTNviEPxv6ihLWSPu1gFdtjSAyM6cFqNrv02yS/SIur3BBIkCf0HjizRc24d8/FfQKw==
   dependencies:
-    "@digitalbazaar/http-client" "^3.2.0"
+    "@digitalbazaar/http-client" "^1.1.0"
     canonicalize "^1.0.1"
     lru-cache "^6.0.0"
     rdf-canonize "^3.0.0"

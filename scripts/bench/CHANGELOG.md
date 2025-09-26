@@ -1,5 +1,15 @@
 # @docknetwork/benchmarks
 
+## 0.4.6
+
+### Patch Changes
+
+- Better DID document handling
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@4.0.5
+  - @docknetwork/cheqd-blockchain-api@4.0.5
+  - @docknetwork/credential-sdk@0.54.6
+
 ## 0.4.5
 
 ### Patch Changes

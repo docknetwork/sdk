@@ -8,6 +8,7 @@ import {
   withProp,
   TypedNumber,
   withBase58btc,
+  withMultibase,
   withProps,
 } from '../../generic';
 import {
@@ -62,11 +63,31 @@ import {
   maybeToCheqdPayloadOrJSON,
   encodeAsBase58,
   u8aToString,
+  normalizeToU8a,
 } from '../../../utils';
+import { isMultibaseBytes } from '../../../utils/encoding/multibase';
 
 export class PublicKeyBase58 extends withBase58(TypedBytes) {}
 
 export class PublicKeyBase64 extends withBase58btc(TypedBytes) {}
+
+export class PublicKeyMultibase extends withMultibase(TypedBytes) {}
+
+export class PublicKeyBase58OrMultibase extends PublicKeyBase58 {
+  toString() {
+    return this.bytes.length === 32 ? super.toString() : `z${super.toString()}`;
+  }
+
+  static from(val) {
+    if (typeof val === 'string' && val.substr(0, 1) === 'z') {
+      return PublicKeyBase58OrMultibase.fromBase58(val.substr(1));
+    } else if (typeof val === 'string') {
+      return PublicKeyBase58OrMultibase.fromBase58(val);
+    }
+
+    return new PublicKeyBase58OrMultibase(val);
+  }
+}
 
 export class PublicKeyMetadata extends withFrom(TypedStruct, (value, from) => {
   const self = from(value);
@@ -135,6 +156,7 @@ export class VerificationMethod extends withFrom(
     controller: NamespaceDid,
     publicKeyBase58: option(PublicKeyBase58),
     publicKeyBase64: option(PublicKeyBase64),
+    publicKeyMultibase: option(PublicKeyMultibase),
     publicKeyJwk: option(TypedString),
     publicKeyHex: option(TypedBytes),
     metadata: option(PublicKeyMetadata),
@@ -147,9 +169,10 @@ export class VerificationMethod extends withFrom(
     );
   }
 
-  publicKeyBytes() {
+  publicKeyBytes(fullRepresentation = false) {
     const bytes = (
-      this.publicKeyBase58
+      this.publicKeyMultibase
+      || this.publicKeyBase58
       || this.publicKeyBase64
       || this.publicKeyJwk
       || this.publicKeyHex
@@ -158,12 +181,17 @@ export class VerificationMethod extends withFrom(
     if (bytes == null) {
       throw new Error(
         `Expected either of ${fmtIterable([
+          'publicKeyMultibase',
           'publicKeyBase58',
           'publicKeyBase64',
           'publicKeyJwk',
           'publicKeyHex',
         ])} to be specified`,
       );
+    }
+
+    if (this.publicKeyMultibase) {
+      return (fullRepresentation || bytes.length === 32) ? bytes : bytes.slice(bytes.length - 32);
     }
 
     return bytes;
@@ -203,12 +231,16 @@ export class VerificationMethod extends withFrom(
   static fromDidKey(keyRef, didKey) {
     const ref = VerificationMethodRef.from(keyRef);
 
+    const pkBytes = valueBytes(didKey.publicKey);
+    const isMultibaseKey = isMultibaseBytes(pkBytes);
+
     return new this(
       ref,
       didKey.publicKey.constructor.VerKeyType,
       ref[0],
-      valueBytes(didKey.publicKey),
+      !isMultibaseKey ? pkBytes : void 0,
       void 0,
+      isMultibaseKey ? pkBytes : void 0,
       void 0,
       void 0,
       didKey.isOffchain() ? didKey.publicKey.value : null,
@@ -222,7 +254,7 @@ export class VerificationMethod extends withFrom(
       this.id,
       this.controller,
       this.type,
-      valueBytes(this.publicKey()),
+      normalizeToU8a(this.publicKeyBytes(true)),
       this.metadata,
     );
   }
@@ -251,7 +283,7 @@ export class CheqdVerificationMethod extends withFrom(
     id: CheqdVerificationMethodRef,
     controller: NamespaceDid,
     verificationMethodType: VerificationMethodType,
-    verificationMaterial: PublicKeyBase58,
+    verificationMaterial: PublicKeyBase58OrMultibase,
     metadata: option(PublicKeyMetadata),
   };
 
@@ -265,12 +297,14 @@ export class CheqdVerificationMethod extends withFrom(
   toVerificationMethod(VerMethod = VerificationMethod) {
     // Convert the Cheqd-specific ID to a generic VerificationMethodRef
     const genericId = VerificationMethodRef.from(this.id.toJSON());
+    const isMultibaseKey = isMultibaseBytes(this.verificationMaterial);
     return new (ensureEqualToOrPrototypeOf(VerificationMethod, VerMethod))(
       genericId,
       this.verificationMethodType,
       this.controller,
-      this.verificationMaterial,
+      !isMultibaseKey ? this.verificationMaterial : void 0,
       void 0,
+      isMultibaseKey ? this.verificationMaterial : void 0,
       void 0,
       void 0,
       this.metadata,

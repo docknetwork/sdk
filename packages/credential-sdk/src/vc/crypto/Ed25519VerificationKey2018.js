@@ -3,6 +3,7 @@ import * as base64 from '@juanelas/base64';
 import { u8aToU8a } from '../../utils/types/bytes';
 import Ed25519Keypair from '../../keypairs/keypair-ed25519';
 import { Ed25519VerKeyName } from './constants';
+import { decodeFromMultibase } from '../../utils/encoding/multibase';
 
 export default class Ed25519VerificationKey2018 {
   constructor(publicKey) {
@@ -30,6 +31,17 @@ export default class Ed25519VerificationKey2018 {
 
     if (verificationMethod.publicKeyBase64) {
       return new this(base64.decode(verificationMethod.publicKeyBase64));
+    }
+
+    const secMultibase = verificationMethod['sec:publicKeyMultibase'];
+    const multiBase = verificationMethod.publicKeyMultibase || (
+      typeof secMultibase === 'object'
+        ? secMultibase['@value']
+        : secMultibase
+    );
+
+    if (multiBase) {
+      return new this(decodeFromMultibase(multiBase).slice(2));
     }
 
     throw new Error(`Unsupported signature encoding for ${Ed25519VerKeyName}`);

@@ -412,15 +412,15 @@ export class CheqdDIDDocument extends TypedStruct {
   static Classes = {
     context: Context,
     id: CheqdID,
-    alsoKnownAs: AlsoKnownAs,
+    alsoKnownAs: option(AlsoKnownAs),
     controller: CheqdControllers,
     verificationMethod: CheqdVerificationMethods,
     service: CheqdServices,
     authentication: CheqdVerificationMethodReferences,
-    assertionMethod: CheqdAssertionMethod,
-    keyAgreement: CheqdVerificationMethodReferences,
-    capabilityInvocation: CheqdVerificationMethodReferences,
-    capabilityDelegation: CheqdVerificationMethodReferences,
+    assertionMethod: option(CheqdAssertionMethod),
+    keyAgreement: option(CheqdVerificationMethodReferences),
+    capabilityInvocation: option(CheqdVerificationMethodReferences),
+    capabilityDelegation: option(CheqdVerificationMethodReferences),
     versionId: option(VersionId),
   };
 
@@ -436,9 +436,9 @@ export class CheqdDIDDocument extends TypedStruct {
     const offchainVerMethod = verificationMethod.filter((verMethod) => verMethod.isOffchain());
 
     this.assertionMethod = [
-      ...this.assertionMethod.filter(
+      ...(this.assertionMethod ? this.assertionMethod.filter(
         (ref) => !offchainVerMethod.some((verMethod) => verMethod.id.eq(ref)),
-      ),
+      ) : []),
       ...offchainVerMethod,
     ];
   }
@@ -500,15 +500,15 @@ export class CheqdTestnetDIDDocument extends CheqdDIDDocument {
   static Classes = {
     context: Context,
     id: CheqdTestnetID,
-    alsoKnownAs: AlsoKnownAs,
+    alsoKnownAs: option(AlsoKnownAs),
     controller: CheqdTestnetControllers,
     verificationMethod: CheqdTestnetVerificationMethods,
     service: CheqdTestnetServices,
     authentication: CheqdTestnetVerificationMethodReferences,
-    assertionMethod: CheqdTestnetAssertionMethod,
-    keyAgreement: CheqdTestnetVerificationMethodReferences,
-    capabilityInvocation: CheqdTestnetVerificationMethodReferences,
-    capabilityDelegation: CheqdTestnetVerificationMethodReferences,
+    assertionMethod: option(CheqdTestnetAssertionMethod),
+    keyAgreement: option(CheqdTestnetVerificationMethodReferences),
+    capabilityInvocation: option(CheqdTestnetVerificationMethodReferences),
+    capabilityDelegation: option(CheqdTestnetVerificationMethodReferences),
     versionId: option(VersionId),
   };
 }
@@ -517,15 +517,15 @@ export class CheqdMainnetDIDDocument extends CheqdDIDDocument {
   static Classes = {
     context: Context,
     id: CheqdMainnetID,
-    alsoKnownAs: AlsoKnownAs,
+    alsoKnownAs: option(AlsoKnownAs),
     controller: CheqdMainnetControllers,
     verificationMethod: CheqdMainnetVerificationMethods,
     service: CheqdMainnetServices,
     authentication: CheqdMainnetVerificationMethodReferences,
-    assertionMethod: CheqdMainnetAssertionMethod,
-    keyAgreement: CheqdMainnetVerificationMethodReferences,
-    capabilityInvocation: CheqdMainnetVerificationMethodReferences,
-    capabilityDelegation: CheqdMainnetVerificationMethodReferences,
+    assertionMethod: option(CheqdMainnetAssertionMethod),
+    keyAgreement: option(CheqdMainnetVerificationMethodReferences),
+    capabilityInvocation: option(CheqdMainnetVerificationMethodReferences),
+    capabilityDelegation: option(CheqdMainnetVerificationMethodReferences),
     versionId: option(VersionId),
   };
 }

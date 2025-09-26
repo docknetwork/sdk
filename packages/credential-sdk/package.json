@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/credential-sdk",
-  "version": "0.54.5",
+  "version": "0.54.6",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -33,7 +33,7 @@
     "url": "https://github.com/docknetwork/sdk"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "@digitalcredentials/vc-status-list": "^9.0.0",

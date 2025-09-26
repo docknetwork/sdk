@@ -14,7 +14,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Node JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: "22.x"
 

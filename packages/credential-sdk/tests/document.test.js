@@ -10,7 +10,9 @@ import {
 import {
   CheqdMainnetDIDDocument,
   CheqdTestnetDIDDocument,
+  CheqdTestnetVerificationMethod,
   DIDDocument,
+  VerificationMethod,
   VerificationMethodRef,
 } from "../src/types/did/document";
 import {
@@ -25,8 +27,57 @@ import { hexToU8a, maybeToCheqdPayloadOrJSON } from "../src/utils";
 import { verMethodRefsEqual } from "../src/vc";
 import { CheqdTestnetVerificationMethodRef } from "../src/types/did/document/verification-method-ref";
 
+const PK_BYTES = [
+  98, 179,  32, 253,  66, 178, 221,  94,
+  117, 126,  54, 167,  54, 168,  94,  29,
+  99,  87, 160,  31, 232, 118, 197, 253,
+  181, 228, 101, 202, 211,  24, 205, 210
+];
+
+const CHEQD_TESTNET_DOC_PROTO = {
+  "context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/ed25519-2020/v1"
+  ],
+  "id": "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50",
+  "controller": [
+    "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50"
+  ],
+  "verificationMethod": [
+    {
+      "id": "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50#key-1",
+      "verificationMethodType": "Ed25519VerificationKey2020",
+      "controller": "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50",
+      // this document contains verificationMaterial in multibase, SDK should detect and convert to base58
+      "verificationMaterial": "z6Mkm6YRSzTJjtmgh5VqFmiU3MDDyUyAEm2HHfqg8od7rp8R"
+    }
+  ],
+  "authentication": [
+    "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50#key-1"
+  ],
+  "assertionMethod": [],
+  "capabilityInvocation": [],
+  "capabilityDelegation": [],
+  "keyAgreement": [],
+  "service": [
+    {
+      "id": "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50#organization-1",
+      "serviceType": "LinkedOrganization",
+      "serviceEndpoint": [
+        "ChatGpt-45311",
+        "https://chatgpt.com"
+      ],
+      "recipientKeys": [],
+      "routingKeys": [],
+      "accept": [],
+      "priority": 0
+    }
+  ],
+  "alsoKnownAs": []
+};
+
 const CHEQD_TESTNET_DOC = {
-  context: [
+  '@context': [
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
   ],
@@ -36,10 +87,10 @@ const CHEQD_TESTNET_DOC = {
   ],
   verificationMethod: [
     {
-      id: "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50#key-1",
-      verificationMethodType: "Ed25519VerificationKey2020",
-      verificationMaterial: "Bt5Mafvpcqou1pBF8SnW1BJMvpkSzZnPEgWunTUFwHZm",
-      controller: "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50"
+      "id": "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50#key-1",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:cheqd:testnet:0bd5cca0-9cad-4eb6-b4f8-12f36e60cb50",
+      "publicKeyMultibase": "z6MkuW75b3drkhiXunvdZ5TuPtxsu9uBQDfSVtAgbNF35MLH"
     }
   ],
   authentication: [
@@ -362,9 +413,27 @@ describe("DID document workflow", () => {
     checkDocs(doc1, doc2, doc3);
   });
 
+  test(`\`CheqdTestnetDIDDocument 3rd party (cheqd proto) converts multibase automatically\``, () => {
+    const cheqdThirdPartyDocument = CheqdTestnetDIDDocument.from(CHEQD_TESTNET_DOC_PROTO);
+    expect(cheqdThirdPartyDocument.verificationMethod[0].verificationMaterial.toString()).toEqual('z6Mkm6YRSzTJjtmgh5VqFmiU3MDDyUyAEm2HHfqg8od7rp8R');
+    const thirdPartyDocument = cheqdThirdPartyDocument.toDIDDocument();
+    const thirdPartyJSON = thirdPartyDocument.toJSON();
+    const verificationMethod = thirdPartyJSON.verificationMethod[0];
+    expect(verificationMethod.publicKeyMultibase).toEqual('z6Mkm6YRSzTJjtmgh5VqFmiU3MDDyUyAEm2HHfqg8od7rp8R');
+
+    const cheqdDocument = DIDDocument.from(thirdPartyJSON).toCheqd(CheqdTestnetDIDDocument);
+    expect(cheqdDocument.verificationMethod[0].verificationMaterial.length).toBe(34);
+    expect(cheqdDocument.verificationMethod[0].verificationMaterial.toString()).toEqual('z6Mkm6YRSzTJjtmgh5VqFmiU3MDDyUyAEm2HHfqg8od7rp8R');
+  });
+
   test(`\`CheqdTestnetDIDDocument 3rd party\``, () => {
-    const thirdPartyDocument = CheqdTestnetDIDDocument.from(CHEQD_TESTNET_DOC);
-    expect(thirdPartyDocument.toJSON()).toMatchObject(CHEQD_TESTNET_DOC);
+    const thirdPartyDocument = DIDDocument.from(CHEQD_TESTNET_DOC);
+    const thirdPartyJSON = thirdPartyDocument.toJSON();
+    expect(thirdPartyJSON).toMatchObject(CHEQD_TESTNET_DOC);
+
+    const cheqdDocument = DIDDocument.from(thirdPartyDocument.toJSON()).toCheqd(CheqdTestnetDIDDocument);
+    expect(cheqdDocument.verificationMethod[0].verificationMaterial.length).toBe(34);
+    expect(cheqdDocument.verificationMethod[0].verificationMaterial.toString()).toEqual('z6MkuW75b3drkhiXunvdZ5TuPtxsu9uBQDfSVtAgbNF35MLH');
   });
 
   test(`\`CheqdTestnetDIDDocument\``, () => {
@@ -393,5 +462,38 @@ describe("DID document workflow", () => {
     const fromLegacy = CheqdMainnetDIDDocument.from(LEGACY_MAINNET_DOC);
 
     checkDoc(mainnetDoc, fromLegacy);
+  });
+
+  test('VerificationMethod publicKeyBase58', () => {
+    const method = VerificationMethod.from({
+      "id": "did:cheqd:testnet:063f91a3-43a4-47a4-86f0-170a71f14355#keys-1",
+      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:063f91a3-43a4-47a4-86f0-170a71f14355",
+      "publicKeyBase58": "7eHNrkCsQMHDaaf8aCkdCFfE9uhJpsmvbevkJXf6wbM3"
+    });
+
+    expect(method.publicKeyBytes().length).toEqual(32);
+    expect([...method.publicKeyBytes()]).toEqual(PK_BYTES);
+
+    const cheqdMethod = method.toCheqd(CheqdTestnetVerificationMethod);
+    expect(cheqdMethod.verificationMaterial.toString()).toEqual('7eHNrkCsQMHDaaf8aCkdCFfE9uhJpsmvbevkJXf6wbM3');
+    expect(cheqdMethod.verificationMaterial).toEqual(PK_BYTES);
+  });
+
+  test('VerificationMethod publicKeyMultibase', () => {
+    const method = VerificationMethod.from({
+      "id": "did:cheqd:testnet:063f91a3-43a4-47a4-86f0-170a71f14355#keys-1",
+      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:063f91a3-43a4-47a4-86f0-170a71f14355",
+      "publicKeyMultibase": "z6Mkm6YRSzTJjtmgh5VqFmiU3MDDyUyAEm2HHfqg8od7rp8R"
+    });
+
+    expect(method.publicKeyBytes().length).toEqual(32);
+    expect([...method.publicKeyBytes()]).toEqual(PK_BYTES);
+
+    const cheqdMethod = method.toCheqd(CheqdTestnetVerificationMethod);
+    expect(cheqdMethod.verificationMaterial.toString()).toEqual('z6Mkm6YRSzTJjtmgh5VqFmiU3MDDyUyAEm2HHfqg8od7rp8R');
+    expect(cheqdMethod.verificationMaterial.length).toEqual(34);
+    expect(cheqdMethod.verificationMaterial).toEqual([237, 1, ...PK_BYTES]);
   });
 });

@@ -23,5 +23,6 @@ export { default as withNullIfNotAVariant } from './with-null-if-not-a-variant';
 export { default as withBase58 } from './with-base58';
 export { default as withBase64 } from './with-base64';
 export { default as withBase58btc } from './with-base58btc';
+export { default as withMultibase } from './with-multibase';
 export { default as withFromJSONBytes } from './with-from-json-bytes';
 export * from './utils';

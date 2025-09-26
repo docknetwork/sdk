@@ -77,4 +77,16 @@ export default class DidKeypair {
   sign(message) {
     return this.keyPair.sign(message);
   }
+
+  /**
+   * Detects a key prefix from a key document
+   *
+   * @return The DidKeypair instance
+   */
+  static detectKeyPrefix(keyDocument) {
+    if (typeof keyDocument.id === 'string') {
+      return keyDocument.id.split('#')[1]?.split('-')[0] || 'keys';
+    }
+    return 'keys';
+  }
 }

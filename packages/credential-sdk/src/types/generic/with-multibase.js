@@ -2,9 +2,6 @@ import withFrom from './with-from';
 import {
   isEqualToOrPrototypeOf,
   u8aToString,
-  stringToU8a,
-  maybeToJSONString,
-  u8aToU8a,
 } from '../../utils';
 import TypedEnum from './typed-enum';
 import { encodeAsMultibase, decodeFromMultibase } from '../../utils/encoding/multibase';
@@ -49,7 +46,6 @@ export default function withMultibase(klass) {
           : klass.Variants;
 
         toString() {
-          return 'test1';
           return this.toMultibaseBase58();
         }
 

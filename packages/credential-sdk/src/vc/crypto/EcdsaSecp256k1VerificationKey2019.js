@@ -33,10 +33,11 @@ export default class EcdsaSecp256k1VerificationKey2019 {
       return new this(base64.decode(verificationMethod.publicKeyBase64));
     }
 
+    const secMultibase = verificationMethod['sec:publicKeyMultibase'];
     const multiBase = verificationMethod.publicKeyMultibase || (
-      typeof verificationMethod['sec:publicKeyMultibase'] === 'object' ?
-        verificationMethod['sec:publicKeyMultibase']['@value'] :
-        verificationMethod['sec:publicKeyMultibase']
+      typeof secMultibase === 'object'
+        ? secMultibase['@value']
+        : secMultibase
     );
 
     if (multiBase) {

@@ -27,10 +27,11 @@ export default class Ed25519VerificationKey2020 extends Ed25519VerificationKey20
       return new this(base64.decode(verificationMethod.publicKeyBase64));
     }
 
+    const secMultibase = verificationMethod['sec:publicKeyMultibase'];
     const multiBase = verificationMethod.publicKeyMultibase || (
-      typeof verificationMethod['sec:publicKeyMultibase'] === 'object' ?
-        verificationMethod['sec:publicKeyMultibase']['@value'] :
-        verificationMethod['sec:publicKeyMultibase']
+      typeof secMultibase === 'object'
+        ? secMultibase['@value']
+        : secMultibase
     );
 
     if (multiBase) {

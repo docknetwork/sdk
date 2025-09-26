@@ -170,7 +170,7 @@ export class VerificationMethod extends withFrom(
   }
 
   publicKeyBytes(fullRepresentation = false) {
-    let bytes = (
+    const bytes = (
       this.publicKeyMultibase
       || this.publicKeyBase58
       || this.publicKeyBase64

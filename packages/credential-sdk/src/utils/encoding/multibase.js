@@ -34,6 +34,4 @@ export const decodeFromMultibase = catchFnErrorWith(
   (string) => base58btc.decode(ensureString(string)),
 );
 
-export const isMultibaseBytes = (bytes) => {
-  return bytes.length === 34;
-};
+export const isMultibaseBytes = (bytes) => bytes.length === 34;

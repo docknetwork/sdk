@@ -240,12 +240,7 @@ export default function generateDIDModuleTests(
 
       await module.createDocument(document, didKeypair);
 
-      const fromMod = await module.getDocument(did);
-      const fromHere = document;
-      console.log('fromMod', JSON.stringify(fromMod, null, 2));
-      console.log('fromHere', JSON.stringify(fromHere, null, 2));
-
-      expect((await module.getDocument(did)).eq(document)).toBe(true); // failing here pls
+      expect((await module.getDocument(did)).eq(document)).toBe(true);
 
       document.addServiceEndpoint([did, 'service1'], service1);
       document.addServiceEndpoint([did, 'service2'], service2);

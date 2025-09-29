@@ -78,6 +78,10 @@ export class PublicKeyBase58OrMultibase extends PublicKeyBase58 {
     return this.bytes.length === 32 ? super.toString() : `z${super.toString()}`;
   }
 
+  toCheqdPayload() {
+    return this.toString();
+  }
+
   static from(val) {
     if (typeof val === 'string' && val.substr(0, 1) === 'z') {
       return PublicKeyBase58OrMultibase.fromBase58(val.substr(1));

@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.7
+
+### Patch Changes
+
+- Fix multibase key cheqd payload
+
 ## 0.54.6
 
 ### Patch Changes

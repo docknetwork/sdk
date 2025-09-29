@@ -1,5 +1,12 @@
 # @docknetwork/sdk-examples
 
+## 0.21.7
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.7
+
 ## 0.21.6
 
 ### Patch Changes

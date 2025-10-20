@@ -1,4 +1,5 @@
-const axios = require('axios');
+const https = require('https');
+const { URL } = require('url');
 
 // Jira configuration
 const { JIRA_API_KEY } = process.env;
@@ -17,17 +18,75 @@ if (!JIRA_API_KEY || !JIRA_EMAIL || !JIRA_DOMAIN) {
 // Create base URL for Jira API
 const JIRA_BASE_URL = `https://${JIRA_DOMAIN}/rest/api/3`;
 
-// Create axios instance with authentication
-const jiraClient = axios.create({
-  baseURL: JIRA_BASE_URL,
-  headers: {
-    Authorization: `Basic ${Buffer.from(
-      `${JIRA_EMAIL}:${JIRA_API_KEY}`,
-    ).toString('base64')}`,
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-  },
-});
+// Create authentication header
+const authHeader = `Basic ${Buffer.from(
+  `${JIRA_EMAIL}:${JIRA_API_KEY}`,
+).toString('base64')}`;
+
+/**
+ * Make an HTTPS request to the Jira API
+ * @param {string} path - API endpoint path
+ * @param {string} method - HTTP method (GET, POST, etc.)
+ * @param {object|null} body - Request body (will be JSON stringified)
+ * @returns {Promise<object>} Response data
+ */
+function makeRequest(path, method, body = null) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(path, JIRA_BASE_URL);
+    const bodyData = body ? JSON.stringify(body) : null;
+
+    const options = {
+      hostname: url.hostname,
+      port: url.port || 443,
+      path: url.pathname + url.search,
+      method,
+      headers: {
+        Authorization: authHeader,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    };
+
+    if (bodyData) {
+      options.headers['Content-Length'] = Buffer.byteLength(bodyData);
+    }
+
+    const req = https.request(options, (res) => {
+      let data = '';
+
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      res.on('end', () => {
+        try {
+          const parsedData = data ? JSON.parse(data) : {};
+
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(parsedData);
+          } else {
+            const error = new Error(`HTTP ${res.statusCode}`);
+            error.status = res.statusCode;
+            error.response = parsedData;
+            reject(error);
+          }
+        } catch (parseError) {
+          reject(new Error(`Failed to parse response: ${parseError.message}`));
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      reject(error);
+    });
+
+    if (bodyData) {
+      req.write(bodyData);
+    }
+
+    req.end();
+  });
+}
 
 /**
  * Create a new Jira ticket in the DCKA project
@@ -54,9 +113,7 @@ async function createTicket() {
       },
     };
 
-    const response = await jiraClient.post('/issue', ticketData);
-
-    const createdTicket = response.data;
+    const createdTicket = await makeRequest('/issue', 'POST', ticketData);
 
     console.log('Bug created successfully!');
     console.log(`\nTicket Key: ${createdTicket.key}`);
@@ -64,10 +121,11 @@ async function createTicket() {
 
     // Transition ticket to "Ready for Dev"
     try {
-      const transitionsResponse = await jiraClient.get(
+      const transitionsResponse = await makeRequest(
         `/issue/${createdTicket.key}/transitions`,
+        'GET',
       );
-      const { transitions } = transitionsResponse.data;
+      const { transitions } = transitionsResponse;
 
       // Find "Ready for Dev" transition
       const readyForDevTransition = transitions.find(
@@ -75,7 +133,7 @@ async function createTicket() {
       );
 
       if (readyForDevTransition) {
-        await jiraClient.post(`/issue/${createdTicket.key}/transitions`, {
+        await makeRequest(`/issue/${createdTicket.key}/transitions`, 'POST', {
           transition: {
             id: readyForDevTransition.id,
           },
@@ -91,7 +149,7 @@ async function createTicket() {
     } catch (transitionError) {
       console.log(
         'Warning: Could not transition ticket:',
-        transitionError.response?.data || transitionError.message,
+        transitionError.response || transitionError.message,
       );
     }
 
@@ -101,26 +159,22 @@ async function createTicket() {
   } catch (error) {
     console.error('Error creating Jira ticket:');
 
-    if (error.response) {
-      console.error(`Status: ${error.response.status}`);
+    if (error.status) {
+      console.error(`Status: ${error.status}`);
       console.error('Full response data:');
-      console.error(JSON.stringify(error.response.data, null, 2));
+      console.error(JSON.stringify(error.response, null, 2));
 
-      if (error.response.status === 401) {
+      if (error.status === 401) {
         console.error(
           '\nAuthentication failed. Please check your credentials.',
         );
-      } else if (error.response.status === 400) {
+      } else if (error.status === 400) {
         console.error(
           '\nBad request. Check if the project key and issue type are correct.',
         );
-      } else if (error.response.status === 404) {
+      } else if (error.status === 404) {
         console.error('\nProject not found. Please check the project key.');
       }
-    } else if (error.request) {
-      console.error(
-        'No response received from Jira. Check your network connection.',
-      );
     } else {
       console.error(error.message);
     }

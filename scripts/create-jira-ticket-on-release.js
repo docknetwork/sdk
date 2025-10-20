@@ -32,7 +32,8 @@ const authHeader = `Basic ${Buffer.from(
  */
 function makeRequest(path, method, body = null) {
   return new Promise((resolve, reject) => {
-    const url = new URL(path, JIRA_BASE_URL);
+    const fullUrl = `${JIRA_BASE_URL}${path}`;
+    const url = new URL(fullUrl);
     const bodyData = body ? JSON.stringify(body) : null;
 
     const options = {
@@ -71,7 +72,10 @@ function makeRequest(path, method, body = null) {
             reject(error);
           }
         } catch (parseError) {
-          reject(new Error(`Failed to parse response: ${parseError.message}`));
+          const error = new Error(`Failed to parse response (HTTP ${res.statusCode}): ${parseError.message}`);
+          error.status = res.statusCode;
+          error.rawData = data.substring(0, 500); // First 500 chars of response
+          reject(error);
         }
       });
     });
@@ -185,5 +189,4 @@ async function createTicket() {
   return null;
 }
 
-// Run the bot
 createTicket();

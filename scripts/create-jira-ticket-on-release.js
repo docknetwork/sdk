@@ -1,6 +1,8 @@
 const https = require('https');
 const { URL } = require('url');
 
+const credentialSdkPackage = require('../packages/credential-sdk/package.json');
+
 // Jira configuration
 const { JIRA_API_KEY } = process.env;
 const { JIRA_EMAIL } = process.env;
@@ -104,7 +106,7 @@ async function createTicket() {
         project: {
           key: 'DCKA',
         },
-        summary: 'Update the Credential SDK version in the wallet',
+        summary: `Update the Credential SDK version in the wallet to ${credentialSdkPackage.version}`,
         issuetype: {
           // We create a bug ticket so that it will appear in the escalations board
           id: '10004', // Bug

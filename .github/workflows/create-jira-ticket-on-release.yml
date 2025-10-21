@@ -1,8 +1,8 @@
 name: Create Jira Ticket on Release
 
-on: [push]
-  # release:
-  #   types: [published]
+on:
+  release:
+    types: [published]
 
 jobs:
   create-jira-ticket:

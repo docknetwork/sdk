@@ -96,24 +96,31 @@ function makeRequest(path, method, body = null) {
 
 /**
  * Create a new Jira ticket in the DCKA project
+ * @param {object} config - Configuration for the ticket
+ * @param {string} config.summary - Ticket summary/title
+ * @param {string} config.componentId - Component ID (e.g., '10022' for Wallet SDK, '10011' for Truvera API)
+ * @param {string} config.componentName - Component name for logging purposes
+ * @returns {Promise<object>} Created ticket data
  */
-async function createTicket() {
+async function createJiraTicket(config) {
+  const { summary, componentId, componentName } = config;
+
   try {
-    console.log('Creating new Jira bug...\n');
+    console.log(`Creating new Jira bug for ${componentName}...\n`);
 
     const ticketData = {
       fields: {
         project: {
           key: 'DCKA',
         },
-        summary: `Update the Credential SDK version in the wallet to ${credentialSdkPackage.version}`,
+        summary,
         issuetype: {
           // We create a bug ticket so that it will appear in the escalations board
           id: '10004', // Bug
         },
         components: [
           {
-            id: '10022', // Wallet SDK
+            id: componentId,
           },
         ],
       },
@@ -159,11 +166,11 @@ async function createTicket() {
       );
     }
 
-    console.log(`URL: https://${JIRA_DOMAIN}/browse/${createdTicket.key}`);
+    console.log(`URL: https://${JIRA_DOMAIN}/browse/${createdTicket.key}\n`);
 
     return createdTicket;
   } catch (error) {
-    console.error('Error creating Jira ticket:');
+    console.error(`Error creating Jira ticket for ${componentName}:`);
 
     if (error.status) {
       console.error(`Status: ${error.status}`);
@@ -185,10 +192,57 @@ async function createTicket() {
       console.error(error.message);
     }
 
+    throw error;
+  }
+}
+
+/**
+ * Create tickets for all components that need to be updated
+ */
+async function createTickets() {
+  const results = [];
+  let hasError = false;
+
+  // Create ticket for Wallet SDK
+  try {
+    const walletSdkTicket = await createJiraTicket({
+      summary: `Update the Credential SDK version in the wallet to ${credentialSdkPackage.version}`,
+      componentId: '10022', // Wallet SDK
+      componentName: 'Wallet SDK',
+    });
+    results.push({ component: 'Wallet SDK', ticket: walletSdkTicket });
+  } catch (error) {
+    console.error('Failed to create Wallet SDK ticket\n');
+    hasError = true;
+  }
+
+  // Create ticket for Truvera API
+  try {
+    const truveraApiTicket = await createJiraTicket({
+      summary: `Update the Credential SDK version in Truvera API to ${credentialSdkPackage.version}`,
+      componentId: '10011', // Truvera API
+      componentName: 'Truvera API',
+    });
+    results.push({ component: 'Truvera API', ticket: truveraApiTicket });
+  } catch (error) {
+    console.error('Failed to create Truvera API ticket\n');
+    hasError = true;
+  }
+
+  // Summary
+  if (results.length > 0) {
+    console.log('\n=== Summary ===');
+    console.log(`Successfully created ${results.length} ticket(s):\n`);
+    results.forEach(({ component, ticket }) => {
+      console.log(`${component}: ${ticket.key} - https://${JIRA_DOMAIN}/browse/${ticket.key}`);
+    });
+  }
+
+  if (hasError) {
     process.exit(1);
   }
 
-  return null;
+  return results;
 }
 
-createTicket();
+createTickets();

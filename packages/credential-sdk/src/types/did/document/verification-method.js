@@ -104,13 +104,10 @@ export class TypedJsonWebKey extends withFrom(
     x: option(TypedString),
   };
 
+  // TODO: implement to support cheqd DID controlling with JsonWebKey
   get bytes() {
-    return [1, 2, 3, 4, 5, 6, 7];
+    return [0, 0, 0, 0];
   }
-
-  // toJSON() {
-  //   return { toJSON: true };
-  // }
 }
 
 export class PublicKeyMetadata extends withFrom(TypedStruct, (value, from) => {

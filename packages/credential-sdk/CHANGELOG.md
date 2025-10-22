@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.8
+
+### Patch Changes
+
+- Fix JsonWebKey DID resolution errors
+
 ## 0.54.7
 
 ### Patch Changes

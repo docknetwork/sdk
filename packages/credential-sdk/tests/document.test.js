@@ -316,7 +316,7 @@ describe("DID document workflow", () => {
   const CAP_INV = new VerificationRelationship().setCapabilityInvocation();
   const KEY_AGR = new VerificationRelationship().setKeyAgreement();
 
-  test.skip(`\`verMethodRefsEqual\` method conversion works`, () => {
+  test(`\`verMethodRefsEqual\` method conversion works`, () => {
     const dockVerMethod = new VerificationMethodRef(DockDid.random(), 3);
     const cheqdVerMethod =
       CheqdTestnetVerificationMethodRef.from(dockVerMethod);
@@ -335,7 +335,7 @@ describe("DID document workflow", () => {
     ).toBe(true);
   });
 
-  test.skip(`\`DIDDocument.from\` works`, () => {
+  test(`\`DIDDocument.from\` works`, () => {
     const doc = {
       "@context": ["test"],
       id: "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
@@ -354,7 +354,7 @@ describe("DID document workflow", () => {
     expect(DIDDocument.from(doc)).toMatchSnapshot();
   });
 
-  test.skip("`DIDDocument`", () => {
+  test("`DIDDocument`", () => {
     const doc1 = DIDDocument.create(
       "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
       [],
@@ -396,7 +396,7 @@ describe("DID document workflow", () => {
     checkDocs(doc1, doc2, doc3);
   });
 
-  test.skip("`CheqdDIDDocument`", () => {
+  test("`CheqdDIDDocument`", () => {
     const cheqdDid = CheqdTestnetDid.from(
       "did:cheqd:testnet:f1749383-d9dd-479f-82aa-e52fe8f59c54"
     );
@@ -449,7 +449,7 @@ describe("DID document workflow", () => {
     checkDocs(doc1, doc2, doc3);
   });
 
-  test.skip(`\`CheqdTestnetDIDDocument 3rd party (cheqd proto) converts multibase automatically\``, () => {
+  test(`\`CheqdTestnetDIDDocument 3rd party (cheqd proto) converts multibase automatically\``, () => {
     const cheqdThirdPartyDocument = CheqdTestnetDIDDocument.from(CHEQD_TESTNET_DOC_PROTO);
     expect(cheqdThirdPartyDocument.verificationMethod[0].verificationMaterial.toString()).toEqual('z6Mkm6YRSzTJjtmgh5VqFmiU3MDDyUyAEm2HHfqg8od7rp8R');
     const thirdPartyDocument = cheqdThirdPartyDocument.toDIDDocument();
@@ -462,7 +462,7 @@ describe("DID document workflow", () => {
     expect(cheqdDocument.verificationMethod[0].verificationMaterial.toString()).toEqual('z6Mkm6YRSzTJjtmgh5VqFmiU3MDDyUyAEm2HHfqg8od7rp8R');
   });
 
-  test.skip(`\`CheqdTestnetDIDDocument 3rd party\``, () => {
+  test(`\`CheqdTestnetDIDDocument 3rd party\``, () => {
     const thirdPartyDocument = DIDDocument.from(CHEQD_TESTNET_DOC);
     const thirdPartyJSON = thirdPartyDocument.toJSON();
     expect(thirdPartyJSON).toMatchObject(CHEQD_TESTNET_DOC);
@@ -482,7 +482,7 @@ describe("DID document workflow", () => {
     expect(cheqdDocument).toBeDefined();
   });
 
-  test.skip(`\`CheqdTestnetDIDDocument\``, () => {
+  test(`\`CheqdTestnetDIDDocument\``, () => {
     const testnetDoc = DIDDocument.create(
       "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
       [
@@ -496,7 +496,7 @@ describe("DID document workflow", () => {
     checkDocs(testnetDoc, fromLegacy);
   });
 
-  test.skip(`\`CheqdMainnetDIDDocument\``, () => {
+  test(`\`CheqdMainnetDIDDocument\``, () => {
     const mainnetDoc = DIDDocument.create(
       "did:dock:5DEHasvC9G3eVF3qCsN2VQvEbHYdQtsv74ozZ1ngQQj39Luk",
       [
@@ -510,7 +510,7 @@ describe("DID document workflow", () => {
     checkDoc(mainnetDoc, fromLegacy);
   });
 
-  test.skip('VerificationMethod publicKeyBase58', () => {
+  test('VerificationMethod publicKeyBase58', () => {
     const method = VerificationMethod.from({
       "id": "did:cheqd:testnet:063f91a3-43a4-47a4-86f0-170a71f14355#keys-1",
       "type": "Ed25519VerificationKey2018",
@@ -526,7 +526,7 @@ describe("DID document workflow", () => {
     expect(cheqdMethod.verificationMaterial).toEqual(PK_BYTES);
   });
 
-  test.skip('VerificationMethod publicKeyMultibase', () => {
+  test('VerificationMethod publicKeyMultibase', () => {
     const method = VerificationMethod.from({
       "id": "did:cheqd:testnet:063f91a3-43a4-47a4-86f0-170a71f14355#keys-1",
       "type": "Ed25519VerificationKey2018",

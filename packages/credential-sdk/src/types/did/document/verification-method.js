@@ -253,7 +253,7 @@ export class VerificationMethod extends withFrom(
   static fromDidKey(keyRef, didKey) {
     const ref = VerificationMethodRef.from(keyRef);
 
-    const isJsonWebKey = true;
+    const isJsonWebKey = false; // TODO: implement to support cheqd DID controlling with JsonWebKey
     const pkBytes = valueBytes(didKey.publicKey);
     const isMultibaseKey = !isJsonWebKey && isMultibaseBytes(pkBytes);
 
@@ -319,7 +319,7 @@ export class CheqdVerificationMethod extends withFrom(
 
   toVerificationMethod(VerMethod = VerificationMethod) {
     // Convert the Cheqd-specific ID to a generic VerificationMethodRef
-    const isJsonWebKey = true;
+    const isJsonWebKey = false; // TODO: implement to support cheqd DID controlling with JsonWebKey
     const genericId = VerificationMethodRef.from(this.id.toJSON());
     const isMultibaseKey = !isJsonWebKey && isMultibaseBytes(this.verificationMaterial);
     return new (ensureEqualToOrPrototypeOf(VerificationMethod, VerMethod))(

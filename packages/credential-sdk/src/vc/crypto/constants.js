@@ -18,3 +18,4 @@ export const Bls12381BBDT16DockVerKeyName = 'Bls12381BBDT16VerificationKeyDock20
 export const Bls12381PSSigDockSigName = 'Bls12381PSSignatureDock2023';
 export const Bls12381PSSigProofDockSigName = 'Bls12381PSSignatureProofDock2023';
 export const Bls12381PSDockVerKeyName = 'Bls12381PSVerificationKeyDock2023';
+export const JsonWebKey2020VerKeyName = 'JsonWebKey2020';

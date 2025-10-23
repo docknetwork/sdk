@@ -279,4 +279,149 @@ describe('Credential delegation and redelegation (pharmacy -> doctor -> patient 
     },
     30000,
   );
+
+  test(
+    'unhappy: guardian cannot pick up/pay without patient->guardian delegation',
+    async () => {
+      const presentation = createPresentation(
+        [
+          prescriptionCred,
+          pharmacyDelegatesToPatient,
+          // missing patientDelegatesToGuardian
+          guardianAssertion,
+        ],
+        `urn:${randomAsHex(16)}`,
+        guardian,
+      );
+      const rules = [...MAYCLAIM_DEF_1];
+      const compositeClaims = [
+        [
+          { Iri: guardian },
+          { Iri: CAN_PICK_UP },
+          { Iri: PRESCRIPTION },
+          { Iri: pharmacy },
+        ],
+      ];
+      const expandedForProof = await jsonld.expand(presentation, { documentLoader });
+      await expect(
+        proveCompositeClaims(expandedForProof, compositeClaims, rules),
+      ).rejects.toBeDefined();
+    },
+    30000,
+  );
+
+  test(
+    'unhappy: patient cannot pick up/pay without pharmacy->patient delegation',
+    async () => {
+      const presentation = createPresentation(
+        [
+          prescriptionCred,
+          // missing pharmacyDelegatesToPatient
+          patientAssertion,
+        ],
+        `urn:${randomAsHex(16)}`,
+        patient,
+      );
+      const rules = [...MAYCLAIM_DEF_1];
+      const compositeClaims = [
+        [
+          { Iri: patient },
+          { Iri: CAN_PICK_UP },
+          { Iri: PRESCRIPTION },
+          { Iri: pharmacy },
+        ],
+      ];
+      const expandedForProof = await jsonld.expand(presentation, { documentLoader });
+      await expect(
+        proveCompositeClaims(expandedForProof, compositeClaims, rules),
+      ).rejects.toBeDefined();
+    },
+    30000,
+  );
+
+  test(
+    'unhappy: guardian cannot pick up/pay with malformed delegation filter',
+    async () => {
+      // patient delegates to guardian but with wrong filter (not ANYCLAIM)
+      const BADFILTER = 'https://rdf.dock.io/alpha/2021#NOTANY';
+      const badDelegationToGuardian = await issueCredential(
+        patientKP,
+        {
+          '@context': ['https://www.w3.org/2018/credentials/v1'],
+          id: `urn:uuid:${randomAsHex(16)}`,
+          type: ['VerifiableCredential', 'DelegationCredential'],
+          issuer: patient,
+          issuanceDate: new Date().toISOString(),
+          credentialSubject: {
+            id: guardian,
+            [MAYCLAIM]: { '@id': BADFILTER },
+          },
+        },
+        true,
+        documentLoader,
+      );
+
+      const presentation = createPresentation(
+        [
+          prescriptionCred,
+          pharmacyDelegatesToPatient,
+          badDelegationToGuardian,
+          guardianAssertion,
+        ],
+        `urn:${randomAsHex(16)}`,
+        guardian,
+      );
+      const rules = [...MAYCLAIM_DEF_1];
+      const compositeClaims = [
+        [
+          { Iri: guardian },
+          { Iri: CAN_PICK_UP },
+          { Iri: PRESCRIPTION },
+          { Iri: pharmacy },
+        ],
+      ];
+      const expandedForProof = await jsonld.expand(presentation, { documentLoader });
+      await expect(
+        proveCompositeClaims(expandedForProof, compositeClaims, rules),
+      ).rejects.toBeDefined();
+    },
+    30000,
+  );
+
+  test(
+    'unhappy: guardian cannot pick up/pay with reversed delegation direction',
+    async () => {
+      const guardianDelegatesToPatient = await issueCredential(
+        guardianKP,
+        delegationCredential(guardian, patient),
+        true,
+        documentLoader,
+      );
+
+      const presentation = createPresentation(
+        [
+          prescriptionCred,
+          pharmacyDelegatesToPatient,
+          guardianDelegatesToPatient, // wrong direction
+          guardianAssertion,
+        ],
+        `urn:${randomAsHex(16)}`,
+        guardian,
+      );
+      const rules = [...MAYCLAIM_DEF_1];
+      const compositeClaims = [
+        [
+          { Iri: guardian },
+          { Iri: CAN_PICK_UP },
+          { Iri: PRESCRIPTION },
+          { Iri: pharmacy },
+        ],
+      ];
+      const expandedForProof = await jsonld.expand(presentation, { documentLoader });
+      await expect(
+        proveCompositeClaims(expandedForProof, compositeClaims, rules),
+      ).rejects.toBeDefined();
+    },
+    30000,
+  );
 });

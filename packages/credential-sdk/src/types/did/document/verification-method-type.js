@@ -8,6 +8,7 @@ import {
   Bls12381BBS23DockVerKeyName,
   Bls12381PSDockVerKeyName,
   Bls12381BBDT16DockVerKeyName,
+  JsonWebKey2020VerKeyName,
 } from '../../../vc/crypto';
 
 export class VerificationMethodType extends TypedEnum {}
@@ -15,6 +16,11 @@ export class Ed25519Verification2018Method extends VerificationMethodType {
   static Class = Null;
 
   static Type = Ed25519VerKeyName;
+}
+export class JsonWebKey2020Method extends VerificationMethodType {
+  static Class = Null;
+
+  static Type = JsonWebKey2020VerKeyName;
 }
 export class Ed25519Verification2020Method extends VerificationMethodType {
   static Class = Null;
@@ -66,4 +72,5 @@ VerificationMethodType.bindVariants(
   Bls12381BBSVerificationKeyDock2023,
   Bls12381BBDT16VerificationKeyDock2024,
   Bls12381PSVerificationKeyDock2023,
+  JsonWebKey2020Method,
 );

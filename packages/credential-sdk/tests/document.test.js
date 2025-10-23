@@ -76,6 +76,42 @@ const CHEQD_TESTNET_DOC_PROTO = {
   "alsoKnownAs": []
 };
 
+const CHEQD_TESTNET_JSONWEBKEY_DOC = {
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1",
+    "https://w3id.org/security/suites/ed25519-2018/v1"
+  ],
+  "id": "did:cheqd:testnet:cad53e1d-71e0-48d2-9352-39cc3d0fac99",
+  "controller": [
+    "did:cheqd:testnet:cad53e1d-71e0-48d2-9352-39cc3d0fac99"
+  ],
+  "verificationMethod": [
+    {
+      "id": "did:cheqd:testnet:cad53e1d-71e0-48d2-9352-39cc3d0fac99#key-1",
+      "type": "JsonWebKey2020",
+      "controller": "did:cheqd:testnet:cad53e1d-71e0-48d2-9352-39cc3d0fac99",
+      "publicKeyJwk": {
+        "crv": "Ed25519",
+        "kty": "OKP",
+        "x": "TYuJbWTCT9f8VzIhtG3NP9QrshBjsKLqs9WwmMMwee4"
+      }
+    },
+    {
+      "id": "did:cheqd:testnet:cad53e1d-71e0-48d2-9352-39cc3d0fac99#key-2",
+      "type": "Ed25519VerificationKey2018",
+      "controller": "did:cheqd:testnet:cad53e1d-71e0-48d2-9352-39cc3d0fac99",
+      "publicKeyBase58": "EEhtFjGByASuuNrtF1ugcke9iLLie213XWnuANif8PJt"
+    }
+  ],
+  "authentication": [
+    "did:cheqd:testnet:cad53e1d-71e0-48d2-9352-39cc3d0fac99#key-2"
+  ],
+  "assertionMethod": [
+    "did:cheqd:testnet:cad53e1d-71e0-48d2-9352-39cc3d0fac99#key-1"
+  ]
+};
+
 const CHEQD_TESTNET_DOC = {
   '@context': [
     "https://www.w3.org/ns/did/v1",
@@ -434,6 +470,16 @@ describe("DID document workflow", () => {
     const cheqdDocument = DIDDocument.from(thirdPartyDocument.toJSON()).toCheqd(CheqdTestnetDIDDocument);
     expect(cheqdDocument.verificationMethod[0].verificationMaterial.length).toBe(34);
     expect(cheqdDocument.verificationMethod[0].verificationMaterial.toString()).toEqual('z6MkuW75b3drkhiXunvdZ5TuPtxsu9uBQDfSVtAgbNF35MLH');
+  });
+
+  test(`\`CheqdTestnetDIDDocument JsonWebKey 3rd party\``, () => {
+    const thirdPartyDocument = DIDDocument.from(CHEQD_TESTNET_JSONWEBKEY_DOC);
+    const thirdPartyJSON = thirdPartyDocument.toJSON();
+    expect(thirdPartyJSON).toMatchObject(CHEQD_TESTNET_JSONWEBKEY_DOC);
+
+    const cheqdDocument = DIDDocument.from(thirdPartyDocument.toJSON()).toCheqd(CheqdTestnetDIDDocument);
+    // TODO: test material when we support JsonWebKey controllers
+    expect(cheqdDocument).toBeDefined();
   });
 
   test(`\`CheqdTestnetDIDDocument\``, () => {

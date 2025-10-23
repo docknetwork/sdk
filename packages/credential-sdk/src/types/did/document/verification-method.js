@@ -42,6 +42,7 @@ import {
 import {
   Ed25519Verification2018Method,
   Ed25519Verification2020Method,
+  JsonWebKey2020Method,
   VerificationMethodType,
 } from './verification-method-type';
 import {
@@ -90,6 +91,22 @@ export class PublicKeyBase58OrMultibase extends PublicKeyBase58 {
     }
 
     return new PublicKeyBase58OrMultibase(val);
+  }
+}
+
+export class TypedJsonWebKey extends withFrom(
+  TypedStruct,
+  (value, fromFn) => fromFn(value),
+) {
+  static Classes = {
+    crv: option(TypedString),
+    kty: option(TypedString),
+    x: option(TypedString),
+  };
+
+  // TODO: implement to support cheqd DID controlling with JsonWebKey
+  get bytes() {
+    return [0, 0, 0, 0];
   }
 }
 
@@ -161,7 +178,7 @@ export class VerificationMethod extends withFrom(
     publicKeyBase58: option(PublicKeyBase58),
     publicKeyBase64: option(PublicKeyBase64),
     publicKeyMultibase: option(PublicKeyMultibase),
-    publicKeyJwk: option(TypedString),
+    publicKeyJwk: option(TypedJsonWebKey),
     publicKeyHex: option(TypedBytes),
     metadata: option(PublicKeyMetadata),
   };
@@ -170,6 +187,7 @@ export class VerificationMethod extends withFrom(
     return !(
       this.type instanceof Ed25519Verification2018Method
       || this.type instanceof Ed25519Verification2020Method
+      || this.type instanceof JsonWebKey2020Method
     );
   }
 
@@ -235,17 +253,18 @@ export class VerificationMethod extends withFrom(
   static fromDidKey(keyRef, didKey) {
     const ref = VerificationMethodRef.from(keyRef);
 
+    const isJsonWebKey = false; // TODO: implement to support cheqd DID controlling with JsonWebKey
     const pkBytes = valueBytes(didKey.publicKey);
-    const isMultibaseKey = isMultibaseBytes(pkBytes);
+    const isMultibaseKey = !isJsonWebKey && isMultibaseBytes(pkBytes);
 
     return new this(
       ref,
       didKey.publicKey.constructor.VerKeyType,
       ref[0],
-      !isMultibaseKey ? pkBytes : void 0,
+      (!isMultibaseKey && !isJsonWebKey) ? pkBytes : void 0,
       void 0,
       isMultibaseKey ? pkBytes : void 0,
-      void 0,
+      isJsonWebKey ? this.verificationMaterial : void 0,
       void 0,
       didKey.isOffchain() ? didKey.publicKey.value : null,
     );
@@ -300,16 +319,17 @@ export class CheqdVerificationMethod extends withFrom(
 
   toVerificationMethod(VerMethod = VerificationMethod) {
     // Convert the Cheqd-specific ID to a generic VerificationMethodRef
+    const isJsonWebKey = false; // TODO: implement to support cheqd DID controlling with JsonWebKey
     const genericId = VerificationMethodRef.from(this.id.toJSON());
-    const isMultibaseKey = isMultibaseBytes(this.verificationMaterial);
+    const isMultibaseKey = !isJsonWebKey && isMultibaseBytes(this.verificationMaterial);
     return new (ensureEqualToOrPrototypeOf(VerificationMethod, VerMethod))(
       genericId,
       this.verificationMethodType,
       this.controller,
-      !isMultibaseKey ? this.verificationMaterial : void 0,
+      (!isMultibaseKey && !isJsonWebKey) ? this.verificationMaterial : void 0,
       void 0,
       isMultibaseKey ? this.verificationMaterial : void 0,
-      void 0,
+      isJsonWebKey ? this.verificationMaterial : void 0,
       void 0,
       this.metadata,
     );

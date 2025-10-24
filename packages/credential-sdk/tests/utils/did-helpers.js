@@ -32,7 +32,7 @@ export function registerDid(did, keypair) {
   });
 }
 
-export function randoDID() {
+export function genPlaceholderDID() {
   return `did:dock:${randomAsHex(32).substring(2, 2 + 20)}`;
 }
 
@@ -62,7 +62,7 @@ export function getSampleKey(randomDID, keypair) {
 
 export async function newDid() {
   const kp = Secp256k1Keypair.random();
-  const randomDID = randoDID();
+  const randomDID = genPlaceholderDID();
   const keypair = getSampleKey(randomDID, kp);
   registerDid(randomDID, keypair);
   return {

@@ -460,7 +460,7 @@ async function checkSoundness(presentation, rules) {
   return acceptCompositeClaims(presentation, rules);
 }
 
-// registerDid and randoDID moved to tests/utils/did-helpers.js
+// registerDid and genPlaceholderDID moved to tests/utils/did-helpers.js
 
 async function verifyC(credential) {
   return verifyCredential(credential, {

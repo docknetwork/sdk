@@ -91,10 +91,10 @@ export default class CheqdDIDModule extends withCheqd(AbstractDIDModule) {
 
     let doc = null;
     try {
-      const { didDocument, didDocumentMetadata } = await this.cheqdOnly.getDidDocumentWithMetadata(cheqdDid);
+      const { didDoc, metadata } = await this.cheqdOnly.getDidDocumentWithMetadata(cheqdDid);
 
-      if (!didDocumentMetadata.deactivated) {
-        doc = didDocument;
+      if (!metadata.deactivated) {
+        doc = didDoc;
       }
     } catch (err) {
       if (!String(err).includes(String(cheqdDid))) {

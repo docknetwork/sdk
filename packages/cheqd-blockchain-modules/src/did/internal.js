@@ -36,7 +36,7 @@ export class CheqdDIDModuleInternal extends createInternalCheqdModule(methods) {
       String(this.types.Did.from(did)),
     );
 
-    if (result?.didDoc) {
+    if (result?.didDoc && result?.didDoc?.context.length === 0) {
       const compliantDoc = await DIDModule.toSpecCompliantPayload(result.didDoc);
       result.didDoc.context = compliantDoc['@context'];
     }

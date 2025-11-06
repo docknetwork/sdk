@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.9
+
+### Patch Changes
+
+- Fix cheqd contexts
+
 ## 0.54.8
 
 ### Patch Changes

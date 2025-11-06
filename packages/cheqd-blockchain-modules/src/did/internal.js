@@ -3,6 +3,7 @@ import {
   CheqdDeactivateDidDocument,
 } from '@docknetwork/credential-sdk/types';
 import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
+import { DIDModule } from '@cheqd/sdk';
 import { createInternalCheqdModule } from '../common';
 
 function createOrUpdateDidDocument(document) {
@@ -29,8 +30,16 @@ export class CheqdDIDModuleInternal extends createInternalCheqdModule(methods) {
   };
 
   async getDidDocumentWithMetadata(did) {
-    return await this.apiProvider.sdk.querier.did.didDoc(
+    // TODO: use sdk.methods.queryDidDoc eventually, but that requires an SDK did doc refactor
+    // for now we can just gather the context through toSpecCompliantPayload
+    const result = await this.apiProvider.sdk.querier.did.didDoc(
       String(this.types.Did.from(did)),
     );
+
+    if (result?.didDoc && result?.didDoc?.context.length === 0) {
+      const compliantDoc = await DIDModule.toSpecCompliantPayload(result.didDoc);
+      result.didDoc.context = compliantDoc['@context'];
+    }
+    return result;
   }
 }

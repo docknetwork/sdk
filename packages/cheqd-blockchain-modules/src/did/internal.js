@@ -29,8 +29,8 @@ export class CheqdDIDModuleInternal extends createInternalCheqdModule(methods) {
   };
 
   async getDidDocumentWithMetadata(did) {
-    return await this.apiProvider.sdk.querier.did.didDoc(
-      String(this.types.Did.from(did)),
-    );
+    return await this.apiProvider.sdk.querier.did.queryDidDoc({
+      didUrl: String(this.types.Did.from(did)),
+    });
   }
 }

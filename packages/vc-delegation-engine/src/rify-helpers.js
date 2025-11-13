@@ -43,7 +43,7 @@ export function buildRifyRules(rootGraphId, authorizedGraphId) {
   ];
 }
 
-export function buildRifyPremisesFromChain(chain, allCredentials, rootGraphId) {
+export function buildRifyPremisesFromChain(chain, rootGraphId) {
   if (!Array.isArray(chain) || chain.length === 0) {
     throw new Error('buildRifyPremisesFromChain requires a non-empty chain');
   }
@@ -83,7 +83,7 @@ export function buildRifyPremisesFromChain(chain, allCredentials, rootGraphId) {
   }
 
   const rootId = rootCredential.id;
-  const attestations = (allCredentials ?? []).filter(
+  const attestations = (chain ?? []).filter(
     (vc) => vc.rootCredentialId === rootId || vc.id === rootId
   );
 

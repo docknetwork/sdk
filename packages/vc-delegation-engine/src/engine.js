@@ -423,7 +423,7 @@ export async function verifyVPWithDelegation({
       const entities = baseEntities(actorIds, facts.actionIds);
       applyCredentialFacts(entities, facts);
 
-      const premises = buildRifyPremisesFromChain(chain, normalizedCredentials, rootCredentialId);
+      const premises = buildRifyPremisesFromChain(chain, rootCredentialId);
       if (!Array.isArray(premises) || premises.some((quad) => quad.length !== 4)) {
         throw new Error('Invalid premises generated for rify inference');
       }

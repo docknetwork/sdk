@@ -44,7 +44,6 @@ export function authorize({
     context.tailIssuer = entityRef('Credential::Actor', tailIssuerId);
   }
 
-
   const result = cedar.isAuthorized({
     principal: { type: 'Credential::Actor', id: principalId },
     action: { type: 'Credential::Action', id: actionId },
@@ -58,4 +57,3 @@ export function authorize({
   }
   return result.response.decision;
 }
-

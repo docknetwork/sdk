@@ -1,5 +1,5 @@
 import jsonld from 'jsonld';
-import { verifyVPWithDelegation } from './engine.js';
+import { verifyVPWithDelegation } from '../src/engine.js';
 
 const policyText = `
 permit(

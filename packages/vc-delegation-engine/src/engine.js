@@ -10,11 +10,6 @@ import jsonld from 'jsonld';
 import { infer } from 'rify';
 
 import {
-  VC_VC,
-  VC_ISSUER,
-  MAY_CLAIM_ALIAS_KEYS,
-} from './constants.js';
-import {
   normalizeContextMap,
   shortenTerm,
   extractExpandedPresentationNode,
@@ -28,73 +23,8 @@ import { baseEntities, collectActorIds, applyCredentialFacts } from './cedar-uti
 import { extractMayClaims, firstArrayItem, toArray } from './utils.js';
 import { buildRifyPremisesFromChain, buildRifyRules } from './rify-helpers.js';
 import { authorize } from './cedar-auth.js';
-
-function collectAuthorizedClaims(chain, derivedFacts, authorizedGraphId, allCredentials = []) {
-  const valueLookup = new Map();
-  (allCredentials ?? []).forEach((vc) => {
-    const subjectId = vc?.credentialSubject?.id;
-    if (!subjectId) {
-      return;
-    }
-    Object.entries(vc.credentialSubject ?? {}).forEach(([key, value]) => {
-      if (key === 'id' || MAY_CLAIM_ALIAS_KEYS.includes(key)) {
-        return;
-      }
-      const storeValue = (entry) => {
-        if (entry === undefined) {
-          return;
-        }
-        valueLookup.set(`${subjectId}::${key}`, entry);
-      };
-      if (Array.isArray(value)) {
-        value.forEach(storeValue);
-      } else {
-        storeValue(value);
-      }
-    });
-  });
-
-  const claimsBySubject = new Map();
-
-  (derivedFacts ?? []).forEach(([subject, claim, value, graph]) => {
-    if (graph !== authorizedGraphId) {
-      return;
-    }
-    if (!claimsBySubject.has(subject)) {
-      claimsBySubject.set(subject, {});
-    }
-    const subjectClaims = claimsBySubject.get(subject);
-    const lookupKey = `${subject}::${claim}`;
-    subjectClaims[claim] = valueLookup.has(lookupKey) ? valueLookup.get(lookupKey) : value;
-  });
-
-  const tailSubjectId = chain[chain.length - 1]?.credentialSubject?.id;
-  const perSubjectObject = {};
-  claimsBySubject.forEach((value, key) => {
-    perSubjectObject[key] = { ...value };
-  });
-
-  const unionClaims =
-    tailSubjectId && perSubjectObject[tailSubjectId]
-      ? { ...perSubjectObject[tailSubjectId] }
-      : {};
-
-  claimsBySubject.forEach((value, key) => {
-    if (key === tailSubjectId) {
-      return;
-    }
-    Object.entries(value).forEach(([claim, claimValue]) => {
-      if (!(claim in unionClaims)) {
-        unionClaims[claim] = claimValue;
-      }
-    });
-  });
-
-  return {
-    perSubject: perSubjectObject,
-    union: unionClaims,
-  };
-}
+import { collectAuthorizedClaims } from './claim-deduction.js';
+import { VC_VC, VC_ISSUER } from './constants.js';
 
 // Normalizes thrown errors into a consistent failure record.
 function normalizeFailure(error, { code = 'CHAIN_VALIDATION_ERROR' } = {}) {
@@ -181,7 +111,7 @@ export function summarizePresentation(vp) {
     }
     if (child.issuer !== parentDelegate) {
       throw new Error(
-        `Credential ${child.id} issuer ${child.issuer ?? 'undefined'} does not match parent delegate ${parentDelegate}`
+        `Credential ${child.id} issuer ${child.issuer ?? 'undefined'} does not match parent delegate ${parentDelegate}`,
       );
     }
   }
@@ -191,7 +121,7 @@ export function summarizePresentation(vp) {
   const rootDeclaredId = rootCredential.rootCredentialId;
   if (rootDeclaredId && rootDeclaredId !== expectedRootId) {
     throw new Error(
-      `Root credential ${rootCredential.id} must declare rootCredentialId equal to its own id`
+      `Root credential ${rootCredential.id} must declare rootCredentialId equal to its own id`,
     );
   }
 
@@ -199,12 +129,12 @@ export function summarizePresentation(vp) {
     const declaredRootId = vc.rootCredentialId;
     if (typeof declaredRootId !== 'string' || declaredRootId.length === 0) {
       throw new Error(
-        `Credential ${vc.id} must include rootCredentialId referencing ${expectedRootId}`
+        `Credential ${vc.id} must include rootCredentialId referencing ${expectedRootId}`,
       );
     }
     if (declaredRootId !== expectedRootId) {
       throw new Error(
-        `Credential ${vc.id} rootCredentialId ${declaredRootId} does not match root ${expectedRootId}`
+        `Credential ${vc.id} rootCredentialId ${declaredRootId} does not match root ${expectedRootId}`,
       );
     }
   });
@@ -328,7 +258,7 @@ export async function verifyVPWithDelegation({
     for (const entry of vcEntries) {
       const credentialNode = firstArrayItem(
         entry?.['@graph'],
-        'Expanded verifiableCredential entry is missing @graph node'
+        'Expanded verifiableCredential entry is missing @graph node',
       );
       const credentialId = credentialNode?.['@id'];
       if (typeof credentialId !== 'string' || credentialId.length === 0) {
@@ -435,6 +365,9 @@ export async function verifyVPWithDelegation({
         throw new Error(`rify inference failed: ${error.message ?? error}`);
       }
 
+      // TODO: check with derived vs premises to see UNAUTHORIZED claims
+      // if any exist, then throw error
+
       const { union: authorizedClaimUnion, perSubject: authorizedPerSubject } = collectAuthorizedClaims(
         chain,
         derived,
@@ -465,7 +398,9 @@ export async function verifyVPWithDelegation({
         authorizedClaimsBySubject: authorizedPerSubject,
       });
 
-      return { decision, summary, facts, entities };
+      return {
+        decision, summary, facts, entities,
+      };
     };
 
     for (const tail of tailCredentials) {
@@ -473,7 +408,9 @@ export async function verifyVPWithDelegation({
       if (!chain) {
         continue;
       }
-      const { decision, summary, facts, entities } = evaluateChain(chain);
+      const {
+        decision, summary, facts, entities,
+      } = evaluateChain(chain);
       if (decision !== 'allow') {
         return {
           decision,

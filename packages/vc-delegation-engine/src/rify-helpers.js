@@ -1,6 +1,6 @@
-import { MAY_CLAIM_ALIAS_KEYS } from "./constants.js";
-import { matchesType } from "./jsonld-utils.js";
-import { extractMayClaims } from "./utils.js";
+import { MAY_CLAIM_ALIAS_KEYS } from './constants.js';
+import { matchesType } from './jsonld-utils.js';
+import { extractMayClaims } from './utils.js';
 
 export function buildRifyRules(rootGraphId, authorizedGraphId) {
   if (!rootGraphId) {
@@ -84,7 +84,7 @@ export function buildRifyPremisesFromChain(chain, rootGraphId) {
 
   const rootId = rootCredential.id;
   const attestations = (chain ?? []).filter(
-    (vc) => vc.rootCredentialId === rootId || vc.id === rootId
+    (vc) => vc.rootCredentialId === rootId || vc.id === rootId,
   );
 
   attestations.forEach((vc) => {
@@ -123,13 +123,13 @@ export function buildRifyPremisesFromChain(chain, rootGraphId) {
   });
 
   const invalidPremises = premises.filter(
-    (quad) => !Array.isArray(quad) || quad.length !== 4 || quad.some((item) => item === undefined)
+    (quad) => !Array.isArray(quad) || quad.length !== 4 || quad.some((item) => item === undefined),
   );
   if (invalidPremises.length > 0) {
     throw new Error(
       `Invalid premises generated: ${JSON.stringify(
-        invalidPremises
-      )} | root ${rootGraphId}`
+        invalidPremises,
+      )} | root ${rootGraphId}`,
     );
   }
 

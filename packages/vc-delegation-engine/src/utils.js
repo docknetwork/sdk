@@ -1,4 +1,4 @@
-import { MAY_CLAIM_ALIAS_KEYS } from "./constants.js";
+import { MAY_CLAIM_ALIAS_KEYS } from './constants.js';
 
 export function firstArrayItem(array, errorMessage) {
   if (!Array.isArray(array) || array.length === 0) {

@@ -46,9 +46,8 @@ export function extractExpandedPresentationNode(expanded) {
   if (!Array.isArray(expanded) || expanded.length === 0) {
     throw new Error('Expanded presentation must contain at least one node');
   }
-  const node =
-    expanded.find((entry) => Array.isArray(entry?.['@type']) && entry['@type'].includes(VC_TYPE)) ??
-    expanded[0];
+  const node = expanded.find((entry) => Array.isArray(entry?.['@type']) && entry['@type'].includes(VC_TYPE))
+    ?? expanded[0];
   if (!Array.isArray(node?.['@type']) || !node['@type'].includes(VC_TYPE)) {
     throw new Error('Expanded data does not include a VerifiablePresentation node');
   }
@@ -63,14 +62,14 @@ export function extractExpandedVerificationMethod(presentationNode, fallbackSign
 
   const proofEntry = firstArrayItem(
     proofEntries,
-    'Expanded presentation is missing security proof data'
+    'Expanded presentation is missing security proof data',
   );
   const proofNode = Array.isArray(proofEntry['@graph'])
     ? firstArrayItem(proofEntry['@graph'], 'Expanded proof entry missing @graph node')
     : proofEntry;
   const verificationEntry = firstArrayItem(
     proofNode[SECURITY_VERIFICATION_METHOD],
-    'Expanded proof is missing verificationMethod'
+    'Expanded proof is missing verificationMethod',
   );
   const verificationValue = verificationEntry?.['@id'] ?? verificationEntry?.['@value'];
   if (typeof verificationValue !== 'string' || verificationValue.length === 0) {
@@ -96,10 +95,10 @@ export function findExpandedTermId(node, term) {
   const keys = Object.keys(node);
   for (const key of keys) {
     if (
-      key === term ||
-      key.endsWith(`#${term}`) ||
-      key.endsWith(`/${term}`) ||
-      key.endsWith(`:${term}`)
+      key === term
+      || key.endsWith(`#${term}`)
+      || key.endsWith(`/${term}`)
+      || key.endsWith(`:${term}`)
     ) {
       return firstExpandedValue(node[key]);
     }
@@ -142,7 +141,7 @@ export function normalizeSubject(compactedSubject) {
   });
 
   const mayClaims = MAY_CLAIM_ALIAS_KEYS.map((alias) => normalized[alias]).find(
-    (val) => val !== undefined
+    (val) => val !== undefined,
   );
   if (mayClaims !== undefined) {
     const list = Array.isArray(mayClaims) ? mayClaims : [mayClaims];

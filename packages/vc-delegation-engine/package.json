@@ -1,0 +1,30 @@
+{
+  "name": "vc-delegation-engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "rm -rf dist && mkdir -p dist && cp -r src dist && cp package.json dist",
+    "lint": "eslint \"src/**/*.js\"",
+    "docs-disabled": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
+    "test": "vitest run ./tests",
+    "prepublishOnly": "yarn build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docknetwork/sdk"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@cedar-policy/cedar-wasm": "^4.5.0",
+    "jsonld": "^6.0.0",
+    "rify": "^0.7.1"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.0.2",
+    "vitest": "^2.1.8"
+  }
+}

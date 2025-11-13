@@ -1,5 +1,6 @@
 import jsonld from 'jsonld';
 import { verifyVPWithDelegation } from '../src/engine.js';
+import documentLoader from './document-loader.js';
 
 export async function runScenario(title, vp, policies, resourceId = undefined) {
   console.log('--------------------------------');
@@ -7,7 +8,7 @@ export async function runScenario(title, vp, policies, resourceId = undefined) {
   console.log('--------------------------------');
 
   try {
-    const expandedPresentation = await jsonld.expand(vp);
+    const expandedPresentation = await jsonld.expand(vp, { documentLoader });
     const credentialContexts = new Map();
     (vp.verifiableCredential ?? []).forEach((vc) => {
       if (vc && typeof vc.id === 'string' && vc['@context']) {
@@ -22,7 +23,7 @@ export async function runScenario(title, vp, policies, resourceId = undefined) {
     });
     if (result.failures && result.failures.length > 0) {
       const messages = result.failures.map((failure) => failure.message).join('; ');
-      console.error('delegation failed ->', messages);
+      console.error('delegation failed ->', result);
     } else {
       console.log('delegation valid ->', result.decision);
     }

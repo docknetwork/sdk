@@ -70,6 +70,17 @@ function checkPresentation(presentation) {
   }
 }
 
+async function optionalDelegationValidation({ verified, ...rest }) {
+  // TODO: detect if has delegation credentials
+
+  console.log('todo: optionalDelegationValidation')
+
+  return {
+    ...rest,
+    verified,
+  };
+}
+
 export async function verifyPresentationCredentials(
   presentation,
   options = {},
@@ -174,14 +185,14 @@ export async function verifyPresentation(presentation, options = {}) {
     verificationOptions,
   );
   try {
-    // Skip proof validation for unsigned
-    if (unsignedPresentation) {
-      return { verified, results: [presentation], credentialResults };
-    }
-
     // Early out incase credentials arent verified
     if (!verified) {
       return { verified, results: [presentation], credentialResults };
+    }
+
+    // Skip proof validation for unsigned
+    if (unsignedPresentation) {
+      return await optionalDelegationValidation({ verified, results: [presentation], credentialResults });
     }
 
     // Get proof purpose
@@ -200,12 +211,12 @@ export async function verifyPresentation(presentation, options = {}) {
     });
 
     // Return results
-    return {
+    return await optionalDelegationValidation({
       presentationResult,
       credentialResults,
       verified: verified && presentationResult.verified,
       error: presentationResult.error,
-    };
+    }, verificationOptions);
   } catch (error) {
     // Error occured when verifying presentation, catch and return error
     return {

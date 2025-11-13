@@ -52,6 +52,9 @@ export function authorize({
     policies,
     entities,
   });
+
+  // DEBUG DIAGNOSTICS
+  // console.log('result', result)
   if (result.type === 'failure') {
     throw new Error(result.errors.map((e) => e.message).join('; '));
   }

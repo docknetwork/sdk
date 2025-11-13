@@ -156,8 +156,9 @@ export function matchesType(vc, typeName) {
   if (!vc) {
     return false;
   }
-  if (Array.isArray(vc.type)) {
-    return vc.type.includes(typeName);
+  const vcTypes = vc.type || vc['@type'];
+  if (Array.isArray(vcTypes)) {
+    return vcTypes.includes(typeName);
   }
-  return vc.type === typeName;
+  return vcTypes === typeName;
 }

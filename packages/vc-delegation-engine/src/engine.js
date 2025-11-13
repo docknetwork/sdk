@@ -3,6 +3,7 @@
 // Have this file focus on claim deduction and chain validation, returning authorized claims
 // After splitting cedar logic, test that it works without credential delegation too. We would run cedar policy check per credential in a VP (like per delegation chain)
 // Support presentations that have delegation chains and normal credentials in them, cedar policy should run on both
+//  authorizedClaims, root and tail issuers for single credentials can all come from the credential
 // See if it makes sense for cedar policies to know the credential type and do authorization based on that (will be needed for above)
 // Investigate alias drift, see if we need to use IRIs more and within cedar policies (its ugly though, so id rather not if we can help it)
 
@@ -17,14 +18,14 @@ import {
   firstExpandedValue,
   findExpandedTermId,
   normalizeSubject,
-  matchesType,
 } from './jsonld-utils.js';
 import { baseEntities, collectActorIds, applyCredentialFacts } from './cedar-utils.js';
-import { extractMayClaims, firstArrayItem, toArray } from './utils.js';
+import { firstArrayItem, toArray } from './utils.js';
 import { buildRifyPremisesFromChain, buildRifyRules } from './rify-helpers.js';
 import { authorize } from './cedar-auth.js';
 import { collectAuthorizedClaims } from './claim-deduction.js';
 import { VC_VC, VC_ISSUER } from './constants.js';
+import { summarizeDelegationChain } from './summarize.js';
 
 // Normalizes thrown errors into a consistent failure record.
 function normalizeFailure(error, { code = 'CHAIN_VALIDATION_ERROR' } = {}) {
@@ -32,205 +33,9 @@ function normalizeFailure(error, { code = 'CHAIN_VALIDATION_ERROR' } = {}) {
     return { code, message: 'Unknown error' };
   }
   if (error.code && error.message) {
-    return { code: error.code, message: error.message };
+    return { code: error.code, message: error.message, stack: error.stack };
   }
-  return { code, message: error.message ?? String(error) };
-}
-
-// Derives delegation-chain facts (root/tail info, depth, mayClaim, etc.) from a VP.
-export function summarizePresentation(vp) {
-  const credentials = Array.isArray(vp?.verifiableCredential)
-    ? vp.verifiableCredential
-    : [];
-  if (credentials.length === 0) {
-    throw new Error('Presentation must include credentials');
-  }
-
-  const credentialMap = new Map();
-  credentials.forEach((vc) => {
-    if (typeof vc.id !== 'string' || vc.id.length === 0) {
-      throw new Error('Each credential must include a non-empty string id');
-    }
-    credentialMap.set(vc.id, vc);
-  });
-
-  const referencedPreviousIds = new Set();
-  credentials.forEach((vc) => {
-    const prevId = vc.previousCredentialId;
-    if (typeof prevId === 'string' && prevId.length > 0) {
-      referencedPreviousIds.add(prevId);
-    }
-  });
-
-  const tailCandidates = credentials.filter((vc) => !referencedPreviousIds.has(vc.id));
-  if (tailCandidates.length === 0) {
-    throw new Error('Unable to determine tail credential');
-  }
-  if (tailCandidates.length > 1) {
-    throw new Error('Unable to determine unique tail credential');
-  }
-
-  const tailCredential = tailCandidates[0];
-
-  if (typeof tailCredential.previousCredentialId !== 'string') {
-    throw new Error('Tail credential must include previousCredentialId');
-  }
-
-  const resourceId = tailCredential.id;
-  if (typeof tailCredential.issuer !== 'string' || tailCredential.issuer.length === 0) {
-    throw new Error('Tail credential must include a string issuer');
-  }
-
-  const chain = [];
-  const visited = new Set();
-  let current = tailCredential;
-
-  while (current) {
-    if (visited.has(current.id)) {
-      throw new Error('Credential chain contains a cycle');
-    }
-    visited.add(current.id);
-    chain.unshift(current);
-    const prevId = current.previousCredentialId;
-    if (!prevId) {
-      break;
-    }
-    const prev = credentialMap.get(prevId);
-    if (!prev) {
-      throw new Error(`Missing credential in chain: ${prevId}`);
-    }
-    current = prev;
-  }
-
-  for (let i = 1; i < chain.length; i += 1) {
-    const parent = chain[i - 1];
-    const child = chain[i];
-    const parentDelegate = parent.credentialSubject?.id;
-    if (typeof parentDelegate !== 'string' || parentDelegate.length === 0) {
-      throw new Error(`Credential ${parent.id} missing credentialSubject.id for delegation binding`);
-    }
-    if (child.issuer !== parentDelegate) {
-      throw new Error(
-        `Credential ${child.id} issuer ${child.issuer ?? 'undefined'} does not match parent delegate ${parentDelegate}`,
-      );
-    }
-  }
-
-  const rootCredential = chain[0];
-  const expectedRootId = rootCredential.id;
-  const rootDeclaredId = rootCredential.rootCredentialId;
-  if (rootDeclaredId && rootDeclaredId !== expectedRootId) {
-    throw new Error(
-      `Root credential ${rootCredential.id} must declare rootCredentialId equal to its own id`,
-    );
-  }
-
-  chain.slice(1).forEach((vc) => {
-    const declaredRootId = vc.rootCredentialId;
-    if (typeof declaredRootId !== 'string' || declaredRootId.length === 0) {
-      throw new Error(
-        `Credential ${vc.id} must include rootCredentialId referencing ${expectedRootId}`,
-      );
-    }
-    if (declaredRootId !== expectedRootId) {
-      throw new Error(
-        `Credential ${vc.id} rootCredentialId ${declaredRootId} does not match root ${expectedRootId}`,
-      );
-    }
-  });
-
-  if (!matchesType(rootCredential, 'DelegationCredential')) {
-    throw new Error('Root credential must be a DelegationCredential');
-  }
-
-  const rootIssuerId = rootCredential.issuer;
-  if (typeof rootIssuerId !== 'string' || rootIssuerId.length === 0) {
-    throw new Error('Root credential must include a string issuer');
-  }
-
-  const rootTypes = Array.isArray(rootCredential.type)
-    ? rootCredential.type
-    : typeof rootCredential.type === 'string'
-      ? [rootCredential.type]
-      : [];
-
-  const rootClaims = rootCredential.credentialSubject ?? {};
-  const rootMayClaims = extractMayClaims(rootClaims);
-
-  const depthByActor = new Map([[rootIssuerId, 0]]);
-  const allowedClaimsByActor = new Map();
-  const delegations = [];
-  const registeredDelegations = new Set();
-
-  const registerDelegation = (principalId, depth) => {
-    if (typeof principalId !== 'string' || principalId.length === 0) {
-      return;
-    }
-    if (registeredDelegations.has(principalId)) {
-      return;
-    }
-    registeredDelegations.add(principalId);
-    delegations.push({ principalId, depth, actions: ['Verify'] });
-  };
-
-  const rootDelegateId = rootCredential.credentialSubject?.id;
-  if (typeof rootDelegateId === 'string' && rootDelegateId.length > 0) {
-    registerDelegation(rootDelegateId, 1);
-    allowedClaimsByActor.set(rootDelegateId, new Set(rootMayClaims));
-    depthByActor.set(rootDelegateId, 1);
-  }
-
-  const delegationCredentialsInChain = [];
-
-  chain.forEach((vc) => {
-    if (!matchesType(vc, 'DelegationCredential')) {
-      return;
-    }
-
-    delegationCredentialsInChain.push(vc);
-
-    const delegator = vc.issuer;
-    const delegate = vc.credentialSubject?.id;
-    if (typeof delegate !== 'string' || delegate.length === 0) {
-      return;
-    }
-
-    const parentDepth = depthByActor.get(delegator) ?? 0;
-    const depth = parentDepth + 1;
-    depthByActor.set(delegate, depth);
-    registerDelegation(delegate, depth);
-  });
-
-  const tailTypes = Array.isArray(tailCredential.type)
-    ? tailCredential.type
-    : typeof tailCredential.type === 'string'
-      ? [tailCredential.type]
-      : [];
-  const tailSubject = tailCredential.credentialSubject ?? {};
-  const tailDelegateId = tailSubject.id;
-  if (typeof tailDelegateId !== 'string' || tailDelegateId.length === 0) {
-    throw new Error('Tail credential must include a subject id');
-  }
-
-  const tailIssuerId = tailCredential.issuer;
-  if (typeof tailIssuerId !== 'string' || tailIssuerId.length === 0) {
-    throw new Error('Tail credential must include a string issuer');
-  }
-
-  const tailDepth = depthByActor.get(tailIssuerId) ?? delegationCredentialsInChain.length;
-  registerDelegation(tailDelegateId, tailDepth);
-
-  return {
-    resourceId,
-    delegations,
-    rootTypes,
-    rootClaims,
-    rootIssuerId,
-    tailTypes,
-    tailClaims: tailSubject,
-    tailIssuerId,
-    tailDepth,
-  };
+  return { code, message: error.message ?? String(error), stack: error.stack };
 }
 
 // High-level helper: parse VP, build entities, run Cedar, and return decision plus failures.
@@ -331,10 +136,10 @@ export async function verifyVPWithDelegation({
     };
 
     const evaluateChain = (chain) => {
-      const summary = summarizePresentation({ verifiableCredential: chain });
+      const rootCredentialId = chain[0]?.id;
+      const summary = summarizeDelegationChain(chain.map((chainItem) => chainItem.expandedNode));
       const resourceId = overrideResourceId ?? summary.resourceId;
       const resolvedPrincipalId = principalId ?? presentationSigner;
-      const rootCredentialId = chain[0]?.id;
       const authorizedGraphId = rootCredentialId ? `urn:authorized:${rootCredentialId}` : 'urn:authorized';
 
       if (!actionId) {
@@ -380,7 +185,7 @@ export async function verifyVPWithDelegation({
       summary.authorizedClaims = authorizedClaimUnion;
       summary.authorizedClaimsBySubject = authorizedPerSubject;
 
-      const decision = authorize({
+      const decision = policies ? authorize({
         policies,
         principalId: resolvedPrincipalId,
         actionId,
@@ -388,15 +193,15 @@ export async function verifyVPWithDelegation({
         vpSignerId: presentationSigner,
         entities,
         rootTypes: summary.rootTypes,
-        rootClaims: summary.rootClaims,
+        // rootClaims: summary.rootClaims,
         rootIssuerId: summary.rootIssuerId,
         tailTypes: summary.tailTypes,
-        tailClaims: summary.tailClaims,
+        // tailClaims: summary.tailClaims,
         tailIssuerId: summary.tailIssuerId,
         tailDepth: summary.tailDepth,
         authorizedClaims: authorizedClaimUnion,
         authorizedClaimsBySubject: authorizedPerSubject,
-      });
+      }) : 'allow';
 
       return {
         decision, summary, facts, entities,

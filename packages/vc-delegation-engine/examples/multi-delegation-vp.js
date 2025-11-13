@@ -118,5 +118,5 @@ if (result.summaries) {
   console.log('Chains verified:', result.summaries.length);
 }
 if (result.failures && result.failures.length > 0) {
-  console.log('failures:', result.failures.map((f) => f.message).join('; '));
+  console.log('failures:', result);
 }

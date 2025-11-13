@@ -162,3 +162,11 @@ export function matchesType(vc, typeName) {
   }
   return vcTypes === typeName;
 }
+
+export function extractGraphId(object, property) {
+  return object[property] && object[property][0] && object[property][0]['@id'];
+}
+
+export function extractGraphObject(object, property) {
+  return object[property] && object[property][0];
+}

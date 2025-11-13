@@ -23,10 +23,8 @@
     "jsonld": "^6.0.0",
     "rify": "^0.7.1"
   },
-  "peerDependencies": {
-    "@docknetwork/credential-sdk": "^0.54.9"
-  },
   "devDependencies": {
+    "@docknetwork/credential-sdk": "^0.54.9",
     "@vitest/coverage-v8": "^2.0.2",
     "vitest": "^2.1.8"
   }

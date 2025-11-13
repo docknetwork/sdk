@@ -11,10 +11,10 @@ permit(
   principal == context.vpSigner &&
 
   // Verifier ensures the root credential is a Prescription type
-  context.rootTypes.contains("Prescription") &&
+  context.rootTypes.contains("https://example.org/credentials#Prescription") &&
 
   // Verifier ensures the tail credential is a PrescriptionUsage type
-  context.tailTypes.contains("PrescriptionUsage") &&
+  context.tailTypes.contains("https://example.org/credentials#PrescriptionUsage") &&
 
   // Verifier ensures a specific root issuer, i.e the doctor
   context.rootIssuer == Credential::Actor::"did:test:doctor" &&

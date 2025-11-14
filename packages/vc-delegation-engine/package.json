@@ -44,7 +44,6 @@
   },
   "devDependencies": {
     "@cedar-policy/cedar-wasm": "^4.5.0",
-    "@docknetwork/credential-sdk": "^0.54.10",
     "@types/minimatch": "^6.0.0",
     "@types/node": "^24.10.1",
     "@vitest/coverage-v8": "^2.0.2",

@@ -6,3 +6,4 @@ export {
   runCedarAuthorization,
 } from './authorization/cedar/index.js';
 export { DelegationError, DelegationErrorCodes } from './errors.js';
+export { MAY_CLAIM_IRI } from './constants.js';

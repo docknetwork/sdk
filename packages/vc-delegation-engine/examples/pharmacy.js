@@ -36,6 +36,10 @@ forbid(
 `;
 
 const policies = { staticPolicies: policyText };
+const BASE_DELEGATION_CONTEXT = [
+  'https://www.w3.org/2018/credentials/v1',
+  'https://ld.truvera.io/credentials/delegation',
+];
 
 // NOTE: to validate that a client is authorized to pay or pickup, a valid PEX request should be used
 // the delegation verfication ensures that the chain of claims is valid. The cedar policy allows custom business logic.
@@ -45,20 +49,14 @@ const policies = { staticPolicies: policyText };
 
 // Initial prescription from doctor to pharmacy, delegating the pharmacy the option to delegate the prescription to the patient.
 const PRESCRIPTION_CREDENTIAL = {
-  "@context": [
-    "https://www.w3.org/2018/credentials/v1",
+  '@context': [
+    ...BASE_DELEGATION_CONTEXT,
     {
-      "@version": 1.1,
-      "dock": "https://rdf.dock.io/alpha/2021#",
-      "ex": "https://example.org/credentials#",
-
-      "Prescription": "ex:Prescription",
-      "DelegationCredential": "ex:DelegationCredential",
-
-      "rootCredentialId": "ex:rootCredentialId",
-      "prescribes": { "@id": "ex:prescribes", "@type": "@id" },
-      "mayClaim": { "@id": "dock:mayClaim", "@container": "@set" }
-    }
+      '@version': 1.1,
+      ex: 'https://example.org/credentials#',
+      Prescription: 'ex:Prescription',
+      prescribes: { '@id': 'ex:prescribes', '@type': '@id' },
+    },
   ],
   id: 'urn:cred:pres-001',
   type: ['VerifiableCredential', 'Prescription', 'DelegationCredential'],
@@ -91,24 +89,16 @@ const PRESENTATION_FIELDS = {
 };
 
 const PRESCRIPTION_USAGE_BASE_FIELDS = {
-  "@context": [
-    "https://www.w3.org/2018/credentials/v1",
+  '@context': [
+    ...BASE_DELEGATION_CONTEXT,
     {
-      "@version": 1.1,
-      "dock": "https://rdf.dock.io/alpha/2021#",
-      "ex": "https://example.org/credentials#",
-      "xsd": "http://www.w3.org/2001/XMLSchema#",
-
-      "PrescriptionUsage": "ex:PrescriptionUsage",
-      "DelegationCredential": "ex:DelegationCredential",
-
-      "previousCredentialId": { "@id": "ex:previousCredentialId", "@type": "@id" },
-      "rootCredentialId": { "@id": "ex:rootCredentialId", "@type": "@id" },
-
-      "mayClaim": { "@id": "dock:mayClaim", "@container": "@set" },
-      "PickUp": { "@id": "ex:PickUp", "@type": "xsd:boolean" },
-      "Pay": { "@id": "ex:Pay", "@type": "xsd:boolean" }
-    }
+      '@version': 1.1,
+      ex: 'https://example.org/credentials#',
+      xsd: 'http://www.w3.org/2001/XMLSchema#',
+      PrescriptionUsage: 'ex:PrescriptionUsage',
+      PickUp: { '@id': 'ex:PickUp', '@type': 'xsd:boolean' },
+      Pay: { '@id': 'ex:Pay', '@type': 'xsd:boolean' },
+    },
   ],
 };
 

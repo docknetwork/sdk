@@ -20,6 +20,7 @@ export async function runScenario(title, vp, policies) {
     const result = await verifyVPWithDelegation({
       expandedPresentation,
       credentialContexts,
+      documentLoader,
     });
     if (result.failures && result.failures.length > 0) {
       console.error('delegation failed ->', result);

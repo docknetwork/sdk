@@ -2,6 +2,7 @@ import jsonld from 'jsonld';
 import * as cedar from '@cedar-policy/cedar-wasm/nodejs';
 import { verifyVPWithDelegation } from '../src/engine.js';
 import { authorizeEvaluationsWithCedar } from '../src/cedar-authorization.js';
+import documentLoader from './document-loader.js';
 
 const policyText = `
 permit(
@@ -20,28 +21,23 @@ const policies = { staticPolicies: policyText };
 
 const DELEGATION_CONTEXT = [
   'https://www.w3.org/2018/credentials/v1',
+  'https://ld.truvera.io/credentials/delegation',
   {
     '@version': 1.1,
-    dock: 'https://rdf.dock.io/alpha/2021#',
     ex: 'https://example.org/credentials#',
-    DelegationCredential: 'ex:DelegationCredential',
     CreditScoreDelegation: 'ex:CreditScoreDelegation',
-    rootCredentialId: 'ex:rootCredentialId',
-    previousCredentialId: 'ex:previousCredentialId',
-    mayClaim: { '@id': 'dock:mayClaim', '@container': '@set' },
   },
 ];
 
 const CREDIT_CONTEXT = [
   'https://www.w3.org/2018/credentials/v1',
+  'https://ld.truvera.io/credentials/delegation',
   {
     '@version': 1.1,
     ex: 'https://example.org/credentials#',
     xsd: 'http://www.w3.org/2001/XMLSchema#',
     CreditScoreCredential: 'ex:CreditScoreCredential',
     creditScore: { '@id': 'ex:creditScore', '@type': 'xsd:integer' },
-    previousCredentialId: { '@id': 'ex:previousCredentialId', '@type': '@id' },
-    rootCredentialId: { '@id': 'ex:rootCredentialId', '@type': '@id' },
   },
 ];
 
@@ -101,7 +97,7 @@ const multiChainPresentation = {
   verifiableCredential: [delegationToB, scoreAlice, scoreBob],
 };
 
-const expanded = await jsonld.expand(multiChainPresentation);
+const expanded = await jsonld.expand(multiChainPresentation, { documentLoader });
 const contexts = new Map();
 (multiChainPresentation.verifiableCredential ?? []).forEach((vc) => {
   if (vc && typeof vc.id === 'string' && vc['@context']) {
@@ -112,6 +108,7 @@ const contexts = new Map();
 const result = await verifyVPWithDelegation({
   expandedPresentation: expanded,
   credentialContexts: contexts,
+  documentLoader,
 });
 
 let decision = result.decision;

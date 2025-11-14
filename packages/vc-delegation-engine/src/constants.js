@@ -10,10 +10,10 @@ export const SECURITY_VERIFICATION_METHOD = `${SECURITY_NS}verificationMethod`;
 export const MAY_CLAIM_IRI = 'https://rdf.dock.io/alpha/2021#mayClaim';
 export const MAY_CLAIM_ALIAS_KEYS = [MAY_CLAIM_IRI, 'mayClaim'];
 
-export const VC_PREVIOUS_CREDENTIAL_ID = 'https://example.org/credentials#previousCredentialId';
-export const VC_ROOT_CREDENTIAL_ID = 'https://example.org/credentials#rootCredentialId';
-
-export const VC_TYPE_DELEGATION_CREDENTIAL = 'https://example.org/credentials#DelegationCredential';
+export const DELEGATION_NS = 'https://ld.truvera.io/credentials/delegation#';
+export const VC_TYPE_DELEGATION_CREDENTIAL = `${DELEGATION_NS}DelegationCredential`;
+export const VC_PREVIOUS_CREDENTIAL_ID = `${DELEGATION_NS}previousCredentialId`;
+export const VC_ROOT_CREDENTIAL_ID = `${DELEGATION_NS}rootCredentialId`;
 
 export const ACTION_VERIFY = 'Verify';
 export const VERIFY_CHAIN_ID = 'Action:Verify';

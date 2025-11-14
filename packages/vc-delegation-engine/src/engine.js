@@ -16,7 +16,11 @@ import { buildRifyPremisesFromChain, buildRifyRules } from './rify-helpers.js';
 import { collectAuthorizedClaims } from './claim-deduction.js';
 import {
   VC_VC,
+  VC_NS,
   VC_ISSUER,
+  VC_PREVIOUS_CREDENTIAL_ID,
+  VC_ROOT_CREDENTIAL_ID,
+  VC_TYPE_DELEGATION_CREDENTIAL,
   ACTION_VERIFY,
   UNKNOWN_ACTOR_ID,
   UNKNOWN_IDENTIFIER,
@@ -25,7 +29,12 @@ import { summarizeDelegationChain, summarizeStandaloneCredential } from './summa
 import { DelegationError, DelegationErrorCodes, normalizeDelegationFailure } from './errors.js';
 
 const CONTROL_PREDICATES = new Set(['allows', 'delegatesTo', 'listsClaim', 'inheritsParent']);
-const RESERVED_RESOURCE_TYPES = new Set(['VerifiableCredential', 'DelegationCredential']);
+const RESERVED_RESOURCE_TYPES = new Set([
+  `${VC_NS}VerifiableCredential`,
+  'VerifiableCredential',
+  VC_TYPE_DELEGATION_CREDENTIAL,
+  'DelegationCredential',
+]);
 
 /**
  * @typedef {Object} DelegationSummary
@@ -137,12 +146,14 @@ function deriveResourceTypesFromChain(chain) {
  * @param {any[]} options.expandedPresentation
  * @param {Map<string, any>|Object} options.credentialContexts
  * @param {boolean} [options.failOnUnauthorizedClaims=false]
+ * @param {Function} [options.documentLoader]
  * @returns {Promise<VerifyDelegationResult>}
  */
 export async function verifyVPWithDelegation({
   expandedPresentation,
   credentialContexts,
   failOnUnauthorizedClaims = false,
+  documentLoader,
 }) {
   try {
     if (!expandedPresentation) {
@@ -184,15 +195,16 @@ export async function verifyVPWithDelegation({
         );
       }
 
-      const compacted = await jsonld.compact(credentialNode, { '@context': context });
+      const compactOptions = documentLoader ? { documentLoader } : undefined;
+      const compacted = await jsonld.compact(credentialNode, { '@context': context }, compactOptions);
       const credentialSubject = normalizeSubject(compacted?.credentialSubject);
 
       const credential = {
         id: credentialId,
         type: toArray(credentialNode['@type']).map((value) => shortenTerm(value)),
         issuer: firstExpandedValue(credentialNode[VC_ISSUER]),
-        previousCredentialId: findExpandedTermId(credentialNode, 'previousCredentialId'),
-        rootCredentialId: findExpandedTermId(credentialNode, 'rootCredentialId'),
+        previousCredentialId: findExpandedTermId(credentialNode, VC_PREVIOUS_CREDENTIAL_ID),
+        rootCredentialId: findExpandedTermId(credentialNode, VC_ROOT_CREDENTIAL_ID),
         credentialSubject,
         expandedNode: credentialNode,
       };

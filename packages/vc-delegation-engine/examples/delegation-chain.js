@@ -19,21 +19,18 @@ const policies = { staticPolicies: policyText };
 
 const CREDIT_DELEGATION_CONTEXT = [
   'https://www.w3.org/2018/credentials/v1',
+  'https://ld.truvera.io/credentials/delegation',
   {
     '@version': 1.1,
-    dock: 'https://rdf.dock.io/alpha/2021#',
     ex: 'https://example.org/credentials#',
-    DelegationCredential: 'ex:DelegationCredential',
     CreditScoreDelegation: 'ex:CreditScoreDelegation',
-    rootCredentialId: 'ex:rootCredentialId',
-    previousCredentialId: 'ex:previousCredentialId',
     body: 'ex:body',
-    mayClaim: { '@id': 'dock:mayClaim', '@container': '@set' },
   },
 ];
 
 const CREDIT_SCORE_CONTEXT = [
   'https://www.w3.org/2018/credentials/v1',
+  'https://ld.truvera.io/credentials/delegation',
   {
     '@version': 1.1,
     ex: 'https://example.org/credentials#',
@@ -42,8 +39,6 @@ const CREDIT_SCORE_CONTEXT = [
     creditScore: { '@id': 'ex:creditScore', '@type': 'xsd:integer' },
     hasLoans: { '@id': 'ex:hasLoans', '@type': 'xsd:boolean' },
     hasCCJs: { '@id': 'ex:hasCCJs', '@type': 'xsd:boolean' },
-    previousCredentialId: { '@id': 'ex:previousCredentialId', '@type': '@id' },
-    rootCredentialId: { '@id': 'ex:rootCredentialId', '@type': '@id' },
   },
 ];
 

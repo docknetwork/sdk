@@ -1,21 +1,3 @@
-import { runScenario } from './helpers.js';
-
-const policyText = `
-permit(
-  principal in Credential::Chain::"Action:Verify",
-  action == Credential::Action::"Verify",
-  resource
-) when {
-  principal == context.vpSigner &&
-  context.tailDepth <= 2 &&
-  context.rootIssuer == Credential::Actor::"did:dock:a" &&
-  context.authorizedClaims.creditScore >= 0 &&
-  context.authorizedClaims.body == "Issuer of Credit Scores"
-};
-`;
-
-const policies = { staticPolicies: policyText };
-
 const CREDIT_DELEGATION_CONTEXT = [
   'https://www.w3.org/2018/credentials/v1',
   'https://ld.truvera.io/credentials/delegation',
@@ -40,6 +22,22 @@ const CREDIT_SCORE_CONTEXT = [
 ];
 
 const PRESENTATION_CONTEXT = ['https://www.w3.org/2018/credentials/v1'];
+
+export const simpleDelegationPolicy = `
+permit(
+  principal in Credential::Chain::"Action:Verify",
+  action == Credential::Action::"Verify",
+  resource in Credential::Chain::"Action:Verify"
+) when {
+  principal == context.vpSigner &&
+  context.tailDepth <= 2 &&
+  context.rootIssuer == Credential::Actor::"did:dock:a" &&
+  context.authorizedClaims.creditScore >= 0 &&
+  context.authorizedClaims.body == "Issuer of Credit Scores"
+};
+`;
+
+export const simpleDelegationPolicies = { staticPolicies: simpleDelegationPolicy };
 
 const authorizedDelegation = {
   '@context': CREDIT_DELEGATION_CONTEXT,
@@ -68,21 +66,6 @@ const authorizedScore = {
   },
 };
 
-await runScenario('AUTHORIZED CREDIT SCORE', {
-  '@context': PRESENTATION_CONTEXT,
-  type: ['VerifiablePresentation'],
-  proof: {
-    type: 'Ed25519Signature2018',
-    created: '2025-01-17T12:15:51Z',
-    verificationMethod: 'did:dock:b#auth-key',
-    proofPurpose: 'authentication',
-    challenge: 'credit-score-example',
-    domain: 'docklabs.example',
-    jws: 'test..signature',
-  },
-  verifiableCredential: [authorizedDelegation, authorizedScore],
-}, policies);
-
 const unauthorizedDelegation = {
   '@context': CREDIT_DELEGATION_CONTEXT,
   id: 'urn:cred:deleg-a-b',
@@ -96,17 +79,34 @@ const unauthorizedDelegation = {
   },
 };
 
-await runScenario('UNAUTHORIZED CREDIT SCORE', {
-  '@context': PRESENTATION_CONTEXT,
-  type: ['VerifiablePresentation'],
-  proof: {
-    type: 'Ed25519Signature2018',
-    created: '2025-01-17T12:15:51Z',
-    verificationMethod: 'did:dock:d#auth-key',
-    proofPurpose: 'authentication',
-    challenge: 'credit-score-example',
-    domain: 'docklabs.example',
-    jws: 'test..signature',
+export const simpleDelegationPresentations = {
+  authorized: {
+    '@context': PRESENTATION_CONTEXT,
+    type: ['VerifiablePresentation'],
+    proof: {
+      type: 'Ed25519Signature2018',
+      created: '2025-01-17T12:15:51Z',
+      verificationMethod: 'did:dock:b#auth-key',
+      proofPurpose: 'authentication',
+      challenge: 'credit-score-example',
+      domain: 'docklabs.example',
+      jws: 'test..signature',
+    },
+    verifiableCredential: [authorizedDelegation, authorizedScore],
   },
-  verifiableCredential: [unauthorizedDelegation, authorizedScore],
-}, policies);
+  unauthorized: {
+    '@context': PRESENTATION_CONTEXT,
+    type: ['VerifiablePresentation'],
+    proof: {
+      type: 'Ed25519Signature2018',
+      created: '2025-01-17T12:15:51Z',
+      verificationMethod: 'did:dock:d#auth-key',
+      proofPurpose: 'authentication',
+      challenge: 'credit-score-example',
+      domain: 'docklabs.example',
+      jws: 'test..signature',
+    },
+    verifiableCredential: [unauthorizedDelegation, authorizedScore],
+  },
+};
+

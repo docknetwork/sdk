@@ -2,6 +2,7 @@ import {
   matchesType,
   extractGraphId,
   extractGraphObject,
+  findExpandedTermId,
 } from './jsonld-utils.js';
 import {
   VC_ISSUER,
@@ -29,7 +30,7 @@ export function summarizeDelegationChain(credentials) {
 
   const referencedPreviousIds = new Set();
   credentials.forEach((vc) => {
-    const prevId = extractGraphId(vc, VC_PREVIOUS_CREDENTIAL_ID);
+    const prevId = findExpandedTermId(vc, VC_PREVIOUS_CREDENTIAL_ID);
     if (typeof prevId === 'string' && prevId) {
       referencedPreviousIds.add(prevId);
     }
@@ -46,7 +47,7 @@ export function summarizeDelegationChain(credentials) {
 
   const tailCredential = tailCandidates[0];
 
-  if (typeof extractGraphId(tailCredential, VC_PREVIOUS_CREDENTIAL_ID) !== 'string') {
+  if (typeof findExpandedTermId(tailCredential, VC_PREVIOUS_CREDENTIAL_ID) !== 'string') {
     throw new Error('Tail credential must include previousCredentialId');
   }
 
@@ -66,7 +67,7 @@ export function summarizeDelegationChain(credentials) {
     }
     visited.add(current['@id']);
     chain.unshift(current);
-    const prevId = extractGraphId(current, VC_PREVIOUS_CREDENTIAL_ID);
+    const prevId = findExpandedTermId(current, VC_PREVIOUS_CREDENTIAL_ID);
     if (!prevId) {
       break;
     }
@@ -102,7 +103,7 @@ export function summarizeDelegationChain(credentials) {
   }
 
   chain.slice(1).forEach((vc) => {
-    const declaredRootId = extractGraphId(vc, VC_ROOT_CREDENTIAL_ID);
+    const declaredRootId = findExpandedTermId(vc, VC_ROOT_CREDENTIAL_ID);
     if (typeof declaredRootId !== 'string' || declaredRootId.length === 0) {
       throw new Error(
         `Credential ${vc['@id']} must include rootCredentialId referencing ${expectedRootId}`,

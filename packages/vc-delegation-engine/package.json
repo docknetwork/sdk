@@ -23,7 +23,7 @@
     "build:cjs": "esbuild src/index.js --bundle --format=cjs --platform=node --sourcemap --outfile=dist/cjs/index.cjs --external:@cedar-policy/cedar-wasm/nodejs --external:jsonld --external:rify",
     "build:types": "tsc -p tsconfig.build.json",
     "build": "yarn clean && yarn build:esm && yarn build:cjs && yarn build:types",
-    "lint": "eslint \"src/**/*.js\"",
+    "lint": "eslint \"src/**/*.js\" \"tests/**/*.js\"",
     "docs-disabled": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
     "test": "vitest run ./tests",
     "prepublishOnly": "yarn build"

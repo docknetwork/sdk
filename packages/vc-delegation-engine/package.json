@@ -1,5 +1,5 @@
 {
-  "name": "vc-delegation-engine",
+  "name": "@docknetwork/vc-delegation-engine",
   "version": "1.0.0",
   "description": "",
   "main": "dist/cjs/index.cjs",

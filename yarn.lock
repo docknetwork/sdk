@@ -11646,7 +11646,7 @@ jsonld@5.2.0, jsonld@^5.0.0:
   resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-5.2.0.tgz#d1e8af38a334cb95edf0f2ae4e2b58baf8d2b5a9"
   integrity sha512-JymgT6Xzk5CHEmHuEyvoTNviEPxv6ihLWSPu1gFdtjSAyM6cFqNrv02yS/SIur3BBIkCf0HjizRc24d8/FfQKw==
   dependencies:
-    "@digitalbazaar/http-client" "^1.1.0"
+    "@digitalbazaar/http-client" "^3.2.0"
     canonicalize "^1.0.1"
     lru-cache "^6.0.0"
     rdf-canonize "^3.0.0"

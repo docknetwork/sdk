@@ -71,11 +71,7 @@ function normalizeFailure(error, { code = 'CHAIN_VALIDATION_ERROR' } = {}) {
 export async function verifyVPWithDelegation({
   expandedPresentation,
   credentialContexts,
-  resourceId: overrideResourceId,
-  actionId = 'Verify',
-  principalId,
   failOnUnauthorizedClaims = false,
-  authorizeChain,
 }) {
   try {
     if (!expandedPresentation) {
@@ -83,7 +79,10 @@ export async function verifyVPWithDelegation({
     }
 
     const presentationNode = extractExpandedPresentationNode(expandedPresentation);
-    const presentationSigner = extractExpandedVerificationMethod(presentationNode, principalId);
+    const extractedSigner = extractExpandedVerificationMethod(presentationNode);
+    const presentationSigner = typeof extractedSigner === 'string' && extractedSigner.length > 0
+      ? extractedSigner
+      : 'unknown';
 
     const normalizedById = new Map();
     const contexts = normalizeContextMap(credentialContexts);
@@ -133,7 +132,7 @@ export async function verifyVPWithDelegation({
 
     const seenChains = new Set();
     const summaries = [];
-    const authorizations = [];
+    const evaluations = [];
     let lastFacts = null;
     let lastEntities = null;
 
@@ -174,18 +173,9 @@ export async function verifyVPWithDelegation({
       const summary = hasDelegationLinks
         ? summarizeDelegationChain(chain.map((chainItem) => chainItem.expandedNode))
         : summarizeStandaloneCredential(chain[chain.length - 1]);
-      const resourceId = overrideResourceId ?? summary.resourceId;
-      const resolvedPrincipalId = principalId ?? presentationSigner;
+      const resourceId = summary.resourceId;
+      const resolvedPrincipalId = presentationSigner;
       const authorizedGraphId = rootCredentialId ? `urn:authorized:${rootCredentialId}` : 'urn:authorized';
-
-      if (authorizeChain) {
-        if (!actionId) {
-          throw new Error('Missing actionId');
-        }
-        if (!resolvedPrincipalId) {
-          throw new Error('Principal id must be provided for authorization');
-        }
-      }
 
       const facts = {
         ...summary,
@@ -233,36 +223,15 @@ export async function verifyVPWithDelegation({
       summary.authorizedClaims = authorizedClaimUnion;
       summary.authorizedClaimsBySubject = authorizedPerSubject;
 
-      let decision = 'allow';
-      let authorizationResult = null;
-      if (typeof authorizeChain === 'function') {
-        authorizationResult = await authorizeChain({
-          actionId,
-          principalId: resolvedPrincipalId,
-          resourceId,
-          presentationSigner,
-          summary,
-          facts,
-          entities,
-          chain,
-          premises,
-          derived,
-          authorizedClaims: authorizedClaimUnion,
-          authorizedClaimsBySubject: authorizedPerSubject,
-        });
-        if (typeof authorizationResult === 'string') {
-          decision = authorizationResult;
-        } else if (authorizationResult && typeof authorizationResult === 'object') {
-          decision = authorizationResult.decision ?? 'allow';
-        }
-      }
-
       return {
-        decision,
         summary,
         facts,
         entities,
-        authorizationResult,
+        chain,
+        premises,
+        derived,
+        authorizedClaims: authorizedClaimUnion,
+        authorizedClaimsBySubject: authorizedPerSubject,
       };
     };
 
@@ -271,24 +240,12 @@ export async function verifyVPWithDelegation({
       if (!chain) {
         continue;
       }
+      const evaluation = await evaluateChain(chain);
       const {
-        decision, summary, facts, entities, authorizationResult,
-      } = await evaluateChain(chain);
-      if (decision !== 'allow') {
-        return {
-          decision,
-          failures: [],
-          summary,
-          summaries: [summary],
-          facts,
-          entities,
-          authorizations: authorizationResult ? [authorizationResult] : [],
-        };
-      }
+        summary, facts, entities,
+      } = evaluation;
       summaries.push(summary);
-      if (authorizationResult) {
-        authorizations.push(authorizationResult);
-      }
+      evaluations.push(evaluation);
       lastFacts = facts;
       lastEntities = entities;
     }
@@ -300,7 +257,7 @@ export async function verifyVPWithDelegation({
       summaries,
       facts: lastFacts,
       entities: lastEntities,
-      authorizations,
+      evaluations,
     };
   } catch (error) {
     return {
@@ -309,7 +266,7 @@ export async function verifyVPWithDelegation({
       summary: null,
       facts: null,
       entities: null,
-      authorizations: [],
+      evaluations: [],
     };
   }
 }

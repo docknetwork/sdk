@@ -1,12 +1,12 @@
 import jsonld from 'jsonld';
 import { verifyVPWithDelegation } from '../src/engine.js';
-import { authorize as authorizeWithCedar } from '../src/cedar-auth.js';
+import { authorizeEvaluationsWithCedar } from '../src/cedar-authorization.js';
 
 const policyText = `
 permit(
   principal in Credential::Chain::"Action:Verify",
   action == Credential::Action::"Verify",
-  resource in Credential::Chain::"Action:Verify"
+  resource
 ) when {
   principal == context.vpSigner &&
   context.tailDepth <= 2 &&
@@ -111,33 +111,21 @@ const contexts = new Map();
 const result = await verifyVPWithDelegation({
   expandedPresentation: expanded,
   credentialContexts: contexts,
-  authorizeClaims: ({
-    principalId,
-    actionId,
-    resourceId,
-    presentationSigner,
-    summary,
-    entities,
-    authorizedClaims,
-    authorizedClaimsBySubject,
-  }) => authorizeWithCedar({
-    policies,
-    principalId,
-    actionId,
-    resourceId,
-    vpSignerId: presentationSigner,
-    entities,
-    rootTypes: summary.rootTypes,
-    rootIssuerId: summary.rootIssuerId,
-    tailTypes: summary.tailTypes,
-    tailIssuerId: summary.tailIssuerId,
-    tailDepth: summary.tailDepth,
-    authorizedClaims,
-    authorizedClaimsBySubject,
-  }),
 });
 
-console.log('Multi-delegation VP decision ->', result.decision);
+let decision = result.decision;
+if (policies) {
+  const authorization = authorizeEvaluationsWithCedar({
+    evaluations: result.evaluations,
+    policies,
+  });
+  decision = authorization.decision;
+  if (authorization.authorizations.length > 0) {
+    console.log('Authorization decisions:', authorization.authorizations);
+  }
+}
+
+console.log('Multi-delegation VP decision ->', decision);
 if (result.summaries) {
   console.log('Chains verified:', result.summaries.length);
 }

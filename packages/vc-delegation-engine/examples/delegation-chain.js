@@ -4,7 +4,7 @@ const policyText = `
 permit(
   principal in Credential::Chain::"Action:Verify",
   action == Credential::Action::"Verify",
-  resource in Credential::Chain::"Action:Verify"
+  resource
 ) when {
   principal == context.vpSigner &&
   context.tailDepth <= 2 &&

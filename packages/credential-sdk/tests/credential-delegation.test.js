@@ -1,427 +1,388 @@
-import jsonld from 'jsonld';
-import { randomAsHex } from '../src/utils';
-
 import {
-  acceptCompositeClaims,
-  proveCompositeClaims,
-  expandedLogicProperty,
-  MAYCLAIM,
-  ANYCLAIM,
-  MAYCLAIM_DEF_1,
-} from '../src/rdf-and-cd';
+  issueCredential,
+  signPresentation,
+  verifyPresentation,
+  documentLoader as credentialDocumentLoader,
+} from '../src/vc/index.js';
+import { MAY_CLAIM_IRI } from '@docknetwork/vc-delegation-engine';
+import * as cedar from '@cedar-policy/cedar-wasm/nodejs';
 
-import { issueCredential } from '../src/vc';
+const AUTHORITY_DID = 'did:example:authority';
+const DELEGATE_DID = 'did:example:delegator';
+const SECOND_DELEGATE_DID = 'did:example:delegate-2';
+const SUBJECT_DID = 'did:example:holder';
+const CHALLENGE = 'test-challenge';
+const DOMAIN = 'delegation.test';
 
-import { createPresentation } from './utils/create-presentation';
-import { documentLoader } from './utils/cached-document-loader';
-import { newDid, verifyC, verifyP } from './utils/did-helpers';
+const CREDIT_DELEGATION_CONTEXT = [
+  'https://www.w3.org/2018/credentials/v1',
+  'https://ld.truvera.io/credentials/delegation',
+  {
+    '@version': 1.1,
+    dock: 'https://rdf.dock.io/alpha/2021#',
+    ex: 'https://example.org/credentials#',
+    CreditScoreDelegation: 'ex:CreditScoreDelegation',
+    body: 'ex:body',
+  },
+];
 
-function delegationCredential(delegator, delegate) {
+const CREDIT_SCORE_CONTEXT = [
+  'https://www.w3.org/2018/credentials/v1',
+  'https://ld.truvera.io/credentials/delegation',
+  {
+    '@version': 1.1,
+    ex: 'https://example.org/credentials#',
+    xsd: 'http://www.w3.org/2001/XMLSchema#',
+    CreditScoreCredential: 'ex:CreditScoreCredential',
+    creditScore: { '@id': 'ex:creditScore', '@type': 'xsd:integer' },
+  },
+];
+
+const BASE_JWK = {
+  type: 'JsonWebKey2020',
+  publicKeyJwk: {
+    kty: 'EC',
+    crv: 'P-384',
+    x: 'dMtj6RjwQK4G5HP3iwOD94RwbzPhS4wTZHO1luk_0Wz89chqV6uJyb51KaZzK0tk',
+    y: 'viPKF7Zbc4FxKegoupyVRcBr8TZHFxUrKQq4huOAyMuhTYJbFpAwMhIrWppql02E',
+  },
+  privateKeyJwk: {
+    kty: 'EC',
+    crv: 'P-384',
+    x: 'dMtj6RjwQK4G5HP3iwOD94RwbzPhS4wTZHO1luk_0Wz89chqV6uJyb51KaZzK0tk',
+    y: 'viPKF7Zbc4FxKegoupyVRcBr8TZHFxUrKQq4huOAyMuhTYJbFpAwMhIrWppql02E',
+    d: 'Wq5_KgqjvYh_EGvBDYtSs_0ufJJP0y0tkAXl6GqxHMkY0QP8vmD76mniXD-BWhd_',
+  },
+};
+
+function buildKeyDoc(controller) {
   return {
-    '@context': ['https://www.w3.org/2018/credentials/v1'],
-    id: `urn:uuid:${randomAsHex(16)}`,
-    type: ['VerifiableCredential', 'DelegationCredential'],
-    issuer: delegator,
-    issuanceDate: new Date().toISOString(),
-    credentialSubject: {
-      id: delegate,
-      [MAYCLAIM]: { '@id': ANYCLAIM },
-    },
+    '@context': [
+      'https://www.w3.org/ns/did/v1',
+      'https://w3id.org/security/suites/jws-2020/v1',
+    ],
+    id: `${controller}#controller-key`,
+    controller,
+    type: BASE_JWK.type,
+    publicKeyJwk: BASE_JWK.publicKeyJwk,
+    privateKeyJwk: BASE_JWK.privateKeyJwk,
   };
 }
 
-describe('Credential delegation and redelegation (pharmacy -> doctor -> patient -> guardian)', () => {
-  let doctor;
-  let doctorKP;
-  let pharmacy;
-  let pharmacyKP;
-  let patient;
-  let patientKP;
-  let guardian;
-  let guardianKP;
-  const CAN_PICK_UP = 'https://example.org/pharmacy#canPickUp';
-  const CAN_PAY = 'https://example.org/pharmacy#canPay';
-  const PRESCRIPTION = 'urn:rx:123456';
-  let prescriptionCred;
-  let pharmacyDelegatesToPatient;
-  let patientDelegatesToGuardian;
-  let guardianAssertion;
-  let patientAssertion;
+const AUTHORITY_KEY = buildKeyDoc(AUTHORITY_DID);
+const DELEGATE_KEY = buildKeyDoc(DELEGATE_DID);
+const SECOND_DELEGATE_KEY = buildKeyDoc(SECOND_DELEGATE_DID);
 
-  beforeAll(async () => {
-    ({ did: doctor, suite: doctorKP } = await newDid());
-    ({ did: pharmacy, suite: pharmacyKP } = await newDid());
-    ({ did: patient, suite: patientKP } = await newDid());
-    ({ did: guardian, suite: guardianKP } = await newDid());
-
-    prescriptionCred = await issueCredential(
-      doctorKP,
-      {
-        '@context': [
-          'https://www.w3.org/2018/credentials/v1',
-          {
-            Prescription: 'https://example.org/pharmacy#Prescription',
-            prescribes: 'https://example.org/pharmacy#prescribes',
-            patient: 'https://schema.org/patient',
-            medication: 'https://example.org/pharmacy#medication',
-          },
-        ],
-        id: 'https://pharmacy.example/credentials/prescription-001',
-        type: ['VerifiableCredential', 'Prescription'],
-        issuer: doctor,
-        issuanceDate: '2024-01-01T00:00:00Z',
-        credentialSubject: {
-          id: pharmacy,
-          prescribes: {
-            '@id': PRESCRIPTION,
-          },
-          patient: {
-            '@id': patient,
-          },
-          medication: 'https://example.org/medication#Amoxicillin-500mg',
+const DID_DOCS = new Map([
+  [
+    AUTHORITY_DID,
+    {
+      '@context': [
+        'https://www.w3.org/ns/did/v1',
+        'https://w3id.org/security/suites/jws-2020/v1',
+      ],
+      id: AUTHORITY_DID,
+      verificationMethod: [
+        {
+          id: AUTHORITY_KEY.id,
+          type: AUTHORITY_KEY.type,
+          controller: AUTHORITY_DID,
+          publicKeyJwk: AUTHORITY_KEY.publicKeyJwk,
         },
-      },
-      true,
-      documentLoader,
-    );
-    expect(await verifyC(prescriptionCred)).toHaveProperty('verified', true);
-
-    pharmacyDelegatesToPatient = await issueCredential(
-      pharmacyKP,
-      delegationCredential(pharmacy, patient),
-      true,
-      documentLoader,
-    );
-    expect(await verifyC(pharmacyDelegatesToPatient)).toHaveProperty(
-      'verified',
-      true,
-    );
-
-    patientDelegatesToGuardian = await issueCredential(
-      patientKP,
-      delegationCredential(patient, guardian),
-      true,
-      documentLoader,
-    );
-    expect(await verifyC(patientDelegatesToGuardian)).toHaveProperty(
-      'verified',
-      true,
-    );
-
-    guardianAssertion = await issueCredential(
-      guardianKP,
-      {
-        '@context': ['https://www.w3.org/2018/credentials/v1'],
-        id: 'https://guardian.example/credentials/claim-001',
-        type: ['VerifiableCredential', 'GuardianActionAuthorization'],
-        issuer: guardian,
-        issuanceDate: '2024-01-02T00:00:00Z',
-        credentialSubject: {
-          '@id': guardian,
-          [CAN_PICK_UP]: { '@id': PRESCRIPTION },
-          [CAN_PAY]: { '@id': PRESCRIPTION },
+      ],
+      authentication: [AUTHORITY_KEY.id],
+      assertionMethod: [AUTHORITY_KEY.id],
+    },
+  ],
+  [
+    DELEGATE_DID,
+    {
+      '@context': [
+        'https://www.w3.org/ns/did/v1',
+        'https://w3id.org/security/suites/jws-2020/v1',
+      ],
+      id: DELEGATE_DID,
+      verificationMethod: [
+        {
+          id: DELEGATE_KEY.id,
+          type: DELEGATE_KEY.type,
+          controller: DELEGATE_DID,
+          publicKeyJwk: DELEGATE_KEY.publicKeyJwk,
         },
-      },
-      true,
-      documentLoader,
-    );
-    expect(await verifyC(guardianAssertion)).toHaveProperty('verified', true);
-
-    patientAssertion = await issueCredential(
-      patientKP,
-      {
-        '@context': ['https://www.w3.org/2018/credentials/v1'],
-        id: 'https://patient.example/credentials/claim-001',
-        type: ['VerifiableCredential', 'PatientActionAuthorization'],
-        issuer: patient,
-        issuanceDate: '2024-01-02T00:00:00Z',
-        credentialSubject: {
-          '@id': patient,
-          [CAN_PICK_UP]: { '@id': PRESCRIPTION },
-          [CAN_PAY]: { '@id': PRESCRIPTION },
+      ],
+      authentication: [DELEGATE_KEY.id],
+      assertionMethod: [DELEGATE_KEY.id],
+    },
+  ],
+  [
+    SECOND_DELEGATE_DID,
+    {
+      '@context': [
+        'https://www.w3.org/ns/did/v1',
+        'https://w3id.org/security/suites/jws-2020/v1',
+      ],
+      id: SECOND_DELEGATE_DID,
+      verificationMethod: [
+        {
+          id: SECOND_DELEGATE_KEY.id,
+          type: SECOND_DELEGATE_KEY.type,
+          controller: SECOND_DELEGATE_DID,
+          publicKeyJwk: SECOND_DELEGATE_KEY.publicKeyJwk,
         },
-      },
-      true,
-      documentLoader,
-    );
-    expect(await verifyC(patientAssertion)).toHaveProperty('verified', true);
+      ],
+      authentication: [SECOND_DELEGATE_KEY.id],
+      assertionMethod: [SECOND_DELEGATE_KEY.id],
+    },
+  ],
+]);
+
+const baseLoader = credentialDocumentLoader();
+async function exampleDocumentLoader(url) {
+  if (DID_DOCS.has(url)) {
+    return {
+      contextUrl: null,
+      documentUrl: url,
+      document: DID_DOCS.get(url),
+    };
+  }
+  const match = Array.from(DID_DOCS.values())
+    .flatMap((doc) => doc.verificationMethod ?? [])
+    .find((method) => method.id === url);
+  if (match) {
+    return { contextUrl: null, documentUrl: url, document: match };
+  }
+  return baseLoader(url);
+}
+
+async function buildDelegationChain({ includeSecondDelegation = false }) {
+  const rootId = 'urn:cred:deleg-root';
+  const delegationCredential = await issueCredential(AUTHORITY_KEY, {
+    '@context': CREDIT_DELEGATION_CONTEXT,
+    id: rootId,
+    type: ['VerifiableCredential', 'CreditScoreDelegation', 'DelegationCredential'],
+    issuer: AUTHORITY_DID,
+    issuanceDate: new Date().toISOString(),
+    credentialSubject: {
+      id: DELEGATE_DID,
+      [MAY_CLAIM_IRI]: ['creditScore', 'body'],
+      body: 'Issuer of Credit Scores',
+    },
+    rootCredentialId: rootId,
+    previousCredentialId: null,
   });
 
-  test(
-    'guardian authorized to pick up and pay via redelegation chain',
-    async () => {
-      const presentation = createPresentation(
-        [
-          prescriptionCred,
-          pharmacyDelegatesToPatient,
-          patientDelegatesToGuardian,
-          guardianAssertion,
-        ],
-        `urn:${randomAsHex(16)}`,
-        guardian,
-      );
-      expect(await verifyP(presentation)).toHaveProperty('verified', true);
+  const secondDelegationCredential = includeSecondDelegation
+    ? await issueCredential(DELEGATE_KEY, {
+      '@context': CREDIT_DELEGATION_CONTEXT,
+      id: 'urn:cred:deleg-secondary',
+      type: ['VerifiableCredential', 'CreditScoreDelegation', 'DelegationCredential'],
+      issuer: DELEGATE_DID,
+      issuanceDate: new Date().toISOString(),
+      credentialSubject: {
+        id: SECOND_DELEGATE_DID,
+        [MAY_CLAIM_IRI]: ['creditScore'],
+      },
+      rootCredentialId: rootId,
+      previousCredentialId: rootId,
+    })
+    : null;
 
-      const rules = [...MAYCLAIM_DEF_1];
-      const compositeClaims = [
-        [
-          { Iri: guardian },
-          { Iri: CAN_PICK_UP },
-          { Iri: PRESCRIPTION },
-          { Iri: pharmacy },
-        ],
-        [
-          { Iri: guardian },
-          { Iri: CAN_PAY },
-          { Iri: PRESCRIPTION },
-          { Iri: pharmacy },
-        ],
-      ];
-
-      const expandedForProof = await jsonld.expand(presentation, { documentLoader });
-      const proof = await proveCompositeClaims(expandedForProof, compositeClaims, rules);
-      presentation[expandedLogicProperty] = proof;
-
-      const expanded = await jsonld.expand(presentation, { documentLoader });
-      const allClaims = await acceptCompositeClaims(expanded, rules);
-
-      expect(allClaims).toContainEqual([
-        { Iri: guardian },
-        { Iri: CAN_PICK_UP },
-        { Iri: PRESCRIPTION },
-        { Iri: pharmacy },
-      ]);
-      expect(allClaims).toContainEqual([
-        { Iri: guardian },
-        { Iri: CAN_PAY },
-        { Iri: PRESCRIPTION },
-        { Iri: pharmacy },
-      ]);
-
-      expect(allClaims).toContainEqual([
-        { Iri: guardian },
-        { Iri: CAN_PICK_UP },
-        { Iri: PRESCRIPTION },
-        { Iri: guardian },
-      ]);
-      expect(allClaims).toContainEqual([
-        { Iri: guardian },
-        { Iri: CAN_PAY },
-        { Iri: PRESCRIPTION },
-        { Iri: guardian },
-      ]);
+  const creditScoreIssuer = includeSecondDelegation ? SECOND_DELEGATE_KEY : DELEGATE_KEY;
+  const creditScoreIssuerDid = includeSecondDelegation ? SECOND_DELEGATE_DID : DELEGATE_DID;
+  const creditScoreCredential = await issueCredential(creditScoreIssuer, {
+    '@context': CREDIT_SCORE_CONTEXT,
+    id: 'urn:cred:score-holder',
+    type: ['VerifiableCredential', 'CreditScoreCredential', 'DelegationCredential'],
+    issuer: creditScoreIssuerDid,
+    issuanceDate: new Date().toISOString(),
+    credentialSubject: {
+      id: SUBJECT_DID,
+      creditScore: 780,
     },
-    30000,
-  );
+    rootCredentialId: rootId,
+    previousCredentialId: includeSecondDelegation ? 'urn:cred:deleg-secondary' : rootId,
+  });
 
-  test(
-    'patient authorized to pick up and pay via delegation chain',
-    async () => {
-      const presentation = createPresentation(
-        [
-          prescriptionCred,
-          pharmacyDelegatesToPatient,
-          patientAssertion,
-        ],
-        `urn:${randomAsHex(16)}`,
-        patient,
-      );
-      expect(await verifyP(presentation)).toHaveProperty('verified', true);
+  const verifiableCredentials = [delegationCredential];
+  if (secondDelegationCredential) {
+    verifiableCredentials.push(secondDelegationCredential);
+  }
+  verifiableCredentials.push(creditScoreCredential);
+  const holderDid = includeSecondDelegation ? SECOND_DELEGATE_DID : DELEGATE_DID;
+  const holderKey = includeSecondDelegation ? SECOND_DELEGATE_KEY : DELEGATE_KEY;
+  return {
+    verifiableCredentials,
+    creditScoreCredential,
+    holderDid,
+    holderKey,
+  };
+}
 
-      const rules = [...MAYCLAIM_DEF_1];
-      const compositeClaims = [
-        [
-          { Iri: patient },
-          { Iri: CAN_PICK_UP },
-          { Iri: PRESCRIPTION },
-          { Iri: pharmacy },
-        ],
-        [
-          { Iri: patient },
-          { Iri: CAN_PAY },
-          { Iri: PRESCRIPTION },
-          { Iri: pharmacy },
-        ],
-      ];
-
-      const expandedForProof = await jsonld.expand(presentation, { documentLoader });
-      const proof = await proveCompositeClaims(expandedForProof, compositeClaims, rules);
-      presentation[expandedLogicProperty] = proof;
-
-      const expanded = await jsonld.expand(presentation, { documentLoader });
-      const allClaims = await acceptCompositeClaims(expanded, rules);
-
-      expect(allClaims).toContainEqual([
-        { Iri: patient },
-        { Iri: CAN_PICK_UP },
-        { Iri: PRESCRIPTION },
-        { Iri: pharmacy },
-      ]);
-      expect(allClaims).toContainEqual([
-        { Iri: patient },
-        { Iri: CAN_PAY },
-        { Iri: PRESCRIPTION },
-        { Iri: pharmacy },
-      ]);
-
-      expect(allClaims).toContainEqual([
-        { Iri: patient },
-        { Iri: CAN_PICK_UP },
-        { Iri: PRESCRIPTION },
-        { Iri: patient },
-      ]);
-      expect(allClaims).toContainEqual([
-        { Iri: patient },
-        { Iri: CAN_PAY },
-        { Iri: PRESCRIPTION },
-        { Iri: patient },
-      ]);
+async function issueStandaloneCreditScore({
+  id = 'urn:cred:score-only',
+  creditScore = 720,
+  subjectId = SUBJECT_DID,
+} = {}) {
+  return issueCredential(DELEGATE_KEY, {
+    '@context': CREDIT_SCORE_CONTEXT,
+    id,
+    type: ['VerifiableCredential', 'CreditScoreCredential'],
+    issuer: DELEGATE_DID,
+    issuanceDate: new Date().toISOString(),
+    credentialSubject: {
+      id: subjectId,
+      creditScore,
     },
-    30000,
-  );
+  });
+}
 
-  test(
-    'unhappy: guardian cannot pick up/pay without patient->guardian delegation',
-    async () => {
-      const presentation = createPresentation(
-        [
-          prescriptionCred,
-          pharmacyDelegatesToPatient,
-          // missing patientDelegatesToGuardian
-          guardianAssertion,
-        ],
-        `urn:${randomAsHex(16)}`,
-        guardian,
-      );
-      const rules = [...MAYCLAIM_DEF_1];
-      const compositeClaims = [
-        [
-          { Iri: guardian },
-          { Iri: CAN_PICK_UP },
-          { Iri: PRESCRIPTION },
-          { Iri: pharmacy },
-        ],
-      ];
-      const expandedForProof = await jsonld.expand(presentation, { documentLoader });
-      await expect(
-        proveCompositeClaims(expandedForProof, compositeClaims, rules),
-      ).rejects.toBeDefined();
+async function signDelegationPresentation({ verifiableCredential, holder, holderKey }) {
+  return signPresentation(
+    {
+      '@context': ['https://www.w3.org/2018/credentials/v1'],
+      type: ['VerifiablePresentation'],
+      holder,
+      verifiableCredential,
     },
-    30000,
+    holderKey,
+    CHALLENGE,
+    DOMAIN,
   );
+}
 
-  test(
-    'unhappy: patient cannot pick up/pay without pharmacy->patient delegation',
-    async () => {
-      const presentation = createPresentation(
-        [
-          prescriptionCred,
-          // missing pharmacyDelegatesToPatient
-          patientAssertion,
-        ],
-        `urn:${randomAsHex(16)}`,
-        patient,
-      );
-      const rules = [...MAYCLAIM_DEF_1];
-      const compositeClaims = [
-        [
-          { Iri: patient },
-          { Iri: CAN_PICK_UP },
-          { Iri: PRESCRIPTION },
-          { Iri: pharmacy },
-        ],
-      ];
-      const expandedForProof = await jsonld.expand(presentation, { documentLoader });
-      await expect(
-        proveCompositeClaims(expandedForProof, compositeClaims, rules),
-      ).rejects.toBeDefined();
-    },
-    30000,
+function includesDelegationType(types = []) {
+  return types.some(
+    (type) => typeof type === 'string'
+      && (type === 'DelegationCredential' || type.endsWith('#DelegationCredential')),
   );
+}
 
-  test(
-    'unhappy: guardian cannot pick up/pay with malformed delegation filter',
-    async () => {
-      // patient delegates to guardian but with wrong filter (not ANYCLAIM)
-      const BADFILTER = 'https://rdf.dock.io/alpha/2021#NOTANY';
-      const badDelegationToGuardian = await issueCredential(
-        patientKP,
-        {
-          '@context': ['https://www.w3.org/2018/credentials/v1'],
-          id: `urn:uuid:${randomAsHex(16)}`,
-          type: ['VerifiableCredential', 'DelegationCredential'],
-          issuer: patient,
-          issuanceDate: new Date().toISOString(),
-          credentialSubject: {
-            id: guardian,
-            [MAYCLAIM]: { '@id': BADFILTER },
-          },
-        },
-        true,
-        documentLoader,
-      );
+function cedarPolicy({ minimumScore = 700 } = {}) {
+  return {
+    staticPolicies: `
+permit(
+  principal in Credential::Chain::"Action:Verify",
+  action == Credential::Action::"Verify",
+  resource in Credential::Chain::"Action:Verify"
+) when {
+  principal == context.vpSigner &&
+  context.authorizedClaims.creditScore >= ${minimumScore}
+};`,
+  };
+}
 
-      const presentation = createPresentation(
-        [
-          prescriptionCred,
-          pharmacyDelegatesToPatient,
-          badDelegationToGuardian,
-          guardianAssertion,
-        ],
-        `urn:${randomAsHex(16)}`,
-        guardian,
-      );
-      const rules = [...MAYCLAIM_DEF_1];
-      const compositeClaims = [
-        [
-          { Iri: guardian },
-          { Iri: CAN_PICK_UP },
-          { Iri: PRESCRIPTION },
-          { Iri: pharmacy },
-        ],
-      ];
-      const expandedForProof = await jsonld.expand(presentation, { documentLoader });
-      await expect(
-        proveCompositeClaims(expandedForProof, compositeClaims, rules),
-      ).rejects.toBeDefined();
-    },
-    30000,
-  );
+describe('credential delegation integration', () => {
+  it('verifies the delegation example without cedar policy', async () => {
+    const {
+      verifiableCredentials,
+      holderDid,
+      holderKey,
+    } = await buildDelegationChain({});
+    const presentation = await signDelegationPresentation({
+      verifiableCredential: verifiableCredentials,
+      holder: holderDid,
+      holderKey,
+    });
+    const result = await verifyPresentation(presentation, {
+      challenge: CHALLENGE,
+      domain: DOMAIN,
+      failOnUnauthorizedClaims: true,
+      documentLoader: exampleDocumentLoader,
+    });
+    expect(result.verified).toBe(true);
+    expect(result.credentialResults.every((r) => r.verified)).toBe(true);
+    expect(result.delegationResult?.decision).toBe('allow');
+    expect(result.delegationResult?.summaries?.length ?? 0).toBeGreaterThan(0);
+  });
 
-  test(
-    'unhappy: guardian cannot pick up/pay with reversed delegation direction',
-    async () => {
-      const guardianDelegatesToPatient = await issueCredential(
-        guardianKP,
-        delegationCredential(guardian, patient),
-        true,
-        documentLoader,
-      );
+  it('applies cedar configuration when provided', async () => {
+    const {
+      verifiableCredentials,
+      holderDid,
+      holderKey,
+    } = await buildDelegationChain({});
+    const presentation = await signDelegationPresentation({
+      verifiableCredential: verifiableCredentials,
+      holder: holderDid,
+      holderKey,
+    });
+    const result = await verifyPresentation(presentation, {
+      challenge: CHALLENGE,
+      domain: DOMAIN,
+      failOnUnauthorizedClaims: true,
+      cedarAuth: { policies: cedarPolicy(), cedar },
+      documentLoader: exampleDocumentLoader,
+    });
+    expect(result.verified).toBe(true);
+    expect(result.delegationResult?.decision).toBe('allow');
+    expect(result.delegationResult?.failures ?? []).toHaveLength(0);
+  });
 
-      const presentation = createPresentation(
-        [
-          prescriptionCred,
-          pharmacyDelegatesToPatient,
-          guardianDelegatesToPatient, // wrong direction
-          guardianAssertion,
-        ],
-        `urn:${randomAsHex(16)}`,
-        guardian,
-      );
-      const rules = [...MAYCLAIM_DEF_1];
-      const compositeClaims = [
-        [
-          { Iri: guardian },
-          { Iri: CAN_PICK_UP },
-          { Iri: PRESCRIPTION },
-          { Iri: pharmacy },
-        ],
-      ];
-      const expandedForProof = await jsonld.expand(presentation, { documentLoader });
-      await expect(
-        proveCompositeClaims(expandedForProof, compositeClaims, rules),
-      ).rejects.toBeDefined();
-    },
-    30000,
-  );
+  it('verifies longer delegation chains', async () => {
+    const {
+      verifiableCredentials,
+      holderDid,
+      holderKey,
+    } = await buildDelegationChain({ includeSecondDelegation: true });
+    const presentation = await signDelegationPresentation({
+      verifiableCredential: verifiableCredentials,
+      holder: holderDid,
+      holderKey,
+    });
+    const result = await verifyPresentation(presentation, {
+      challenge: CHALLENGE,
+      domain: DOMAIN,
+      failOnUnauthorizedClaims: true,
+      documentLoader: exampleDocumentLoader,
+    });
+    expect(result.verified).toBe(true);
+    const summaries = result.delegationResult?.summaries ?? [];
+    const chainSummary = summaries.find(
+      (summary) => Array.isArray(summary?.delegations) && summary.delegations.length > 0,
+    );
+    expect(chainSummary).toBeDefined();
+    const tailDepths = summaries.map((summary) => summary?.tailDepth ?? 0);
+    const maxTailDepth = tailDepths.length > 0 ? Math.max(...tailDepths) : 0;
+    expect(maxTailDepth).toBeGreaterThan(0);
+    const delegateIds = chainSummary?.delegations?.map((delegation) => delegation.principalId) ?? [];
+    expect(delegateIds).toContain(SECOND_DELEGATE_DID);
+  });
+
+  it('handles presentations mixing delegated and standalone credentials', async () => {
+    const {
+      verifiableCredentials,
+      holderDid,
+      holderKey,
+    } = await buildDelegationChain({});
+    const standalone = await issueStandaloneCreditScore({
+      id: 'urn:cred:score-standalone',
+      creditScore: 730,
+      subjectId: 'did:example:secondary-holder',
+    });
+    const mixedPresentation = await signDelegationPresentation({
+      verifiableCredential: [...verifiableCredentials, standalone],
+      holder: holderDid,
+      holderKey,
+    });
+    const result = await verifyPresentation(mixedPresentation, {
+      challenge: CHALLENGE,
+      domain: DOMAIN,
+      failOnUnauthorizedClaims: true,
+      documentLoader: exampleDocumentLoader,
+    });
+    expect(result.verified).toBe(true);
+    const summaries = result.delegationResult?.summaries ?? [];
+    const resourceIds = summaries.map((summary) => summary.resourceId);
+    expect(resourceIds).toContain('urn:cred:score-holder');
+    expect(resourceIds).toContain('urn:cred:score-standalone');
+    const chainSummary = summaries.find(
+      (summary) => includesDelegationType(summary?.rootTypes),
+    );
+    const standaloneSummary = summaries.find(
+      (summary) => summary.resourceId === 'urn:cred:score-standalone',
+    );
+    expect(chainSummary).toBeDefined();
+    expect(standaloneSummary).toBeDefined();
+  });
 });
+

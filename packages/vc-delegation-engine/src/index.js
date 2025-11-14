@@ -2,4 +2,6 @@ export { verifyVPWithDelegation } from './engine.js';
 export {
   authorizeEvaluationsWithCedar,
   buildAuthorizationInputsFromEvaluation,
-} from './cedar-authorization.js';
+  buildCedarContext,
+  runCedarAuthorization,
+} from './authorization/cedar/index.js';

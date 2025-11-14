@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { MAY_CLAIM_ALIAS_KEYS } from './constants.js';
 import { matchesType } from './jsonld-utils.js';
 import { extractMayClaims } from './utils.js';
@@ -63,12 +64,14 @@ export function buildRifyPremisesFromChain(chain, rootGraphId) {
 
   for (const vc of chain) {
     if (!matchesType(vc, 'DelegationCredential')) {
+      // eslint-disable-next-line no-continue
       continue;
     }
 
     const parent = vc.issuer;
     const child = vc.credentialSubject?.id;
     if (!parent || !child) {
+      // eslint-disable-next-line no-continue
       continue;
     }
 

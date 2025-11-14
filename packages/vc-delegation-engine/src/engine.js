@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import jsonld from 'jsonld';
 import { infer } from 'rify';
 
@@ -22,7 +23,6 @@ import {
   VC_ROOT_CREDENTIAL_ID,
   VC_TYPE_DELEGATION_CREDENTIAL,
   ACTION_VERIFY,
-  UNKNOWN_ACTOR_ID,
   UNKNOWN_IDENTIFIER,
 } from './constants.js';
 import { summarizeDelegationChain, summarizeStandaloneCredential } from './summarize.js';
@@ -109,7 +109,9 @@ function findUnauthorizedClaims(premises = [], derived = [], authorizedGraphId) 
     }
     const key = `${subject}:::${predicate}:::${value}`;
     if (!remainingPremises.has(key)) {
-      remainingPremises.set(key, { subject, claim: predicate, value, issuer: graph });
+      remainingPremises.set(key, {
+        subject, claim: predicate, value, issuer: graph,
+      });
     }
   });
 
@@ -196,6 +198,7 @@ export async function verifyVPWithDelegation({
       }
 
       const compactOptions = documentLoader ? { documentLoader } : undefined;
+      // eslint-disable-next-line no-await-in-loop
       const compacted = await jsonld.compact(credentialNode, { '@context': context }, compactOptions);
       const credentialSubject = normalizeSubject(compacted?.credentialSubject);
 
@@ -277,7 +280,7 @@ export async function verifyVPWithDelegation({
       const summary = hasDelegationLinks
         ? summarizeDelegationChain(chain.map((chainItem) => chainItem.expandedNode))
         : summarizeStandaloneCredential(chain[chain.length - 1]);
-      const resourceId = summary.resourceId;
+      const { resourceId } = summary;
       const resolvedPrincipalId = presentationSigner;
       const authorizedGraphId = rootCredentialId ? `urn:authorized:${rootCredentialId}` : 'urn:authorized';
       const resourceTypes = deriveResourceTypesFromChain(chain);
@@ -354,8 +357,10 @@ export async function verifyVPWithDelegation({
     for (const tail of tailCredentials) {
       const chain = buildChain(tail.id);
       if (!chain) {
+        // eslint-disable-next-line no-continue
         continue;
       }
+      // eslint-disable-next-line no-await-in-loop
       const evaluation = await evaluateChain(chain);
       const {
         summary, facts, entities,

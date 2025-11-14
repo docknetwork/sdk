@@ -3,4 +3,3 @@ export {
   buildAuthorizationInputsFromEvaluation,
   authorizeEvaluationsWithCedar,
 } from './authorization.js';
-

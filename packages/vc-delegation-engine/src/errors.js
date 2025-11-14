@@ -28,4 +28,3 @@ export function normalizeDelegationFailure(error, { defaultCode = DelegationErro
     stack: error.stack,
   };
 }
-

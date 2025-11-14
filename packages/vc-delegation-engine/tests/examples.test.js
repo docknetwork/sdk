@@ -124,4 +124,3 @@ describe('delegation engine examples', () => {
     expect(authorization.decision).toBe('allow');
   });
 });
-

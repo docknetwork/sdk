@@ -1,6 +1,11 @@
 import { ensureEntity, entityRef, addParent } from '../../cedar-utils.js';
 import { ACTION_VERIFY, VERIFY_CHAIN_ID, UNKNOWN_ACTOR_ID } from '../../constants.js';
 
+const ACTOR_ENTITY = 'Credential::Actor';
+const ACTION_ENTITY = 'Credential::Action';
+const OBJECT_ENTITY = 'Credential::Object';
+const CHAIN_ENTITY = 'Credential::Chain';
+
 function cloneEntities(entities = []) {
   return (entities ?? []).map((entity) => ({
     uid: { ...(entity?.uid ?? {}) },
@@ -36,17 +41,17 @@ export function buildCedarContext({
   }
 
   const workingEntities = cloneEntities(entities);
-  ensureEntity(workingEntities, 'Credential::Actor', principalId);
-  ensureEntity(workingEntities, 'Credential::Action', actionId);
-  const resourceEntity = ensureEntity(workingEntities, 'Credential::Object', resourceId);
-  const verifyChain = ensureEntity(workingEntities, 'Credential::Chain', VERIFY_CHAIN_ID);
+  ensureEntity(workingEntities, ACTOR_ENTITY, principalId);
+  ensureEntity(workingEntities, ACTION_ENTITY, actionId);
+  const resourceEntity = ensureEntity(workingEntities, OBJECT_ENTITY, resourceId);
+  const verifyChain = ensureEntity(workingEntities, CHAIN_ENTITY, VERIFY_CHAIN_ID);
   addParent(resourceEntity, verifyChain.uid);
 
   const rootTypesArray = Array.isArray(rootTypes) ? Array.from(new Set(rootTypes)) : [];
   const tailTypesArray = Array.isArray(tailTypes) ? Array.from(new Set(tailTypes)) : [];
   const tailDepthValue = typeof tailDepth === 'number' ? tailDepth : 0;
   const context = {
-    vpSigner: entityRef('Credential::Actor', vpSignerId ?? principalId ?? UNKNOWN_ACTOR_ID),
+    vpSigner: entityRef(ACTOR_ENTITY, vpSignerId ?? principalId ?? UNKNOWN_ACTOR_ID),
     rootTypes: rootTypesArray,
     rootClaims,
     tailTypes: tailTypesArray,
@@ -57,16 +62,16 @@ export function buildCedarContext({
   };
 
   if (typeof rootIssuerId === 'string' && rootIssuerId.length > 0) {
-    context.rootIssuer = entityRef('Credential::Actor', rootIssuerId);
+    context.rootIssuer = entityRef(ACTOR_ENTITY, rootIssuerId);
   }
   if (typeof tailIssuerId === 'string' && tailIssuerId.length > 0) {
-    context.tailIssuer = entityRef('Credential::Actor', tailIssuerId);
+    context.tailIssuer = entityRef(ACTOR_ENTITY, tailIssuerId);
   }
 
   return {
-    principal: { type: 'Credential::Actor', id: principalId },
-    action: { type: 'Credential::Action', id: actionId },
-    resource: { type: 'Credential::Object', id: resourceId },
+    principal: { type: ACTOR_ENTITY, id: principalId },
+    action: { type: ACTION_ENTITY, id: actionId },
+    resource: { type: OBJECT_ENTITY, id: resourceId },
     context,
     entities: workingEntities,
   };
@@ -88,4 +93,3 @@ export function runCedarAuthorization({ cedar, policies, request }) {
   }
   return result.response.decision;
 }
-

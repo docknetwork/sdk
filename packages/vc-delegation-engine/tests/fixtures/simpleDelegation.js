@@ -109,4 +109,3 @@ export const simpleDelegationPresentations = {
     verifiableCredential: [unauthorizedDelegation, authorizedScore],
   },
 };
-

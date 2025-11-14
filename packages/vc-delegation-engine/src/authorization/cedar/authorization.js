@@ -37,11 +37,15 @@ export function buildAuthorizationInputsFromEvaluation({
   }
 
   const resolvedPrincipalId = principalId ?? facts.principalId ?? facts.presentationSigner ?? UNKNOWN_ACTOR_ID;
-  const resourceTypes = evaluation.resourceTypes?.length
-    ? evaluation.resourceTypes
-    : facts.resourceTypes?.length
-      ? facts.resourceTypes
-      : [UNKNOWN_IDENTIFIER];
+  const resourceTypes = (() => {
+    if (evaluation.resourceTypes?.length) {
+      return evaluation.resourceTypes;
+    }
+    if (facts.resourceTypes?.length) {
+      return facts.resourceTypes;
+    }
+    return [UNKNOWN_IDENTIFIER];
+  })();
 
   return resourceTypes.map((resourceType) => ({
     summary,
@@ -106,4 +110,3 @@ export function authorizeEvaluationsWithCedar({
 
   return { decision: 'allow', authorizations };
 }
-

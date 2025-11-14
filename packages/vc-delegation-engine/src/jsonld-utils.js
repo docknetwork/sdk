@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import {
   VC_TYPE,
   SECURITY_PROOF,
@@ -129,7 +130,8 @@ export function normalizeSubject(compactedSubject) {
         return item;
       });
       if (!MAY_CLAIM_ALIAS_KEYS.includes(key) && normalized[key].length === 1) {
-        normalized[key] = normalized[key][0];
+        const [singleValue] = normalized[key];
+        normalized[key] = singleValue;
       }
     } else if (value && typeof value === 'object') {
       if ('@value' in value) {

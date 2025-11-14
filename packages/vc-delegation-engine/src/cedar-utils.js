@@ -1,3 +1,5 @@
+import { ACTION_VERIFY, VERIFY_CHAIN_ID } from './constants.js';
+
 export function collectActorIds(credentials, signer) {
   const ids = new Set();
   (credentials ?? []).forEach((vc) => {
@@ -30,8 +32,6 @@ export function addParent(entity, parent) {
   }
 }
 
-import { ACTION_VERIFY, VERIFY_CHAIN_ID } from './constants.js';
-
 export function baseEntities(actorIds, actionIds = []) {
   const entities = [];
 
@@ -55,7 +55,7 @@ export function entityRef(type, id) {
 }
 
 // Adds chain membership facts (Verify action relationships) to Cedar entities.
-export function applyCredentialFacts(entities, { resourceId, actionIds, delegations }) {
+export function applyCredentialFacts(entities, { resourceId, actionIds: _actionIds, delegations }) {
   const resourceEntity = ensureEntity(entities, 'Credential::Object', resourceId);
 
   const verifyChain = ensureEntity(entities, 'Credential::Chain', VERIFY_CHAIN_ID);

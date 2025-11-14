@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import {
   matchesType,
   extractGraphId,
@@ -12,6 +13,16 @@ import {
   VC_TYPE_DELEGATION_CREDENTIAL,
   ACTION_VERIFY,
 } from './constants.js';
+
+function normalizeTypeList(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (typeof value === 'string' && value.length > 0) {
+    return [value];
+  }
+  return [];
+}
 
 // Derives delegation-chain facts (root/tail info, depth, mayClaim, etc.) from chain of expanded JSON-LD credentials
 export function summarizeDelegationChain(credentials) {
@@ -125,11 +136,7 @@ export function summarizeDelegationChain(credentials) {
     throw new Error('Root credential must include a string issuer');
   }
 
-  const rootTypes = Array.isArray(rootCredential['@type'])
-    ? rootCredential['@type']
-    : typeof rootCredential['@type'] === 'string'
-      ? [rootCredential['@type']]
-      : [];
+  const rootTypes = normalizeTypeList(rootCredential['@type']);
 
   const rootClaims = extractGraphObject(rootCredential, VC_SUBJECT) ?? {};
 
@@ -139,7 +146,7 @@ export function summarizeDelegationChain(credentials) {
 
   const registerDelegation = (principalId, depth) => {
     if (typeof principalId !== 'string' || principalId.length === 0) {
-      throw new Error('Tried to register delegation with no principal ID')
+      throw new Error('Tried to register delegation with no principal ID');
     }
     if (registeredDelegations.has(principalId)) {
       return;
@@ -175,11 +182,7 @@ export function summarizeDelegationChain(credentials) {
     registerDelegation(delegate, depth);
   });
 
-  const tailTypes = Array.isArray(tailCredential['@type'])
-    ? tailCredential['@type']
-    : typeof tailCredential['@type'] === 'string'
-      ? [tailCredential['@type']]
-      : [];
+  const tailTypes = normalizeTypeList(tailCredential['@type']);
   // const tailSubject = tailCredential.credentialSubject ?? {};
   const tailDelegateId = extractGraphId(tailCredential, VC_SUBJECT);
   if (typeof tailDelegateId !== 'string' || tailDelegateId.length === 0) {
@@ -216,7 +219,7 @@ export function summarizeStandaloneCredential(credential) {
   if (typeof issuer !== 'string' || issuer.length === 0) {
     throw new Error('Standalone credential must include an issuer');
   }
-  const types = Array.isArray(type) ? type : type ? [type] : [];
+  const types = normalizeTypeList(type);
 
   return {
     resourceId: id,

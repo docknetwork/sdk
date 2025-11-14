@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { MAY_CLAIM_ALIAS_KEYS } from './constants.js';
 
 export function collectAuthorizedClaims(chain, derivedFacts, authorizedGraphId, allCredentials = []) {

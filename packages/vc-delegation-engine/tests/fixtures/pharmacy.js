@@ -167,4 +167,3 @@ export const pharmacyPresentations = {
     ],
   },
 };
-

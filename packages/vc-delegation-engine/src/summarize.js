@@ -9,6 +9,7 @@ import {
   VC_ROOT_CREDENTIAL_ID,
   VC_SUBJECT,
   VC_TYPE_DELEGATION_CREDENTIAL,
+  ACTION_VERIFY,
 } from './constants.js';
 
 // Derives delegation-chain facts (root/tail info, depth, mayClaim, etc.) from chain of expanded JSON-LD credentials
@@ -143,7 +144,7 @@ export function summarizeDelegationChain(credentials) {
       return;
     }
     registeredDelegations.add(principalId);
-    delegations.push({ principalId, depth, actions: ['Verify'] });
+    delegations.push({ principalId, depth, actions: [ACTION_VERIFY] });
   };
 
   const rootDelegateId = extractGraphId(rootClaims, VC_SUBJECT);

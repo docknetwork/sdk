@@ -1,4 +1,5 @@
 import { buildCedarContext, runCedarAuthorization } from './context.js';
+import { ACTION_VERIFY, UNKNOWN_ACTOR_ID, UNKNOWN_IDENTIFIER } from '../../constants.js';
 
 function cloneEntities(entities = []) {
   return (entities ?? []).map((entity) => ({
@@ -18,7 +19,7 @@ function cloneEntities(entities = []) {
  */
 export function buildAuthorizationInputsFromEvaluation({
   evaluation,
-  actionId = 'Verify',
+  actionId = ACTION_VERIFY,
   principalId,
 } = {}) {
   if (!evaluation) {
@@ -35,12 +36,12 @@ export function buildAuthorizationInputsFromEvaluation({
     return [];
   }
 
-  const resolvedPrincipalId = principalId ?? facts.principalId ?? facts.presentationSigner ?? 'unknown';
+  const resolvedPrincipalId = principalId ?? facts.principalId ?? facts.presentationSigner ?? UNKNOWN_ACTOR_ID;
   const resourceTypes = evaluation.resourceTypes?.length
     ? evaluation.resourceTypes
     : facts.resourceTypes?.length
       ? facts.resourceTypes
-      : ['unknown'];
+      : [UNKNOWN_IDENTIFIER];
 
   return resourceTypes.map((resourceType) => ({
     summary,
@@ -64,7 +65,7 @@ export function authorizeEvaluationsWithCedar({
   cedar,
   evaluations = [],
   policies,
-  actionId = 'Verify',
+  actionId = ACTION_VERIFY,
   principalId,
 } = {}) {
   if (!policies) {

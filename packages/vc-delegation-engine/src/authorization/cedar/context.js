@@ -1,4 +1,5 @@
 import { ensureEntity, entityRef, addParent } from '../../cedar-utils.js';
+import { ACTION_VERIFY, VERIFY_CHAIN_ID, UNKNOWN_ACTOR_ID } from '../../constants.js';
 
 function cloneEntities(entities = []) {
   return (entities ?? []).map((entity) => ({
@@ -10,7 +11,7 @@ function cloneEntities(entities = []) {
 
 export function buildCedarContext({
   principalId,
-  actionId = 'Verify',
+  actionId = ACTION_VERIFY,
   resourceId,
   vpSignerId,
   entities = [],
@@ -38,14 +39,14 @@ export function buildCedarContext({
   ensureEntity(workingEntities, 'Credential::Actor', principalId);
   ensureEntity(workingEntities, 'Credential::Action', actionId);
   const resourceEntity = ensureEntity(workingEntities, 'Credential::Object', resourceId);
-  const verifyChain = ensureEntity(workingEntities, 'Credential::Chain', 'Action:Verify');
+  const verifyChain = ensureEntity(workingEntities, 'Credential::Chain', VERIFY_CHAIN_ID);
   addParent(resourceEntity, verifyChain.uid);
 
   const rootTypesArray = Array.isArray(rootTypes) ? Array.from(new Set(rootTypes)) : [];
   const tailTypesArray = Array.isArray(tailTypes) ? Array.from(new Set(tailTypes)) : [];
   const tailDepthValue = typeof tailDepth === 'number' ? tailDepth : 0;
   const context = {
-    vpSigner: entityRef('Credential::Actor', vpSignerId ?? principalId),
+    vpSigner: entityRef('Credential::Actor', vpSignerId ?? principalId ?? UNKNOWN_ACTOR_ID),
     rootTypes: rootTypesArray,
     rootClaims,
     tailTypes: tailTypesArray,

@@ -14,3 +14,8 @@ export const VC_PREVIOUS_CREDENTIAL_ID = 'https://example.org/credentials#previo
 export const VC_ROOT_CREDENTIAL_ID = 'https://example.org/credentials#rootCredentialId';
 
 export const VC_TYPE_DELEGATION_CREDENTIAL = 'https://example.org/credentials#DelegationCredential';
+
+export const ACTION_VERIFY = 'Verify';
+export const VERIFY_CHAIN_ID = 'Action:Verify';
+export const UNKNOWN_IDENTIFIER = 'unknown';
+export const UNKNOWN_ACTOR_ID = UNKNOWN_IDENTIFIER;

@@ -14,8 +14,15 @@ import { baseEntities, collectActorIds, applyCredentialFacts } from './cedar-uti
 import { firstArrayItem, toArray } from './utils.js';
 import { buildRifyPremisesFromChain, buildRifyRules } from './rify-helpers.js';
 import { collectAuthorizedClaims } from './claim-deduction.js';
-import { VC_VC, VC_ISSUER } from './constants.js';
+import {
+  VC_VC,
+  VC_ISSUER,
+  ACTION_VERIFY,
+  UNKNOWN_ACTOR_ID,
+  UNKNOWN_IDENTIFIER,
+} from './constants.js';
 import { summarizeDelegationChain, summarizeStandaloneCredential } from './summarize.js';
+import { DelegationError, DelegationErrorCodes, normalizeDelegationFailure } from './errors.js';
 
 const CONTROL_PREDICATES = new Set(['allows', 'delegatesTo', 'listsClaim', 'inheritsParent']);
 const RESERVED_RESOURCE_TYPES = new Set(['VerifiableCredential', 'DelegationCredential']);
@@ -109,14 +116,8 @@ function findUnauthorizedClaims(premises = [], derived = [], authorizedGraphId) 
 }
 
 // Normalizes thrown errors into a consistent failure record.
-function normalizeFailure(error, { code = 'CHAIN_VALIDATION_ERROR' } = {}) {
-  if (!error) {
-    return { code, message: 'Unknown error' };
-  }
-  if (error.code && error.message) {
-    return { code: error.code, message: error.message, stack: error.stack };
-  }
-  return { code, message: error.message ?? String(error), stack: error.stack };
+function normalizeFailure(error) {
+  return normalizeDelegationFailure(error);
 }
 
 function deriveResourceTypesFromChain(chain) {
@@ -145,14 +146,17 @@ export async function verifyVPWithDelegation({
 }) {
   try {
     if (!expandedPresentation) {
-      throw new Error('verifyVPWithDelegation requires an expanded presentation');
+      throw new DelegationError(
+        DelegationErrorCodes.INVALID_PRESENTATION,
+        'verifyVPWithDelegation requires an expanded presentation',
+      );
     }
 
     const presentationNode = extractExpandedPresentationNode(expandedPresentation);
     const extractedSigner = extractExpandedVerificationMethod(presentationNode);
     const presentationSigner = typeof extractedSigner === 'string' && extractedSigner.length > 0
       ? extractedSigner
-      : 'unknown';
+      : UNKNOWN_IDENTIFIER;
 
     const normalizedById = new Map();
     const contexts = normalizeContextMap(credentialContexts);
@@ -166,12 +170,18 @@ export async function verifyVPWithDelegation({
       );
       const credentialId = credentialNode?.['@id'];
       if (typeof credentialId !== 'string' || credentialId.length === 0) {
-        throw new Error('Expanded credential node must include an @id');
+        throw new DelegationError(
+          DelegationErrorCodes.INVALID_CREDENTIAL,
+          'Expanded credential node must include an @id',
+        );
       }
 
       const context = contexts.get(credentialId);
       if (!context) {
-        throw new Error(`Missing compaction context for credential ${credentialId}`);
+        throw new DelegationError(
+          DelegationErrorCodes.MISSING_CONTEXT,
+          `Missing compaction context for credential ${credentialId}`,
+        );
       }
 
       const compacted = await jsonld.compact(credentialNode, { '@context': context });
@@ -197,7 +207,10 @@ export async function verifyVPWithDelegation({
     const normalizedCredentials = Array.from(normalizedById.values());
     const tailCredentials = normalizedCredentials.filter((vc) => !referencedPreviousIds.has(vc.id));
     if (tailCredentials.length === 0) {
-      throw new Error('Unable to determine tail credential');
+      throw new DelegationError(
+        DelegationErrorCodes.INVALID_PRESENTATION,
+        'Unable to determine tail credential',
+      );
     }
 
     const seenChains = new Set();
@@ -214,11 +227,17 @@ export async function verifyVPWithDelegation({
       const visited = new Set();
       let current = normalizedById.get(tailId);
       if (!current) {
-        throw new Error(`Tail credential ${tailId} not found in presentation`);
+        throw new DelegationError(
+          DelegationErrorCodes.MISSING_CREDENTIAL,
+          `Tail credential ${tailId} not found in presentation`,
+        );
       }
       while (current) {
         if (visited.has(current.id)) {
-          throw new Error('Delegation chain contains a cycle');
+          throw new DelegationError(
+            DelegationErrorCodes.CHAIN_CYCLE,
+            'Delegation chain contains a cycle',
+          );
         }
         visited.add(current.id);
         chain.unshift(current);
@@ -228,7 +247,10 @@ export async function verifyVPWithDelegation({
         }
         current = normalizedById.get(prevId);
         if (!current) {
-          throw new Error(`Missing credential ${prevId} referenced by ${chain[0].id}`);
+          throw new DelegationError(
+            DelegationErrorCodes.MISSING_CREDENTIAL,
+            `Missing credential ${prevId} referenced by ${chain[0].id}`,
+          );
         }
       }
       seenChains.add(tailId);
@@ -251,7 +273,7 @@ export async function verifyVPWithDelegation({
       const facts = {
         ...summary,
         resourceId,
-        actionIds: ['Verify'],
+        actionIds: [ACTION_VERIFY],
         principalId: resolvedPrincipalId,
         presentationSigner,
         resourceTypes,
@@ -262,14 +284,20 @@ export async function verifyVPWithDelegation({
 
       const premises = buildRifyPremisesFromChain(chain, rootCredentialId);
       if (!Array.isArray(premises) || premises.some((quad) => quad.length !== 4)) {
-        throw new Error('Invalid premises generated for rify inference');
+        throw new DelegationError(
+          DelegationErrorCodes.RIFY_FAILURE,
+          'Invalid premises generated for rify inference',
+        );
       }
       const rules = buildRifyRules(rootCredentialId, authorizedGraphId);
       let derived;
       try {
         derived = infer(premises, rules);
       } catch (error) {
-        throw new Error(`rify inference failed: ${error.message ?? error}`);
+        throw new DelegationError(
+          DelegationErrorCodes.RIFY_FAILURE,
+          `rify inference failed: ${error.message ?? error}`,
+        );
       }
 
       const { union: authorizedClaimUnion, perSubject: authorizedPerSubject } = collectAuthorizedClaims(
@@ -285,7 +313,8 @@ export async function verifyVPWithDelegation({
           .slice(0, 5)
           .map((claim) => `${claim.subject}.${claim.claim}`)
           .join(', ');
-        throw new Error(
+        throw new DelegationError(
+          DelegationErrorCodes.UNAUTHORIZED_CLAIM,
           `Unauthorized claims detected in delegation chain${details ? `: ${details}` : ''}`,
         );
       }

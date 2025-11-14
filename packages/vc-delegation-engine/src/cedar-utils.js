@@ -30,17 +30,19 @@ export function addParent(entity, parent) {
   }
 }
 
+import { ACTION_VERIFY, VERIFY_CHAIN_ID } from './constants.js';
+
 export function baseEntities(actorIds, actionIds = []) {
   const entities = [];
 
-  entities.push({ uid: { type: 'Credential::Action', id: 'Verify' }, attrs: {}, parents: [] });
+  entities.push({ uid: { type: 'Credential::Action', id: ACTION_VERIFY }, attrs: {}, parents: [] });
 
   new Set(actorIds ?? []).forEach((id) => {
     entities.push({ uid: { type: 'Credential::Actor', id }, attrs: {}, parents: [] });
   });
 
   (actionIds ?? []).forEach((id) => {
-    if (id !== 'Verify') {
+    if (id !== ACTION_VERIFY) {
       entities.push({ uid: { type: 'Credential::Action', id }, attrs: {}, parents: [] });
     }
   });
@@ -56,13 +58,13 @@ export function entityRef(type, id) {
 export function applyCredentialFacts(entities, { resourceId, actionIds, delegations }) {
   const resourceEntity = ensureEntity(entities, 'Credential::Object', resourceId);
 
-  const verifyChain = ensureEntity(entities, 'Credential::Chain', 'Action:Verify');
+  const verifyChain = ensureEntity(entities, 'Credential::Chain', VERIFY_CHAIN_ID);
   addParent(resourceEntity, verifyChain.uid);
 
   delegations.forEach(({ principalId, actions }) => {
     const principalEntity = ensureEntity(entities, 'Credential::Actor', principalId);
     (actions ?? []).forEach((actionId) => {
-      if (actionId !== 'Verify') {
+      if (actionId !== ACTION_VERIFY) {
         throw new Error(`Unexpected action "${actionId}" encountered; expected only "Verify"`);
       }
       const actionChain = verifyChain;

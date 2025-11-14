@@ -1,4 +1,4 @@
-name: Credential SDK tests
+name: Delegation Engine tests
 
 on: [pull_request]
 jobs:

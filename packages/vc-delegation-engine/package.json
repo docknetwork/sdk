@@ -2,8 +2,14 @@
   "name": "vc-delegation-engine",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "rm -rf dist && mkdir -p dist && cp -r src dist && cp package.json dist",
     "lint": "eslint \"src/**/*.js\"",
@@ -19,11 +25,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@cedar-policy/cedar-wasm": "^4.5.0",
     "jsonld": "^6.0.0",
     "rify": "^0.7.1"
   },
+  "peerDependencies": {
+    "@cedar-policy/cedar-wasm": "^4.5.0"
+  },
   "devDependencies": {
+    "@cedar-policy/cedar-wasm": "^4.5.0",
     "@docknetwork/credential-sdk": "^0.54.9",
     "@vitest/coverage-v8": "^2.0.2",
     "vitest": "^2.1.8"

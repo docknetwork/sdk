@@ -27,6 +27,41 @@ import { collectAuthorizedClaims } from './claim-deduction.js';
 import { VC_VC, VC_ISSUER } from './constants.js';
 import { summarizeDelegationChain } from './summarize.js';
 
+const CONTROL_PREDICATES = new Set(['allows', 'delegatesTo', 'listsClaim', 'inheritsParent']);
+
+function findUnauthorizedClaims(premises = [], derived = [], authorizedGraphId) {
+  if (!authorizedGraphId) {
+    return [];
+  }
+
+  const remainingPremises = new Map();
+  premises.forEach(([subject, predicate, value, graph]) => {
+    if (
+      !subject
+      || !predicate
+      || CONTROL_PREDICATES.has(predicate)
+      || typeof value === 'undefined'
+      || typeof graph === 'undefined'
+    ) {
+      return;
+    }
+    const key = `${subject}:::${predicate}:::${value}`;
+    if (!remainingPremises.has(key)) {
+      remainingPremises.set(key, { subject, claim: predicate, value, issuer: graph });
+    }
+  });
+
+  derived.forEach(([subject, predicate, value, graph]) => {
+    if (graph !== authorizedGraphId || CONTROL_PREDICATES.has(predicate)) {
+      return;
+    }
+    const key = `${subject}:::${predicate}:::${value}`;
+    remainingPremises.delete(key);
+  });
+
+  return Array.from(remainingPremises.values());
+}
+
 // Normalizes thrown errors into a consistent failure record.
 function normalizeFailure(error, { code = 'CHAIN_VALIDATION_ERROR' } = {}) {
   if (!error) {
@@ -46,6 +81,7 @@ export async function verifyVPWithDelegation({
   resourceId: overrideResourceId,
   actionId = 'Verify',
   principalId,
+  failOnUnauthorizedClaims = true,
 }) {
   try {
     if (!expandedPresentation) {
@@ -170,15 +206,23 @@ export async function verifyVPWithDelegation({
         throw new Error(`rify inference failed: ${error.message ?? error}`);
       }
 
-      // TODO: check with derived vs premises to see UNAUTHORIZED claims
-      // if any exist, then throw error
-
       const { union: authorizedClaimUnion, perSubject: authorizedPerSubject } = collectAuthorizedClaims(
         chain,
         derived,
         authorizedGraphId,
         normalizedCredentials,
       );
+
+      const unauthorizedClaims = findUnauthorizedClaims(premises, derived, authorizedGraphId);
+      if (unauthorizedClaims.length > 0 && failOnUnauthorizedClaims) {
+        const details = unauthorizedClaims
+          .slice(0, 5)
+          .map((claim) => `${claim.subject}.${claim.claim}`)
+          .join(', ');
+        throw new Error(
+          `Unauthorized claims detected in delegation chain${details ? `: ${details}` : ''}`,
+        );
+      }
 
       facts.authorizedClaims = authorizedClaimUnion;
       facts.authorizedClaimsBySubject = authorizedPerSubject;

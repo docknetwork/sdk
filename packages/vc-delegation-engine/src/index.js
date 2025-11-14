@@ -1,10 +1,5 @@
-export * from './engine.js';
-export * from './cedar-auth.js';
-export * from './cedar-authorization.js';
-export * from './cedar-utils.js';
-export * from './claim-deduction.js';
-export * from './constants.js';
-export * from './jsonld-utils.js';
-export * from './rify-helpers.js';
-export * from './summarize.js';
-export * from './utils.js';
+export { verifyVPWithDelegation } from './engine.js';
+export {
+  authorizeEvaluationsWithCedar,
+  buildAuthorizationInputsFromEvaluation,
+} from './cedar-authorization.js';

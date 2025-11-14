@@ -3,7 +3,13 @@ import {
   extractGraphId,
   extractGraphObject,
 } from './jsonld-utils.js';
-import { VC_ISSUER, VC_PREVIOUS_CREDENTIAL_ID, VC_ROOT_CREDENTIAL_ID, VC_SUBJECT, VC_TYPE_DELEGATION_CREDENTIAL } from './constants.js';
+import {
+  VC_ISSUER,
+  VC_PREVIOUS_CREDENTIAL_ID,
+  VC_ROOT_CREDENTIAL_ID,
+  VC_SUBJECT,
+  VC_TYPE_DELEGATION_CREDENTIAL,
+} from './constants.js';
 
 // Derives delegation-chain facts (root/tail info, depth, mayClaim, etc.) from chain of expanded JSON-LD credentials
 export function summarizeDelegationChain(credentials) {
@@ -194,5 +200,29 @@ export function summarizeDelegationChain(credentials) {
     rootIssuerId,
     tailIssuerId,
     tailDepth,
+  };
+}
+
+export function summarizeStandaloneCredential(credential) {
+  if (!credential || typeof credential !== 'object') {
+    throw new Error('Standalone credential is required to summarize');
+  }
+  const { id, type, issuer } = credential;
+  if (typeof id !== 'string' || id.length === 0) {
+    throw new Error('Standalone credential must include an id');
+  }
+  if (typeof issuer !== 'string' || issuer.length === 0) {
+    throw new Error('Standalone credential must include an issuer');
+  }
+  const types = Array.isArray(type) ? type : type ? [type] : [];
+
+  return {
+    resourceId: id,
+    delegations: [],
+    rootTypes: types,
+    tailTypes: types,
+    rootIssuerId: issuer,
+    tailIssuerId: issuer,
+    tailDepth: 0,
   };
 }

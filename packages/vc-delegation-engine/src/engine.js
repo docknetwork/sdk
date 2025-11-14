@@ -1,7 +1,4 @@
 // TODOs:
-// After splitting cedar logic, test that it works without credential delegation too. We would run cedar policy check per credential in a VP (like per delegation chain)
-// Support presentations that have delegation chains and normal credentials in them, cedar policy should run on both
-//  authorizedClaims, root and tail issuers for single credentials can all come from the credential
 // See if it makes sense for cedar policies to know the credential type and do authorization based on that (will be needed for above)
 // Investigate alias drift, see if we need to use IRIs more and within cedar policies (its ugly though, so id rather not if we can help it)
 
@@ -22,7 +19,7 @@ import { firstArrayItem, toArray } from './utils.js';
 import { buildRifyPremisesFromChain, buildRifyRules } from './rify-helpers.js';
 import { collectAuthorizedClaims } from './claim-deduction.js';
 import { VC_VC, VC_ISSUER } from './constants.js';
-import { summarizeDelegationChain } from './summarize.js';
+import { summarizeDelegationChain, summarizeStandaloneCredential } from './summarize.js';
 
 const CONTROL_PREDICATES = new Set(['allows', 'delegatesTo', 'listsClaim', 'inheritsParent']);
 
@@ -78,7 +75,7 @@ export async function verifyVPWithDelegation({
   actionId = 'Verify',
   principalId,
   failOnUnauthorizedClaims = false,
-  authorizeClaims,
+  authorizeChain,
 }) {
   try {
     if (!expandedPresentation) {
@@ -171,12 +168,17 @@ export async function verifyVPWithDelegation({
 
     const evaluateChain = async (chain) => {
       const rootCredentialId = chain[0]?.id;
-      const summary = summarizeDelegationChain(chain.map((chainItem) => chainItem.expandedNode));
+      const hasDelegationLinks = chain.some(
+        (vc) => typeof vc.previousCredentialId === 'string' && vc.previousCredentialId.length > 0,
+      );
+      const summary = hasDelegationLinks
+        ? summarizeDelegationChain(chain.map((chainItem) => chainItem.expandedNode))
+        : summarizeStandaloneCredential(chain[chain.length - 1]);
       const resourceId = overrideResourceId ?? summary.resourceId;
       const resolvedPrincipalId = principalId ?? presentationSigner;
       const authorizedGraphId = rootCredentialId ? `urn:authorized:${rootCredentialId}` : 'urn:authorized';
 
-      if (authorizeClaims) {
+      if (authorizeChain) {
         if (!actionId) {
           throw new Error('Missing actionId');
         }
@@ -233,8 +235,8 @@ export async function verifyVPWithDelegation({
 
       let decision = 'allow';
       let authorizationResult = null;
-      if (typeof authorizeClaims === 'function') {
-        authorizationResult = await authorizeClaims({
+      if (typeof authorizeChain === 'function') {
+        authorizationResult = await authorizeChain({
           actionId,
           principalId: resolvedPrincipalId,
           resourceId,

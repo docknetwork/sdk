@@ -50,7 +50,7 @@ export async function runScenario(title, vp, policies, resourceId = undefined) {
       expandedPresentation,
       credentialContexts,
       resourceId,
-      authorizeClaims: buildAuthorizeChain(policies),
+      authorizeChain: buildAuthorizeChain(policies),
     });
     if (result.failures && result.failures.length > 0) {
       const messages = result.failures.map((failure) => failure.message).join('; ');

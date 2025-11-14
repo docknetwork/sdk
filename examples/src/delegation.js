@@ -1,3 +1,12 @@
+import {
+  issueCredential,
+  signPresentation,
+  verifyPresentation,
+  documentLoader as credentialDocumentLoader,
+} from '@docknetwork/credential-sdk/vc';
+import { MAY_CLAIM_IRI } from '@docknetwork/vc-delegation-engine';
+import * as cedar from '@cedar-policy/cedar-wasm/nodejs';
+
 const cedarPolicies = {
   staticPolicies: `
 permit(
@@ -10,23 +19,18 @@ permit(
 };
 `,
 };
-import {
-  issueCredential,
-  signPresentation,
-  verifyPresentation,
-  documentLoader as credentialDocumentLoader,
-} from '@docknetwork/credential-sdk/vc';
-import { MAY_CLAIM_IRI } from '@docknetwork/vc-delegation-engine';
-import * as cedar from '@cedar-policy/cedar-wasm/nodejs';
 
 const AUTHORITY_DID = 'did:example:authority';
 const DELEGATE_DID = 'did:example:delegator';
 const SUBJECT_DID = 'did:example:alice';
 const CHALLENGE = 'credit-score-demo';
 const DOMAIN = 'delegation.example';
+const W3CONTEXT = 'https://www.w3.org/2018/credentials/v1';
+const DIDCONTEXT = 'https://www.w3.org/ns/did/v1';
+const JWSCONTEXT = 'https://w3id.org/security/suites/jws-2020/v1';
 
 const CREDIT_DELEGATION_CONTEXT = [
-  'https://www.w3.org/2018/credentials/v1',
+  W3CONTEXT,
   'https://ld.truvera.io/credentials/delegation',
   {
     '@version': 1.1,
@@ -38,7 +42,7 @@ const CREDIT_DELEGATION_CONTEXT = [
 ];
 
 const CREDIT_SCORE_CONTEXT = [
-  'https://www.w3.org/2018/credentials/v1',
+  W3CONTEXT,
   'https://ld.truvera.io/credentials/delegation',
   {
     '@version': 1.1,
@@ -69,8 +73,8 @@ const BASE_JWK_KEY = {
 function buildKeyDoc(controller) {
   return {
     '@context': [
-      'https://www.w3.org/ns/did/v1',
-      'https://w3id.org/security/suites/jws-2020/v1',
+      DIDCONTEXT,
+      JWSCONTEXT,
     ],
     id: `${controller}#controller-key`,
     controller,
@@ -84,7 +88,7 @@ const AUTHORITY_KEY = buildKeyDoc(AUTHORITY_DID);
 const DELEGATE_KEY = buildKeyDoc(DELEGATE_DID);
 
 const AUTHORITY_DID_DOC = {
-  '@context': ['https://www.w3.org/ns/did/v1', 'https://w3id.org/security/suites/jws-2020/v1'],
+  '@context': [DIDCONTEXT, JWSCONTEXT],
   id: AUTHORITY_DID,
   verificationMethod: [
     {
@@ -99,7 +103,7 @@ const AUTHORITY_DID_DOC = {
 };
 
 const DELEGATE_DID_DOC = {
-  '@context': ['https://www.w3.org/ns/did/v1', 'https://w3id.org/security/suites/jws-2020/v1'],
+  '@context': [DIDCONTEXT, JWSCONTEXT],
   id: DELEGATE_DID,
   verificationMethod: [
     {
@@ -164,7 +168,7 @@ async function main() {
 
   const signedPresentation = await signPresentation(
     {
-      '@context': ['https://www.w3.org/2018/credentials/v1'],
+      '@context': [W3CONTEXT],
       type: ['VerifiablePresentation'],
       holder: DELEGATE_DID,
       verifiableCredential: [delegationCredential, creditScoreCredential],
@@ -206,4 +210,3 @@ main()
     console.error('Delegation example failed', error);
     process.exit(1);
   });
-

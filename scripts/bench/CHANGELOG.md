@@ -1,5 +1,14 @@
 # @docknetwork/benchmarks
 
+## 0.4.10
+
+### Patch Changes
+
+- VC delegation engine
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@4.0.7
+  - @docknetwork/credential-sdk@0.54.10
+
 ## 0.4.9
 
 ### Patch Changes

@@ -1,0 +1,18 @@
+flowchart TD
+    A[Expanded VP + contexts] --> B{Parse presentation}
+    B -->|missing data| F[DelegationError · invalid presentation]
+    B --> C[Normalize credentials]
+    C -->|missing context or id| F
+    C --> D[Build chains + summaries]
+    D -->|cycle or missing link| F
+    D --> E[Generate rify premises & rules]
+    E -->|invalid or rify error| F
+    E --> G[Infer derived facts]
+    G --> H[Collect authorized claims per chain]
+    H -->|failOnUnauthorizedClaims & mismatch| F
+    H --> I[Aggregated result: verification allow + evaluations]
+    I -->|policies supplied| J{Run Cedar per chain?}
+    J --> K[buildCedarContext → isAuthorized]
+    K -->|decision deny| L[Return overall deny with authorization records]
+    J -->|no policies| M[Return verification allow]
+    K -->|all allow| M

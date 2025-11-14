@@ -1,5 +1,6 @@
 import jsonld from 'jsonld';
 import { verifyVPWithDelegation } from '../src/engine.js';
+import { authorize as authorizeWithCedar } from '../src/cedar-auth.js';
 
 const policyText = `
 permit(
@@ -110,7 +111,30 @@ const contexts = new Map();
 const result = await verifyVPWithDelegation({
   expandedPresentation: expanded,
   credentialContexts: contexts,
-  policies,
+  authorizeClaims: ({
+    principalId,
+    actionId,
+    resourceId,
+    presentationSigner,
+    summary,
+    entities,
+    authorizedClaims,
+    authorizedClaimsBySubject,
+  }) => authorizeWithCedar({
+    policies,
+    principalId,
+    actionId,
+    resourceId,
+    vpSignerId: presentationSigner,
+    entities,
+    rootTypes: summary.rootTypes,
+    rootIssuerId: summary.rootIssuerId,
+    tailTypes: summary.tailTypes,
+    tailIssuerId: summary.tailIssuerId,
+    tailDepth: summary.tailDepth,
+    authorizedClaims,
+    authorizedClaimsBySubject,
+  }),
 });
 
 console.log('Multi-delegation VP decision ->', result.decision);

@@ -1,6 +1,37 @@
 import jsonld from 'jsonld';
 import { verifyVPWithDelegation } from '../src/engine.js';
+import { authorize as authorizeWithCedar } from '../src/cedar-auth.js';
 import documentLoader from './document-loader.js';
+
+function buildAuthorizeChain(policies) {
+  if (!policies) {
+    return undefined;
+  }
+  return ({
+    principalId,
+    actionId,
+    resourceId,
+    presentationSigner,
+    summary,
+    entities,
+    authorizedClaims,
+    authorizedClaimsBySubject,
+  }) => authorizeWithCedar({
+    policies,
+    principalId,
+    actionId,
+    resourceId,
+    vpSignerId: presentationSigner,
+    entities,
+    rootTypes: summary.rootTypes,
+    rootIssuerId: summary.rootIssuerId,
+    tailTypes: summary.tailTypes,
+    tailIssuerId: summary.tailIssuerId,
+    tailDepth: summary.tailDepth,
+    authorizedClaims,
+    authorizedClaimsBySubject,
+  });
+}
 
 export async function runScenario(title, vp, policies, resourceId = undefined) {
   console.log('--------------------------------');
@@ -18,8 +49,8 @@ export async function runScenario(title, vp, policies, resourceId = undefined) {
     const result = await verifyVPWithDelegation({
       expandedPresentation,
       credentialContexts,
-      policies,
       resourceId,
+      authorizeClaims: buildAuthorizeChain(policies),
     });
     if (result.failures && result.failures.length > 0) {
       const messages = result.failures.map((failure) => failure.message).join('; ');

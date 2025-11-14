@@ -1,6 +1,4 @@
 // TODOs:
-// Make cedar policies optional, and split from this file
-// Have this file focus on claim deduction and chain validation, returning authorized claims
 // After splitting cedar logic, test that it works without credential delegation too. We would run cedar policy check per credential in a VP (like per delegation chain)
 // Support presentations that have delegation chains and normal credentials in them, cedar policy should run on both
 //  authorizedClaims, root and tail issuers for single credentials can all come from the credential
@@ -22,7 +20,6 @@ import {
 import { baseEntities, collectActorIds, applyCredentialFacts } from './cedar-utils.js';
 import { firstArrayItem, toArray } from './utils.js';
 import { buildRifyPremisesFromChain, buildRifyRules } from './rify-helpers.js';
-import { authorize } from './cedar-auth.js';
 import { collectAuthorizedClaims } from './claim-deduction.js';
 import { VC_VC, VC_ISSUER } from './constants.js';
 import { summarizeDelegationChain } from './summarize.js';
@@ -77,11 +74,11 @@ function normalizeFailure(error, { code = 'CHAIN_VALIDATION_ERROR' } = {}) {
 export async function verifyVPWithDelegation({
   expandedPresentation,
   credentialContexts,
-  policies,
   resourceId: overrideResourceId,
   actionId = 'Verify',
   principalId,
-  failOnUnauthorizedClaims = true,
+  failOnUnauthorizedClaims = false,
+  authorizeClaims,
 }) {
   try {
     if (!expandedPresentation) {
@@ -139,6 +136,7 @@ export async function verifyVPWithDelegation({
 
     const seenChains = new Set();
     const summaries = [];
+    const authorizations = [];
     let lastFacts = null;
     let lastEntities = null;
 
@@ -171,24 +169,28 @@ export async function verifyVPWithDelegation({
       return chain;
     };
 
-    const evaluateChain = (chain) => {
+    const evaluateChain = async (chain) => {
       const rootCredentialId = chain[0]?.id;
       const summary = summarizeDelegationChain(chain.map((chainItem) => chainItem.expandedNode));
       const resourceId = overrideResourceId ?? summary.resourceId;
       const resolvedPrincipalId = principalId ?? presentationSigner;
       const authorizedGraphId = rootCredentialId ? `urn:authorized:${rootCredentialId}` : 'urn:authorized';
 
-      if (!actionId) {
-        throw new Error('Missing actionId');
-      }
-      if (!resolvedPrincipalId) {
-        throw new Error('Principal id must be provided for authorization');
+      if (authorizeClaims) {
+        if (!actionId) {
+          throw new Error('Missing actionId');
+        }
+        if (!resolvedPrincipalId) {
+          throw new Error('Principal id must be provided for authorization');
+        }
       }
 
       const facts = {
         ...summary,
         resourceId,
         actionIds: ['Verify'],
+        principalId: resolvedPrincipalId,
+        presentationSigner,
       };
       const actorIds = collectActorIds(chain, presentationSigner);
       const entities = baseEntities(actorIds, facts.actionIds);
@@ -229,26 +231,36 @@ export async function verifyVPWithDelegation({
       summary.authorizedClaims = authorizedClaimUnion;
       summary.authorizedClaimsBySubject = authorizedPerSubject;
 
-      const decision = policies ? authorize({
-        policies,
-        principalId: resolvedPrincipalId,
-        actionId,
-        resourceId,
-        vpSignerId: presentationSigner,
-        entities,
-        rootTypes: summary.rootTypes,
-        // rootClaims: summary.rootClaims,
-        rootIssuerId: summary.rootIssuerId,
-        tailTypes: summary.tailTypes,
-        // tailClaims: summary.tailClaims,
-        tailIssuerId: summary.tailIssuerId,
-        tailDepth: summary.tailDepth,
-        authorizedClaims: authorizedClaimUnion,
-        authorizedClaimsBySubject: authorizedPerSubject,
-      }) : 'allow';
+      let decision = 'allow';
+      let authorizationResult = null;
+      if (typeof authorizeClaims === 'function') {
+        authorizationResult = await authorizeClaims({
+          actionId,
+          principalId: resolvedPrincipalId,
+          resourceId,
+          presentationSigner,
+          summary,
+          facts,
+          entities,
+          chain,
+          premises,
+          derived,
+          authorizedClaims: authorizedClaimUnion,
+          authorizedClaimsBySubject: authorizedPerSubject,
+        });
+        if (typeof authorizationResult === 'string') {
+          decision = authorizationResult;
+        } else if (authorizationResult && typeof authorizationResult === 'object') {
+          decision = authorizationResult.decision ?? 'allow';
+        }
+      }
 
       return {
-        decision, summary, facts, entities,
+        decision,
+        summary,
+        facts,
+        entities,
+        authorizationResult,
       };
     };
 
@@ -258,8 +270,8 @@ export async function verifyVPWithDelegation({
         continue;
       }
       const {
-        decision, summary, facts, entities,
-      } = evaluateChain(chain);
+        decision, summary, facts, entities, authorizationResult,
+      } = await evaluateChain(chain);
       if (decision !== 'allow') {
         return {
           decision,
@@ -268,9 +280,13 @@ export async function verifyVPWithDelegation({
           summaries: [summary],
           facts,
           entities,
+          authorizations: authorizationResult ? [authorizationResult] : [],
         };
       }
       summaries.push(summary);
+      if (authorizationResult) {
+        authorizations.push(authorizationResult);
+      }
       lastFacts = facts;
       lastEntities = entities;
     }
@@ -282,6 +298,7 @@ export async function verifyVPWithDelegation({
       summaries,
       facts: lastFacts,
       entities: lastEntities,
+      authorizations,
     };
   } catch (error) {
     return {
@@ -290,6 +307,7 @@ export async function verifyVPWithDelegation({
       summary: null,
       facts: null,
       entities: null,
+      authorizations: [],
     };
   }
 }

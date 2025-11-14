@@ -1,8 +1,8 @@
-import * as cedar from '@cedar-policy/cedar-wasm/nodejs';
 import { ensureEntity, entityRef } from './cedar-utils.js';
 
 // Runs Cedar authorization with the given entities, policies, and context.
 export function authorize({
+  cedar,
   policies,
   principalId,
   actionId,
@@ -19,6 +19,9 @@ export function authorize({
   authorizedClaims,
   authorizedClaimsBySubject,
 }) {
+  if (!cedar || typeof cedar.isAuthorized !== 'function') {
+    throw new Error('authorize requires a cedar module with isAuthorized');
+  }
   ensureEntity(entities, 'Credential::Actor', principalId);
   ensureEntity(entities, 'Credential::Action', actionId);
   ensureEntity(entities, 'Credential::Object', resourceId);
@@ -53,8 +56,6 @@ export function authorize({
     entities,
   });
 
-  // DEBUG DIAGNOSTICS
-  // console.log('result', result)
   if (result.type === 'failure') {
     throw new Error(result.errors.map((e) => e.message).join('; '));
   }

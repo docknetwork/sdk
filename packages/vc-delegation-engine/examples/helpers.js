@@ -1,4 +1,5 @@
 import jsonld from 'jsonld';
+import * as cedar from '@cedar-policy/cedar-wasm/nodejs';
 import { verifyVPWithDelegation } from '../src/engine.js';
 import { authorizeEvaluationsWithCedar } from '../src/cedar-authorization.js';
 import documentLoader from './document-loader.js';
@@ -27,6 +28,7 @@ export async function runScenario(title, vp, policies) {
       let authorizations = [];
       if (policies) {
         const authorizationOutcome = authorizeEvaluationsWithCedar({
+          cedar,
           evaluations: result.evaluations,
           policies,
         });

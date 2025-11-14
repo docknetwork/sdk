@@ -10,6 +10,7 @@ function cloneEntities(entities = []) {
 }
 
 export function authorizeEvaluationsWithCedar({
+  cedar,
   evaluations = [],
   policies,
   actionId = 'Verify',
@@ -17,6 +18,9 @@ export function authorizeEvaluationsWithCedar({
 } = {}) {
   if (!policies) {
     return { decision: 'allow', authorizations: [] };
+  }
+  if (!cedar || typeof cedar.isAuthorized !== 'function') {
+    throw new Error('authorizeEvaluationsWithCedar requires a cedar module when policies are provided');
   }
 
   const authorizations = [];
@@ -49,6 +53,7 @@ export function authorizeEvaluationsWithCedar({
       addParent(resourceEntity, verifyChain.uid);
 
       const decision = authorize({
+        cedar,
         policies,
         principalId: resolvedPrincipalId,
         actionId,

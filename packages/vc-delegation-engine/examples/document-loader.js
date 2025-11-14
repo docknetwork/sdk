@@ -1,11 +1,7 @@
-import { documentLoader as defaultDocumentLoader } from '@docknetwork/credential-sdk/vc';
+import credentialDocumentLoader from '../../credential-sdk/src/vc/document-loader.js';
 
-const loadDocumentDefault = defaultDocumentLoader();
+const loadDocumentDefault = credentialDocumentLoader();
 
-export default async function documentLoader(id) {
-  let document;
-  if (!document) {
-    document = await loadDocumentDefault(id);
-  }
-  return document;
+export default function documentLoader(id) {
+  return loadDocumentDefault(id);
 }

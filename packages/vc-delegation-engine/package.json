@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/vc-delegation-engine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@cedar-policy/cedar-wasm": "^4.5.0",
-    "@docknetwork/credential-sdk": "^0.54.9",
+    "@docknetwork/credential-sdk": "^0.54.10",
     "@types/minimatch": "^6.0.0",
     "@types/node": "^24.10.1",
     "@vitest/coverage-v8": "^2.0.2",

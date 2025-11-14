@@ -2,16 +2,27 @@
   "name": "vc-delegation-engine",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.js"
+    }
   },
   "type": "module",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist && cp -r src dist && cp package.json dist",
+    "clean": "rimraf dist",
+    "build:esm": "esbuild src/index.js --bundle --format=esm --platform=node --sourcemap --outfile=dist/esm/index.js --external:@cedar-policy/cedar-wasm/nodejs --external:jsonld --external:rify",
+    "build:cjs": "esbuild src/index.js --bundle --format=cjs --platform=node --sourcemap --outfile=dist/cjs/index.cjs --external:@cedar-policy/cedar-wasm/nodejs --external:jsonld --external:rify",
+    "build:types": "tsc -p tsconfig.build.json",
+    "build": "yarn clean && yarn build:esm && yarn build:cjs && yarn build:types",
     "lint": "eslint \"src/**/*.js\"",
     "docs-disabled": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
     "test": "vitest run ./tests",
@@ -34,7 +45,12 @@
   "devDependencies": {
     "@cedar-policy/cedar-wasm": "^4.5.0",
     "@docknetwork/credential-sdk": "^0.54.9",
+    "@types/minimatch": "^6.0.0",
+    "@types/node": "^24.10.1",
     "@vitest/coverage-v8": "^2.0.2",
+    "esbuild": "^0.21.5",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.6.3",
     "vitest": "^2.1.8"
   }
 }

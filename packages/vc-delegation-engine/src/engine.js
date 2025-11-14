@@ -20,6 +20,61 @@ import { summarizeDelegationChain, summarizeStandaloneCredential } from './summa
 const CONTROL_PREDICATES = new Set(['allows', 'delegatesTo', 'listsClaim', 'inheritsParent']);
 const RESERVED_RESOURCE_TYPES = new Set(['VerifiableCredential', 'DelegationCredential']);
 
+/**
+ * @typedef {Object} DelegationSummary
+ * @property {string} resourceId
+ * @property {Array} delegations
+ * @property {string[]} rootTypes
+ * @property {string[]} tailTypes
+ * @property {string} rootIssuerId
+ * @property {string} tailIssuerId
+ * @property {number} tailDepth
+ * @property {Record<string, unknown>} authorizedClaims
+ * @property {Record<string, Record<string, unknown>>} authorizedClaimsBySubject
+ * @property {string[]} [resourceTypes]
+ */
+
+/**
+ * @typedef {Object} DelegationFacts
+ * @property {string} resourceId
+ * @property {Array} delegations
+ * @property {string[]} rootTypes
+ * @property {string[]} tailTypes
+ * @property {string} rootIssuerId
+ * @property {string} tailIssuerId
+ * @property {number} tailDepth
+ * @property {string[]} actionIds
+ * @property {string} principalId
+ * @property {string} presentationSigner
+ * @property {Record<string, unknown>} authorizedClaims
+ * @property {Record<string, Record<string, unknown>>} authorizedClaimsBySubject
+ * @property {string[]} [resourceTypes]
+ */
+
+/**
+ * @typedef {Object} DelegationEvaluation
+ * @property {DelegationSummary} summary
+ * @property {DelegationFacts} facts
+ * @property {Array} entities
+ * @property {Array} chain
+ * @property {Array} premises
+ * @property {Array} derived
+ * @property {Record<string, unknown>} authorizedClaims
+ * @property {Record<string, Record<string, unknown>>} authorizedClaimsBySubject
+ * @property {string[]} [resourceTypes]
+ */
+
+/**
+ * @typedef {Object} VerifyDelegationResult
+ * @property {'allow'|'deny'} decision
+ * @property {Array<{code:string,message:string,stack?:string}>} failures
+ * @property {DelegationSummary|null} summary
+ * @property {DelegationSummary[]} summaries
+ * @property {DelegationFacts|null} facts
+ * @property {Array|null} entities
+ * @property {DelegationEvaluation[]} evaluations
+ */
+
 function findUnauthorizedClaims(premises = [], derived = [], authorizedGraphId) {
   if (!authorizedGraphId) {
     return [];
@@ -75,7 +130,14 @@ function deriveResourceTypesFromChain(chain) {
   return filtered.length > 0 ? filtered : [];
 }
 
-// High-level helper: parse VP, build entities, run Cedar, and return decision plus failures.
+// High-level helper: parse VP, build entities, and return decision plus failures.
+/**
+ * @param {Object} options
+ * @param {any[]} options.expandedPresentation
+ * @param {Map<string, any>|Object} options.credentialContexts
+ * @param {boolean} [options.failOnUnauthorizedClaims=false]
+ * @returns {Promise<VerifyDelegationResult>}
+ */
 export async function verifyVPWithDelegation({
   expandedPresentation,
   credentialContexts,

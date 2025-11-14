@@ -5,7 +5,9 @@ const policyText = `
 permit(
   principal in Credential::Chain::"Action:Verify",
   action == Credential::Action::"Verify",
-  resource in Credential::Chain::"Action:Verify"
+
+  // Resource must be a prescription credential type, we can use this to define permit blocks per credential type
+  resource == Credential::Object::"Prescription"
 ) when {
   // Verifier ensures that the principal matches presentation signer
   principal == context.vpSigner &&

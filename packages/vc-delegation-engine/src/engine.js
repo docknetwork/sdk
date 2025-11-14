@@ -1,7 +1,3 @@
-// TODOs:
-// See if it makes sense for cedar policies to know the credential type and do authorization based on that (will be needed for above)
-// Investigate alias drift, see if we need to use IRIs more and within cedar policies (its ugly though, so id rather not if we can help it)
-
 import jsonld from 'jsonld';
 import { infer } from 'rify';
 
@@ -22,6 +18,7 @@ import { VC_VC, VC_ISSUER } from './constants.js';
 import { summarizeDelegationChain, summarizeStandaloneCredential } from './summarize.js';
 
 const CONTROL_PREDICATES = new Set(['allows', 'delegatesTo', 'listsClaim', 'inheritsParent']);
+const RESERVED_RESOURCE_TYPES = new Set(['VerifiableCredential', 'DelegationCredential']);
 
 function findUnauthorizedClaims(premises = [], derived = [], authorizedGraphId) {
   if (!authorizedGraphId) {
@@ -65,6 +62,17 @@ function normalizeFailure(error, { code = 'CHAIN_VALIDATION_ERROR' } = {}) {
     return { code: error.code, message: error.message, stack: error.stack };
   }
   return { code, message: error.message ?? String(error), stack: error.stack };
+}
+
+function deriveResourceTypesFromChain(chain) {
+  const root = chain[0];
+  if (!root || !Array.isArray(root.type)) {
+    return [];
+  }
+  const filtered = root.type.filter(
+    (typeName) => typeof typeName === 'string' && !RESERVED_RESOURCE_TYPES.has(typeName),
+  );
+  return filtered.length > 0 ? filtered : [];
 }
 
 // High-level helper: parse VP, build entities, run Cedar, and return decision plus failures.
@@ -176,6 +184,7 @@ export async function verifyVPWithDelegation({
       const resourceId = summary.resourceId;
       const resolvedPrincipalId = presentationSigner;
       const authorizedGraphId = rootCredentialId ? `urn:authorized:${rootCredentialId}` : 'urn:authorized';
+      const resourceTypes = deriveResourceTypesFromChain(chain);
 
       const facts = {
         ...summary,
@@ -183,6 +192,7 @@ export async function verifyVPWithDelegation({
         actionIds: ['Verify'],
         principalId: resolvedPrincipalId,
         presentationSigner,
+        resourceTypes,
       };
       const actorIds = collectActorIds(chain, presentationSigner);
       const entities = baseEntities(actorIds, facts.actionIds);
@@ -220,8 +230,10 @@ export async function verifyVPWithDelegation({
 
       facts.authorizedClaims = authorizedClaimUnion;
       facts.authorizedClaimsBySubject = authorizedPerSubject;
+      facts.resourceTypes = resourceTypes;
       summary.authorizedClaims = authorizedClaimUnion;
       summary.authorizedClaimsBySubject = authorizedPerSubject;
+      summary.resourceTypes = resourceTypes;
 
       return {
         summary,
@@ -232,6 +244,7 @@ export async function verifyVPWithDelegation({
         derived,
         authorizedClaims: authorizedClaimUnion,
         authorizedClaimsBySubject: authorizedPerSubject,
+        resourceTypes,
       };
     };
 

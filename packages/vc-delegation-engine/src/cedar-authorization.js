@@ -1,4 +1,13 @@
 import { authorize } from './cedar-auth.js';
+import { ensureEntity, addParent } from './cedar-utils.js';
+
+function cloneEntities(entities = []) {
+  return (entities ?? []).map((entity) => ({
+    uid: { ...entity.uid },
+    attrs: { ...entity.attrs },
+    parents: [...(entity.parents ?? [])],
+  }));
+}
 
 export function authorizeEvaluationsWithCedar({
   evaluations = [],
@@ -27,29 +36,45 @@ export function authorizeEvaluationsWithCedar({
     }
 
     const resolvedPrincipalId = principalId ?? facts.principalId ?? facts.presentationSigner;
-    const decision = authorize({
-      policies,
-      principalId: resolvedPrincipalId,
-      actionId,
-      resourceId: facts.resourceId,
-      vpSignerId: facts.presentationSigner,
-      entities,
-      rootTypes: summary.rootTypes,
-      rootIssuerId: summary.rootIssuerId,
-      tailTypes: summary.tailTypes,
-      tailIssuerId: summary.tailIssuerId,
-      tailDepth: summary.tailDepth,
-      authorizedClaims,
-      authorizedClaimsBySubject,
-    });
+    const resourceTypes = evaluation.resourceTypes?.length
+      ? evaluation.resourceTypes
+      : facts.resourceTypes?.length
+        ? facts.resourceTypes
+        : ['unknown'];
 
-    authorizations.push({
-      decision,
-      summary,
-      facts,
-    });
-    if (decision !== 'allow') {
-      return { decision, authorizations };
+    for (const resourceType of resourceTypes) {
+      const entitiesForAuth = cloneEntities(entities);
+      const resourceEntity = ensureEntity(entitiesForAuth, 'Credential::Object', resourceType);
+      const verifyChain = ensureEntity(entitiesForAuth, 'Credential::Chain', 'Action:Verify');
+      addParent(resourceEntity, verifyChain.uid);
+
+      const decision = authorize({
+        policies,
+        principalId: resolvedPrincipalId,
+        actionId,
+        resourceId: resourceType,
+        vpSignerId: facts.presentationSigner,
+        entities: entitiesForAuth,
+        rootTypes: summary.rootTypes,
+        rootIssuerId: summary.rootIssuerId,
+        tailTypes: summary.tailTypes,
+        tailIssuerId: summary.tailIssuerId,
+        tailDepth: summary.tailDepth,
+        authorizedClaims,
+        authorizedClaimsBySubject,
+      });
+
+      authorizations.push({
+        decision,
+        summary,
+        facts: {
+          ...facts,
+          evaluatedResourceType: resourceType,
+        },
+      });
+      if (decision !== 'allow') {
+        return { decision, authorizations };
+      }
     }
   }
 

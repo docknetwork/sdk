@@ -36,6 +36,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "base64url": "^3.0.1",
     "jsonld": "^6.0.0",
     "rify": "^0.7.1"
   },

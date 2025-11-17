@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import jsonld from 'jsonld';
 import { infer } from 'rify';
+import base64url from 'base64url';
 
 import {
   normalizeContextMap,
@@ -35,6 +36,9 @@ const RESERVED_RESOURCE_TYPES = new Set([
   VC_TYPE_DELEGATION_CREDENTIAL,
   'DelegationCredential',
 ]);
+const VC_JWT_PATTERN = /^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$/;
+const VC_JWT_ID_PREFIX = 'urn:vcjwt:';
+const AUTHORIZED_GRAPH_PREFIX = 'urn:authorized';
 
 /**
  * @typedef {Object} DelegationSummary
@@ -89,6 +93,8 @@ const RESERVED_RESOURCE_TYPES = new Set([
  * @property {DelegationFacts|null} facts
  * @property {Array|null} entities
  * @property {DelegationEvaluation[]} evaluations
+ * @property {string[]} [skippedCredentialIds]
+ * @property {Array<{credentialId:string,issuerId?:string,subjectId?:string,types?:string[],claims?:Record<string,unknown>}>} [skippedCredentials]
  */
 
 function findUnauthorizedClaims(premises = [], derived = [], authorizedGraphId) {
@@ -126,6 +132,174 @@ function findUnauthorizedClaims(premises = [], derived = [], authorizedGraphId) 
   return Array.from(remainingPremises.values());
 }
 
+function ensureSubjectId(subject, fallbackId) {
+  if (!subject || typeof subject !== 'object' || subject.id) {
+    return subject;
+  }
+  if (fallbackId) {
+    return { ...subject, id: fallbackId };
+  }
+  return subject;
+}
+
+function resolveCredentialContext(credentialId, contexts, contextOverride) {
+  const context = contexts.get(credentialId) ?? contextOverride;
+  if (!context) {
+    throw new DelegationError(
+      DelegationErrorCodes.MISSING_CONTEXT,
+      `Missing compaction context for credential ${credentialId}`,
+    );
+  }
+  return context;
+}
+
+function createSkippedCredential({
+  credentialId = UNKNOWN_IDENTIFIER,
+  issuerId = UNKNOWN_IDENTIFIER,
+  subjectId = UNKNOWN_IDENTIFIER,
+  types = [],
+  claims = {},
+}) {
+  return {
+    credentialId,
+    issuerId,
+    subjectId,
+    types: toArray(types).filter(Boolean),
+    claims,
+  };
+}
+
+async function expandJwtCredential(jwt, index, documentLoader) {
+  const parts = jwt.split('.');
+  if (parts.length !== 3) {
+    throw new DelegationError(
+      DelegationErrorCodes.INVALID_CREDENTIAL,
+      'Malformed VC-JWT encountered in presentation',
+    );
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(base64url.decode(parts[1]));
+  } catch (error) {
+    throw new DelegationError(
+      DelegationErrorCodes.INVALID_CREDENTIAL,
+      'Unable to decode VC-JWT payload',
+    );
+  }
+
+  const credential = payload?.vc;
+  if (!credential || typeof credential !== 'object') {
+    throw new DelegationError(
+      DelegationErrorCodes.INVALID_CREDENTIAL,
+      'VC-JWT payload missing vc object',
+    );
+  }
+
+  const normalizedCredential = { ...credential };
+  normalizedCredential.id = normalizedCredential.id ?? payload?.jti ?? `${VC_JWT_ID_PREFIX}${index}`;
+  const subjectId = payload?.sub;
+  if (!normalizedCredential.credentialSubject) {
+    normalizedCredential.credentialSubject = subjectId ? { id: subjectId } : {};
+  } else if (Array.isArray(normalizedCredential.credentialSubject)) {
+    normalizedCredential.credentialSubject = normalizedCredential.credentialSubject.map(
+      (subject) => ensureSubjectId(subject, subjectId),
+    );
+  } else {
+    normalizedCredential.credentialSubject = ensureSubjectId(
+      normalizedCredential.credentialSubject,
+      subjectId,
+    );
+  }
+
+  if (!normalizedCredential.issuer && payload?.iss) {
+    normalizedCredential.issuer = payload.iss;
+  }
+
+  const hasJsonLdContext = Array.isArray(normalizedCredential['@context'])
+    || typeof normalizedCredential['@context'] === 'string';
+  if (!hasJsonLdContext) {
+    return {
+      kind: 'skipped',
+      metadata: {
+        credentialId: normalizedCredential.id,
+        claims: normalizedCredential.credentialSubject ?? {},
+        issuerId: normalizedCredential.issuer ?? payload?.iss ?? UNKNOWN_IDENTIFIER,
+        subjectId: normalizedCredential.credentialSubject?.id ?? subjectId ?? UNKNOWN_IDENTIFIER,
+        types: toArray(normalizedCredential.type),
+      },
+    };
+  }
+  if (!Array.isArray(normalizedCredential['@context'])) {
+    normalizedCredential['@context'] = [normalizedCredential['@context']];
+  }
+
+  if (!normalizedCredential.type) {
+    normalizedCredential.type = ['VerifiableCredential'];
+  } else if (!Array.isArray(normalizedCredential.type)) {
+    normalizedCredential.type = [normalizedCredential.type];
+  }
+
+  const loader = documentLoader ?? jsonld.documentLoaders?.node?.();
+  const expandOptions = loader ? { documentLoader: loader } : {};
+  const expanded = await jsonld.expand(normalizedCredential, expandOptions);
+  const credentialNode = firstArrayItem(
+    expanded,
+    'Expanded VC-JWT credential missing node',
+  );
+
+  return {
+    kind: 'expanded',
+    credentialNode,
+    contextOverride: normalizedCredential['@context'],
+  };
+}
+
+async function normalizeJwtEntry(value, index, documentLoader) {
+  const outcome = await expandJwtCredential(value, index, documentLoader);
+  if (outcome.kind === 'skipped') {
+    return { skipped: createSkippedCredential(outcome.metadata) };
+  }
+  return {
+    credentialNode: outcome.credentialNode,
+    contextOverride: outcome.contextOverride,
+  };
+}
+
+async function normalizeCredentialEntry(entry, index, { documentLoader }) {
+  if (Array.isArray(entry?.['@graph'])) {
+    const credentialNode = firstArrayItem(
+      entry['@graph'],
+      'Expanded verifiableCredential entry is missing @graph node',
+    );
+    const referenceId = credentialNode?.['@id'];
+    const onlyHasId = referenceId
+      && Object.keys(credentialNode).every((key) => key === '@id');
+    if (onlyHasId && VC_JWT_PATTERN.test(referenceId)) {
+      return normalizeJwtEntry(referenceId, index, documentLoader);
+    }
+    return {
+      credentialNode,
+      contextOverride: null,
+    };
+  }
+
+  const literalValue = entry?.['@value'];
+  if (typeof literalValue === 'string' && VC_JWT_PATTERN.test(literalValue)) {
+    return normalizeJwtEntry(literalValue, index, documentLoader);
+  }
+
+  const referenceId = entry?.['@id'];
+  if (typeof referenceId === 'string' && VC_JWT_PATTERN.test(referenceId)) {
+    return normalizeJwtEntry(referenceId, index, documentLoader);
+  }
+
+  throw new DelegationError(
+    DelegationErrorCodes.INVALID_CREDENTIAL,
+    'Unsupported credential entry encountered in presentation',
+  );
+}
+
 // Normalizes thrown errors into a consistent failure record.
 function normalizeFailure(error) {
   return normalizeDelegationFailure(error);
@@ -157,6 +331,8 @@ export async function verifyVPWithDelegation({
   failOnUnauthorizedClaims = false,
   documentLoader,
 }) {
+  const skippedCredentialIds = new Set();
+  const skippedCredentials = [];
   try {
     if (!expandedPresentation) {
       throw new DelegationError(
@@ -176,11 +352,22 @@ export async function verifyVPWithDelegation({
     const referencedPreviousIds = new Set();
     const vcEntries = presentationNode[VC_VC] ?? [];
 
-    for (const entry of vcEntries) {
-      const credentialNode = firstArrayItem(
-        entry?.['@graph'],
-        'Expanded verifiableCredential entry is missing @graph node',
+    for (let index = 0; index < vcEntries.length; index += 1) {
+      const entry = vcEntries[index];
+      // eslint-disable-next-line no-await-in-loop
+      const normalizedEntry = await normalizeCredentialEntry(
+        entry,
+        index,
+        { documentLoader },
       );
+      if (normalizedEntry?.skipped) {
+        const { skipped } = normalizedEntry;
+        skippedCredentialIds.add(skipped.credentialId);
+        skippedCredentials.push(skipped);
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      const { credentialNode, contextOverride } = normalizedEntry;
       const credentialId = credentialNode?.['@id'];
       if (typeof credentialId !== 'string' || credentialId.length === 0) {
         throw new DelegationError(
@@ -189,13 +376,7 @@ export async function verifyVPWithDelegation({
         );
       }
 
-      const context = contexts.get(credentialId);
-      if (!context) {
-        throw new DelegationError(
-          DelegationErrorCodes.MISSING_CONTEXT,
-          `Missing compaction context for credential ${credentialId}`,
-        );
-      }
+      const context = resolveCredentialContext(credentialId, contexts, contextOverride);
 
       const compactOptions = documentLoader ? { documentLoader } : undefined;
       // eslint-disable-next-line no-await-in-loop
@@ -220,6 +401,19 @@ export async function verifyVPWithDelegation({
     }
 
     const normalizedCredentials = Array.from(normalizedById.values());
+    if (normalizedCredentials.length === 0) {
+      return {
+        decision: 'allow',
+        failures: [],
+        summary: null,
+        summaries: [],
+        facts: null,
+        entities: null,
+        evaluations: [],
+        skippedCredentialIds: Array.from(skippedCredentialIds),
+        skippedCredentials,
+      };
+    }
     const tailCredentials = normalizedCredentials.filter((vc) => !referencedPreviousIds.has(vc.id));
     if (tailCredentials.length === 0) {
       throw new DelegationError(
@@ -282,7 +476,9 @@ export async function verifyVPWithDelegation({
         : summarizeStandaloneCredential(chain[chain.length - 1]);
       const { resourceId } = summary;
       const resolvedPrincipalId = presentationSigner;
-      const authorizedGraphId = rootCredentialId ? `urn:authorized:${rootCredentialId}` : 'urn:authorized';
+      const authorizedGraphId = rootCredentialId
+        ? `${AUTHORIZED_GRAPH_PREFIX}:${rootCredentialId}`
+        : AUTHORIZED_GRAPH_PREFIX;
       const resourceTypes = deriveResourceTypesFromChain(chain);
 
       const facts = {
@@ -379,15 +575,20 @@ export async function verifyVPWithDelegation({
       facts: lastFacts,
       entities: lastEntities,
       evaluations,
+      skippedCredentialIds: Array.from(skippedCredentialIds),
+      skippedCredentials,
     };
   } catch (error) {
     return {
       decision: 'deny',
       failures: [normalizeFailure(error)],
       summary: null,
+      summaries: [],
       facts: null,
       entities: null,
       evaluations: [],
+      skippedCredentialIds: Array.from(skippedCredentialIds),
+      skippedCredentials,
     };
   }
 }

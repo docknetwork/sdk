@@ -4,6 +4,7 @@ import {
   verifyPresentation,
   documentLoader as credentialDocumentLoader,
 } from '../src/vc/index.js';
+import { VC_ISSUE_TYPE_JWT } from '../src/vc/credentials.js';
 import { MAY_CLAIM_IRI } from '@docknetwork/vc-delegation-engine';
 import * as cedar from '@cedar-policy/cedar-wasm/nodejs';
 
@@ -382,6 +383,67 @@ describe('credential delegation integration', () => {
       (summary) => summary.resourceId === 'urn:cred:score-standalone',
     );
     expect(chainSummary).toBeDefined();
+    expect(standaloneSummary).toBeDefined();
+  });
+
+  it('handles presentations mixing delegated, standalone, and JWT credentials', async () => {
+    const {
+      verifiableCredentials,
+      holderDid,
+      holderKey,
+    } = await buildDelegationChain({});
+
+    const standalone = await issueStandaloneCreditScore({
+      id: 'urn:cred:score-standalone-jwt',
+      creditScore: 705,
+      subjectId: 'did:example:standalone-holder',
+    });
+
+    const jwtCredential = await issueCredential(
+      DELEGATE_KEY,
+      {
+        '@context': CREDIT_SCORE_CONTEXT,
+        id: 'urn:cred:jwt-score-holder',
+        type: ['VerifiableCredential', 'CreditScoreCredential'],
+        issuer: DELEGATE_DID,
+        issuanceDate: new Date().toISOString(),
+        credentialSubject: {
+          id: SUBJECT_DID,
+          creditScore: 715,
+        },
+      },
+      true,
+      null,
+      null,
+      undefined,
+      null,
+      true,
+      VC_ISSUE_TYPE_JWT,
+    );
+
+    const mixedPresentation = await signDelegationPresentation({
+      verifiableCredential: [...verifiableCredentials, standalone, jwtCredential],
+      holder: holderDid,
+      holderKey,
+    });
+
+    const result = await verifyPresentation(mixedPresentation, {
+      challenge: CHALLENGE,
+      domain: DOMAIN,
+      failOnUnauthorizedClaims: true,
+      documentLoader: exampleDocumentLoader,
+    });
+
+    expect(result.verified).toBe(true);
+    const summaries = result.delegationResult?.summaries ?? [];
+    const jwtSummary = summaries.find(
+      (summary) => summary?.resourceId === 'urn:cred:jwt-score-holder',
+    );
+    expect(jwtSummary).toBeDefined();
+    expect(jwtSummary?.tailIssuerId).toBe(DELEGATE_DID);
+    const standaloneSummary = summaries.find(
+      (summary) => summary?.resourceId === 'urn:cred:score-standalone-jwt',
+    );
     expect(standaloneSummary).toBeDefined();
   });
 });

@@ -1,4 +1,4 @@
-import credentialDocumentLoader from '../../credential-sdk/dist/esm/vc/document-loader.js';
+import credentialDocumentLoader from '../../credential-sdk/src/vc/document-loader.js';
 
 const loadDocumentDefault = credentialDocumentLoader();
 

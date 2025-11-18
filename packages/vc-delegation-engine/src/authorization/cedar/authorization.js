@@ -56,12 +56,15 @@ export function buildAuthorizationInputsFromEvaluation({
     vpSignerId: facts.presentationSigner,
     entities: cloneEntities(entities),
     rootTypes: summary.rootTypes,
+    rootClaims: summary.rootClaims,
     rootIssuerId: summary.rootIssuerId,
     tailTypes: summary.tailTypes,
+    tailClaims: summary.tailClaims,
     tailIssuerId: summary.tailIssuerId,
     tailDepth: summary.tailDepth,
     authorizedClaims,
     authorizedClaimsBySubject,
+    parentClaims: facts.parentClaims,
   }));
 }
 

@@ -69,6 +69,7 @@ const AUTHORIZED_GRAPH_PREFIX = 'urn:authorized';
  * @property {Record<string, unknown>} authorizedClaims
  * @property {Record<string, Record<string, unknown>>} authorizedClaimsBySubject
  * @property {string[]} [resourceTypes]
+ * @property {Record<string, unknown>|null} [parentClaims]
  */
 
 /**
@@ -82,6 +83,7 @@ const AUTHORIZED_GRAPH_PREFIX = 'urn:authorized';
  * @property {Record<string, unknown>} authorizedClaims
  * @property {Record<string, Record<string, unknown>>} authorizedClaimsBySubject
  * @property {string[]} [resourceTypes]
+ * @property {Record<string, unknown>|null} [parentClaims]
  */
 
 /**
@@ -140,6 +142,46 @@ function ensureSubjectId(subject, fallbackId) {
     return { ...subject, id: fallbackId };
   }
   return subject;
+}
+
+function normalizeScopeClaims(subject = {}) {
+  if (!subject || typeof subject !== 'object') {
+    return subject ?? {};
+  }
+  const normalized = { ...subject };
+  if (Object.prototype.hasOwnProperty.call(normalized, 'permittedSystems')) {
+    normalized.permittedSystems = toArray(normalized.permittedSystems ?? []);
+  }
+  if (Object.prototype.hasOwnProperty.call(normalized, 'contractTypes')) {
+    normalized.contractTypes = toArray(normalized.contractTypes ?? []);
+  }
+  return normalized;
+}
+
+function buildParentClaimsChain(chain) {
+  if (!Array.isArray(chain) || chain.length < 2) {
+    return null;
+  }
+  const orderedSegments = [];
+  for (let index = chain.length - 2; index >= 0; index -= 1) {
+    const subjectClaims = normalizeScopeClaims(chain[index]?.credentialSubject);
+    if (subjectClaims && typeof subjectClaims === 'object') {
+      orderedSegments.push(subjectClaims);
+    }
+  }
+  let head = null;
+  let previousNode = null;
+  orderedSegments.forEach((claims) => {
+    const node = { ...claims };
+    if (!head) {
+      head = node;
+    }
+    if (previousNode) {
+      previousNode.parentClaims = node;
+    }
+    previousNode = node;
+  });
+  return head;
 }
 
 function resolveCredentialContext(credentialId, contexts, contextOverride) {
@@ -481,6 +523,11 @@ export async function verifyVPWithDelegation({
         : AUTHORIZED_GRAPH_PREFIX;
       const resourceTypes = deriveResourceTypesFromChain(chain);
 
+      const rootCredential = chain[0];
+      const tailCredential = chain[chain.length - 1];
+      const rootClaims = normalizeScopeClaims(rootCredential?.credentialSubject ?? {});
+      const tailClaims = normalizeScopeClaims(tailCredential?.credentialSubject ?? {});
+      const parentClaimsChain = buildParentClaimsChain(chain);
       const facts = {
         ...summary,
         resourceId,
@@ -488,6 +535,9 @@ export async function verifyVPWithDelegation({
         principalId: resolvedPrincipalId,
         presentationSigner,
         resourceTypes,
+        rootClaims,
+        tailClaims,
+        parentClaims: parentClaimsChain,
       };
       const actorIds = collectActorIds(chain, presentationSigner);
       const entities = baseEntities(actorIds, facts.actionIds);
@@ -533,9 +583,15 @@ export async function verifyVPWithDelegation({
       facts.authorizedClaims = authorizedClaimUnion;
       facts.authorizedClaimsBySubject = authorizedPerSubject;
       facts.resourceTypes = resourceTypes;
+      const parentCredential = chain.length > 1 ? chain[chain.length - 2] : null;
+      facts.parentClaims = parentClaimsChain ?? parentCredential?.credentialSubject ?? {};
       summary.authorizedClaims = authorizedClaimUnion;
       summary.authorizedClaimsBySubject = authorizedPerSubject;
       summary.resourceTypes = resourceTypes;
+      summary.rootClaims = rootClaims;
+      summary.tailClaims = tailClaims;
+      summary.parentClaims = parentClaimsChain;
+      summary.tailClaims = tailClaims;
 
       return {
         summary,

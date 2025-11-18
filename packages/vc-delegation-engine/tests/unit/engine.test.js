@@ -23,24 +23,33 @@ const SUBJECT_DELEGATE = 'did:delegate';
 const SUBJECT_HOLDER = 'did:subject';
 const CLAIM_NAME = 'creditScore';
 const CLAIM_VALUE = 750;
+const STAFF_ROOT_ID = 'urn:cred:staff-root';
+const STAFF_MID_ID = 'urn:cred:staff-mid';
+const STAFF_TAIL_ID = 'urn:cred:staff-tail';
+const DID_CORP_ROOT = 'did:corp:root';
+const DID_CORP_MANAGER = 'did:corp:manager';
+const DID_CORP_SENIOR = 'did:corp:senior';
+const DID_CORP_CFO = 'did:corp:cfo';
 
-vi.mock('jsonld', () => {
-  const compact = vi.fn(async (node) => {
-    if (node?.['@id'] === ROOT_CREDENTIAL_ID) {
-      return {
-        credentialSubject: {
-          id: SUBJECT_DELEGATE,
-          mayClaim: [CLAIM_NAME],
-        },
-      };
-    }
+async function defaultCompactImplementation(node) {
+  if (node?.['@id'] === ROOT_CREDENTIAL_ID) {
     return {
       credentialSubject: {
-        id: SUBJECT_HOLDER,
-        creditScore: CLAIM_VALUE,
+        id: SUBJECT_DELEGATE,
+        mayClaim: [CLAIM_NAME],
       },
     };
-  });
+  }
+  return {
+    credentialSubject: {
+      id: SUBJECT_HOLDER,
+      creditScore: CLAIM_VALUE,
+    },
+  };
+}
+
+vi.mock('jsonld', () => {
+  const compact = vi.fn(defaultCompactImplementation);
   return {
     default: { compact },
     compact,
@@ -133,6 +142,100 @@ describe('engine', () => {
       documentLoader: loader,
     });
     expect(loader).not.toHaveBeenCalled(); // no remote loads expected
+  });
+
+  it('normalizes parentClaims chain with array scopes', async () => {
+    const defaultContextMap = new Map([
+      [STAFF_ROOT_ID, [W3C_CONTEXT]],
+      [STAFF_MID_ID, [W3C_CONTEXT]],
+      [STAFF_TAIL_ID, [W3C_CONTEXT]],
+    ]);
+
+    jsonld.compact.mockImplementation(async (node) => {
+      if (node?.['@id'] === STAFF_ROOT_ID) {
+        return {
+          credentialSubject: {
+            id: DID_CORP_ROOT,
+            role: 'Finance Director',
+            maxSpendingLimit: 1_000_000,
+            permittedSystems: ['erp', 'contracts', 'payroll'],
+            contractTypes: ['vendor', 'consulting', 'capital'],
+          },
+        };
+      }
+      if (node?.['@id'] === STAFF_MID_ID) {
+        return {
+          credentialSubject: {
+            id: DID_CORP_MANAGER,
+            role: 'Finance Manager',
+            maxSpendingLimit: 200_000,
+            permittedSystems: 'erp',
+            contractTypes: ['vendor', 'consulting'],
+          },
+        };
+      }
+      return {
+        credentialSubject: {
+          id: DID_CORP_SENIOR,
+          role: 'Senior Accountant',
+          maxSpendingLimit: 45_000,
+          permittedSystems: 'erp',
+          contractTypes: 'vendor',
+        },
+      };
+    });
+
+    const presentation = [{
+      '@type': [VC_TYPE],
+      [VC_VC]: [
+        {
+          '@graph': [{
+            '@id': STAFF_ROOT_ID,
+            '@type': [VC_TYPE_DELEGATION_CREDENTIAL],
+            [VC_ISSUER]: [{ '@id': DID_CORP_CFO }],
+            [VC_SUBJECT]: [{ '@id': DID_CORP_MANAGER }],
+            [VC_ROOT_CREDENTIAL_ID]: [{ '@id': STAFF_ROOT_ID }],
+          }],
+        },
+        {
+          '@graph': [{
+            '@id': STAFF_MID_ID,
+            '@type': [VC_TYPE_DELEGATION_CREDENTIAL],
+            [VC_ISSUER]: [{ '@id': DID_CORP_MANAGER }],
+            [VC_SUBJECT]: [{ '@id': DID_CORP_SENIOR }],
+            [VC_ROOT_CREDENTIAL_ID]: [{ '@id': STAFF_ROOT_ID }],
+            [VC_PREVIOUS_CREDENTIAL_ID]: [{ '@id': STAFF_ROOT_ID }],
+          }],
+        },
+        {
+          '@graph': [{
+            '@id': STAFF_TAIL_ID,
+            '@type': [VC_TYPE_DELEGATION_CREDENTIAL],
+            [VC_ISSUER]: [{ '@id': DID_CORP_SENIOR }],
+            [VC_SUBJECT]: [{ '@id': DID_CORP_SENIOR }],
+            [VC_ROOT_CREDENTIAL_ID]: [{ '@id': STAFF_ROOT_ID }],
+            [VC_PREVIOUS_CREDENTIAL_ID]: [{ '@id': STAFF_MID_ID }],
+          }],
+        },
+      ],
+      [SECURITY_PROOF]: [{
+        [SECURITY_VERIFICATION_METHOD]: [{ '@id': `${DID_CORP_SENIOR}#auth-key` }],
+      }],
+    }];
+
+    const result = await verifyVPWithDelegation({
+      expandedPresentation: presentation,
+      credentialContexts: defaultContextMap,
+    });
+
+    expect(result.decision).toBe('allow');
+    const { parentClaims } = result.evaluations[0].facts;
+    expect(parentClaims.permittedSystems).toEqual(['erp']);
+    expect(parentClaims.contractTypes).toEqual(['vendor', 'consulting']);
+    expect(parentClaims.parentClaims.permittedSystems).toEqual(['erp', 'contracts', 'payroll']);
+    expect(parentClaims.parentClaims.contractTypes).toEqual(['vendor', 'consulting', 'capital']);
+
+    jsonld.compact.mockImplementation(defaultCompactImplementation);
   });
 });
 

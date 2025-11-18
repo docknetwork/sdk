@@ -20,6 +20,10 @@ import {
   multiDelegationPolicies,
   multiDelegationPresentation,
 } from './fixtures/multiDelegation.js';
+import {
+  staffPolicies,
+  staffPresentations,
+} from './fixtures/staff.js';
 
 async function verifyPresentation(presentation) {
   const expandedPresentation = await jsonld.expand(JSON.parse(JSON.stringify(presentation)), { documentLoader });
@@ -122,5 +126,26 @@ describe('delegation engine examples', () => {
     }
     expect(verification.decision).toBe('allow');
     expect(authorization.decision).toBe('allow');
+  });
+
+  it('enforces staff delegation policy across parent hops', async () => {
+    const validResult = await verifyAndAuthorize(
+      staffPresentations.valid,
+      staffPolicies,
+    );
+    if (validResult.verification.decision !== 'allow') {
+      console.error('staff valid verification failure', validResult.verification.failures);
+    }
+    expect(validResult.verification.decision).toBe('allow');
+    expect(validResult.authorization.decision).toBe('allow');
+
+    const invalidResult = await verifyAndAuthorize(
+      staffPresentations.invalid,
+      staffPolicies,
+    );
+    if (invalidResult.verification.decision !== 'allow') {
+      console.error('staff invalid verification failure', invalidResult.verification.failures);
+    }
+    expect(invalidResult.authorization.decision).toBe('deny');
   });
 });

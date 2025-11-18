@@ -29,6 +29,7 @@ export function buildCedarContext({
   tailDepth,
   authorizedClaims,
   authorizedClaimsBySubject,
+  parentClaims,
 } = {}) {
   if (typeof principalId !== 'string' || principalId.length === 0) {
     throw new Error('buildCedarContext requires a principalId');
@@ -60,6 +61,7 @@ export function buildCedarContext({
     authorizedClaims,
     authorizedClaimsBySubject,
   };
+  context.parentClaims = parentClaims ?? {};
 
   if (typeof rootIssuerId === 'string' && rootIssuerId.length > 0) {
     context.rootIssuer = entityRef(ACTOR_ENTITY, rootIssuerId);

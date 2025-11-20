@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { MAY_CLAIM_ALIAS_KEYS } from './constants.js';
+import { collectSubjectClaimEntries } from './utils.js';
 
 export function collectAuthorizedClaims(chain, derivedFacts, authorizedGraphId, allCredentials = []) {
   const valueLookup = new Map();
@@ -8,21 +8,12 @@ export function collectAuthorizedClaims(chain, derivedFacts, authorizedGraphId, 
     if (!subjectId) {
       return;
     }
-    Object.entries(vc.credentialSubject ?? {}).forEach(([key, value]) => {
-      if (key === 'id' || MAY_CLAIM_ALIAS_KEYS.includes(key)) {
+    const entries = collectSubjectClaimEntries(vc.credentialSubject ?? {});
+    entries.forEach(([key, value]) => {
+      if (value === undefined) {
         return;
       }
-      const storeValue = (entry) => {
-        if (entry === undefined) {
-          return;
-        }
-        valueLookup.set(`${subjectId}::${key}`, entry);
-      };
-      if (Array.isArray(value)) {
-        value.forEach(storeValue);
-      } else {
-        storeValue(value);
-      }
+      valueLookup.set(`${subjectId}::${key}`, value);
     });
   });
 

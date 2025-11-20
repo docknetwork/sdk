@@ -32,10 +32,6 @@ export function shortenTerm(iri) {
   if (hashIndex >= 0 && hashIndex + 1 < iri.length) {
     return iri.slice(hashIndex + 1);
   }
-  const slashIndex = iri.lastIndexOf('/');
-  if (slashIndex >= 0 && slashIndex + 1 < iri.length) {
-    return iri.slice(slashIndex + 1);
-  }
   const colonIndex = iri.lastIndexOf(':');
   if (colonIndex >= 0 && colonIndex + 1 < iri.length) {
     return iri.slice(colonIndex + 1);

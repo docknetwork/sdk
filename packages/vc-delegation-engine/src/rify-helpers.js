@@ -1,7 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { MAY_CLAIM_ALIAS_KEYS } from './constants.js';
 import { matchesType } from './jsonld-utils.js';
-import { extractMayClaims } from './utils.js';
+import { extractMayClaims, collectSubjectClaimEntries } from './utils.js';
 
 export function buildRifyRules(rootGraphId, authorizedGraphId) {
   if (!rootGraphId) {
@@ -96,31 +95,22 @@ export function buildRifyPremisesFromChain(chain, rootGraphId) {
     if (!subjectId || !issuerId) {
       return;
     }
-    Object.entries(vc.credentialSubject ?? {}).forEach(([key, value]) => {
-      if (key === 'id' || MAY_CLAIM_ALIAS_KEYS.includes(key)) {
+    const claimEntries = collectSubjectClaimEntries(vc.credentialSubject ?? {});
+    claimEntries.forEach(([key, value]) => {
+      if (value === undefined || value === null) {
         return;
       }
-      const addValue = (entry) => {
-        if (entry === undefined || entry === null) {
-          return;
-        }
-        let valueForPremise;
-        if (entry && typeof entry === 'object') {
-          valueForPremise = JSON.stringify(entry);
-        } else if (typeof entry === 'string') {
-          valueForPremise = entry;
-        } else {
-          valueForPremise = String(entry);
-        }
-        premises.push([subjectId, key, valueForPremise, issuerId]);
-        if (vc.id === rootId) {
-          premises.push([issuerId, 'allows', key, rootGraphId]);
-        }
-      };
-      if (Array.isArray(value)) {
-        value.forEach(addValue);
+      let valueForPremise;
+      if (value && typeof value === 'object') {
+        valueForPremise = JSON.stringify(value);
+      } else if (typeof value === 'string') {
+        valueForPremise = value;
       } else {
-        addValue(value);
+        valueForPremise = String(value);
+      }
+      premises.push([subjectId, key, valueForPremise, issuerId]);
+      if (vc.id === rootId) {
+        premises.push([issuerId, 'allows', key, rootGraphId]);
       }
     });
   });

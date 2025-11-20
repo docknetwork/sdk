@@ -183,7 +183,6 @@ export function summarizeDelegationChain(credentials) {
   });
 
   const tailTypes = normalizeTypeList(tailCredential['@type']);
-  // const tailSubject = tailCredential.credentialSubject ?? {};
   const tailDelegateId = extractGraphId(tailCredential, VC_SUBJECT);
   if (typeof tailDelegateId !== 'string' || tailDelegateId.length === 0) {
     throw new Error('Tail credential must include a subject id');

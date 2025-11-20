@@ -37,6 +37,7 @@
   "license": "ISC",
   "dependencies": {
     "base64url": "^3.0.1",
+    "jsonpath-plus": "^10.1.0",
     "jsonld": "^6.0.0",
     "rify": "^0.7.1"
   },

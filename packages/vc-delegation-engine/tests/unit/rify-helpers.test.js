@@ -50,4 +50,43 @@ describe('rify-helpers', () => {
       ]),
     );
   });
+
+  it('supports JSONPath-based mayClaim entries for nested properties', () => {
+    const chain = [
+      {
+        id: ROOT_GRAPH,
+        issuer: ISSUER_ROOT,
+        credentialSubject: {
+          id: SUBJECT_DELEGATE,
+          [MAY_CLAIM_IRI]: ['$.scope.spending.max'],
+          scope: {
+            spending: { max: 5000 },
+          },
+        },
+        type: [DELEGATION_TYPE],
+        rootCredentialId: ROOT_GRAPH,
+      },
+      {
+        id: `${ROOT_GRAPH}#nested`,
+        issuer: SUBJECT_DELEGATE,
+        credentialSubject: {
+          id: SUBJECT_HOLDER,
+          scope: {
+            spending: { max: 2000 },
+          },
+        },
+        type: [DELEGATION_TYPE],
+        previousCredentialId: ROOT_GRAPH,
+        rootCredentialId: ROOT_GRAPH,
+      },
+    ];
+
+    const premises = buildRifyPremisesFromChain(chain, ROOT_GRAPH);
+    expect(premises).toEqual(
+      expect.arrayContaining([
+        [SUBJECT_DELEGATE, 'listsClaim', 'scope.spending.max', ROOT_GRAPH],
+        [SUBJECT_HOLDER, 'scope.spending.max', '2000', SUBJECT_DELEGATE],
+      ]),
+    );
+  });
 });

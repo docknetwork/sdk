@@ -20,7 +20,7 @@ describe('jsonld-utils', () => {
     expect(map.get('a')).toBe(1);
   });
 
-  it('shortens IRIs using hash, slash, or colon', () => {
+  it('shortens IRIs using hash or colon', () => {
     expect(shortenTerm('https://example.com#term')).toBe('term');
     expect(shortenTerm('urn:foo:bar')).toBe('bar');
   });

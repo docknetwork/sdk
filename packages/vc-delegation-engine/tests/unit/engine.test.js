@@ -237,6 +237,90 @@ describe('engine', () => {
 
     jsonld.compact.mockImplementation(defaultCompactImplementation);
   });
+
+  it('supports nested mayClaim entries via JSONPath expressions', async () => {
+    const contexts = new Map([
+      [ROOT_CREDENTIAL_ID, [W3C_CONTEXT]],
+      [LEAF_CREDENTIAL_ID, [W3C_CONTEXT]],
+    ]);
+
+    jsonld.compact.mockImplementation(async (node) => {
+      if (node?.['@id'] === ROOT_CREDENTIAL_ID) {
+        return {
+          credentialSubject: {
+            id: SUBJECT_DELEGATE,
+            mayClaim: ['$.scope.controls.limit'],
+            scope: {
+              controls: {
+                limit: 5_000,
+              },
+            },
+          },
+        };
+      }
+      return {
+        credentialSubject: {
+          id: SUBJECT_HOLDER,
+          scope: {
+            controls: {
+              limit: 1_000,
+            },
+          },
+        },
+      };
+    });
+
+    const presentation = [
+      {
+        '@type': [VC_TYPE],
+        [VC_VC]: [
+          {
+            '@graph': [
+              {
+                '@id': ROOT_CREDENTIAL_ID,
+                '@type': [VC_TYPE_DELEGATION_CREDENTIAL],
+                [VC_ISSUER]: [{ '@id': ISSUER_ROOT }],
+                [VC_SUBJECT]: [{ '@id': SUBJECT_DELEGATE }],
+                [VC_ROOT_CREDENTIAL_ID]: [{ '@id': ROOT_CREDENTIAL_ID }],
+              },
+            ],
+          },
+          {
+            '@graph': [
+              {
+                '@id': LEAF_CREDENTIAL_ID,
+                '@type': [VC_TYPE_DELEGATION_CREDENTIAL],
+                [VC_ISSUER]: [{ '@id': SUBJECT_DELEGATE }],
+                [VC_SUBJECT]: [{ '@id': SUBJECT_HOLDER }],
+                [VC_ROOT_CREDENTIAL_ID]: [{ '@id': ROOT_CREDENTIAL_ID }],
+                [VC_PREVIOUS_CREDENTIAL_ID]: [{ '@id': ROOT_CREDENTIAL_ID }],
+              },
+            ],
+          },
+        ],
+        [SECURITY_PROOF]: [
+          {
+            [SECURITY_VERIFICATION_METHOD]: [{ '@id': `${ISSUER_ROOT}#key` }],
+          },
+        ],
+      },
+    ];
+
+    const result = await verifyVPWithDelegation({
+      expandedPresentation: presentation,
+      credentialContexts: contexts,
+    });
+
+    expect(result.decision).toBe('allow');
+    const { premises } = result.evaluations[0];
+    expect(premises).toEqual(
+      expect.arrayContaining([
+        [SUBJECT_HOLDER, 'scope.controls.limit', '1000', SUBJECT_DELEGATE],
+      ]),
+    );
+
+    jsonld.compact.mockImplementation(defaultCompactImplementation);
+  });
 });
 
 function buildPresentation() {

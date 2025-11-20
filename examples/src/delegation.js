@@ -15,7 +15,8 @@ permit(
   resource
 ) when {
   principal == context.vpSigner &&
-  context.authorizedClaims.creditScore >= 700
+  context.authorizedClaims.profile.financial.creditScore >= 700 &&
+  context.authorizedClaims.status == "active"
 };
 `,
 };
@@ -38,6 +39,10 @@ const CREDIT_DELEGATION_CONTEXT = [
     ex: 'https://example.org/credentials#',
     CreditScoreDelegation: 'ex:CreditScoreDelegation',
     body: 'ex:body',
+    scope: 'ex:scope',
+    profile: 'ex:profile',
+    financial: 'ex:financial',
+    allowed: 'ex:allowed',
   },
 ];
 
@@ -49,7 +54,10 @@ const CREDIT_SCORE_CONTEXT = [
     ex: 'https://example.org/credentials#',
     xsd: 'http://www.w3.org/2001/XMLSchema#',
     CreditScoreCredential: 'ex:CreditScoreCredential',
+    profile: 'ex:profile',
+    financial: 'ex:financial',
     creditScore: { '@id': 'ex:creditScore', '@type': 'xsd:integer' },
+    status: 'ex:status',
   },
 ];
 
@@ -145,7 +153,15 @@ async function main() {
     issuanceDate: new Date().toISOString(),
     credentialSubject: {
       id: DELEGATE_DID,
-      [MAY_CLAIM_IRI]: ['creditScore'],
+      // Demonstrate nested JSONPath allowance
+      scope: {
+        profile: {
+          financial: {
+            creditScore: 'creditScore',
+          },
+        },
+      },
+      [MAY_CLAIM_IRI]: ['$.scope.profile.financial.creditScore', 'status'],
       body: 'Issuer of Credit Scores',
     },
     rootCredentialId: rootId,
@@ -160,7 +176,12 @@ async function main() {
     issuanceDate: new Date().toISOString(),
     credentialSubject: {
       id: SUBJECT_DID,
-      creditScore: 760,
+      profile: {
+        financial: {
+          creditScore: 760,
+        },
+      },
+      status: 'active',
     },
     rootCredentialId: rootId,
     previousCredentialId: rootId,

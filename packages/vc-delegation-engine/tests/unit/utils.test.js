@@ -1,6 +1,15 @@
 import { describe, it, expect } from 'vitest';
 
-import { firstArrayItem, toArray, extractMayClaims } from '../../src/utils.js';
+import {
+  firstArrayItem,
+  toArray,
+  extractMayClaims,
+  collectSubjectClaimEntries,
+} from '../../src/utils.js';
+
+const SAMPLE_EMAIL = 'user@example.com';
+const ACTION_READ = 'read';
+const ACTION_WRITE = 'write';
 
 describe('utils', () => {
   it('returns first array item or throws', () => {
@@ -21,8 +30,47 @@ describe('utils', () => {
     expect(extractMayClaims({})).toEqual([]);
   });
 
+  it('expands JSONPath expressions in mayClaim arrays', () => {
+    const subject = {
+      mayClaim: ['$.finance.limits.max'],
+      finance: {
+        limits: {
+          max: 9000,
+        },
+      },
+    };
+    expect(extractMayClaims(subject)).toEqual(['finance.limits.max']);
+  });
+
   it('returns empty array for invalid subjects', () => {
     expect(extractMayClaims(null)).toEqual([]);
     expect(extractMayClaims('bad')).toEqual([]);
+  });
+
+  it('collects nested subject claim entries with path identifiers', () => {
+    const subject = {
+      id: 'did:root',
+      profile: {
+        contact: {
+          email: SAMPLE_EMAIL,
+        },
+      },
+      permissions: [
+        { action: ACTION_READ },
+        { action: ACTION_WRITE },
+      ],
+    };
+    const entries = collectSubjectClaimEntries(subject);
+    expect(entries).toEqual(
+      expect.arrayContaining([
+        ['profile', { contact: { email: SAMPLE_EMAIL } }],
+        ['profile.contact', { email: SAMPLE_EMAIL }],
+        ['profile.contact.email', SAMPLE_EMAIL],
+        ['permissions', subject.permissions],
+        ['permissions[0]', { action: 'read' }],
+        ['permissions[0].action', ACTION_READ],
+        ['permissions[1].action', ACTION_WRITE],
+      ]),
+    );
   });
 });

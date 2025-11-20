@@ -53,9 +53,9 @@ export function buildRifyPremisesFromChain(chain, rootGraphId) {
   const premises = [];
   const rootCredential = chain[0];
   const rootSubjectId = rootCredential.credentialSubject?.id;
-  const rootMayClaims = extractMayClaims(rootCredential.credentialSubject ?? {});
 
   if (rootSubjectId) {
+    const rootMayClaims = extractMayClaims(rootCredential.credentialSubject ?? {});
     rootMayClaims.forEach((claim) => {
       premises.push([rootSubjectId, 'allows', claim, rootGraphId]);
     });

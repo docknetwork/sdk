@@ -14,6 +14,7 @@ import dockPSV1Context from './contexts/dock-ps-v1.json';
 import dockBBDT16V1Context from './contexts/dock-bbdt16-v1.json';
 import dockPrettyVCContext from './contexts/prettyvc.json';
 import jws2020V1Context from './contexts/jws-2020-v1.json';
+import delegationCredentialContext from './contexts/delegation-credential.json';
 import statusList21Context from './contexts/status-list-21';
 import privateStatusList21Context from './contexts/private-status-list-21';
 import sphereonId from './contexts/sphereon-wallet-identity-v1.json';
@@ -27,6 +28,7 @@ export default new Map([
   ['https://ld.truvera.io/security/ps/v1', dockPSV1Context],
   ['https://ld.truvera.io/security/bbdt16/v1', dockBBDT16V1Context],
   ['https://ld.truvera.io/private-status-list-21', privateStatusList21Context],
+  ['https://ld.truvera.io/credentials/delegation', delegationCredentialContext],
   ['https://w3id.org/security/bbs/v1', bbsV1Context],
   ['https://w3c-ccg.github.io/ldp-bbs2020/contexts/v1/', bbsV1Context],
   ['https://www.w3.org/2018/credentials/v1', credV1Context],

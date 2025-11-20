@@ -8,6 +8,7 @@ import {
   CredentialSchema,
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
+import { verifyVPWithDelegation } from '@docknetwork/vc-delegation-engine';
 import { getPrivateStatus, verifyCredential } from './credentials';
 /// import DIDResolver from "../resolver/did/did-resolver"; // eslint-disable-line
 import { isCredVerGte060 } from './crypto/common/DockCryptoSignature';
@@ -70,6 +71,117 @@ function checkPresentation(presentation) {
   }
 }
 
+const DELEGATION_TYPE_URIS = new Set([
+  'DelegationCredential',
+  'https://ld.truvera.io/credentials/delegation#DelegationCredential',
+]);
+
+async function optionalDelegationValidation(
+  {
+    verified,
+    presentation,
+    ...rest
+  },
+  verificationOptions,
+  delegationOptions = {},
+) {
+  const result = {
+    ...rest,
+    verified,
+  };
+
+  if (!presentation || !verified) {
+    return result;
+  }
+
+  if (!shouldRunDelegationValidation(presentation, delegationOptions)) {
+    return result;
+  }
+
+  try {
+    const expandedPresentation = await jsonld.expand(presentation, {
+      documentLoader: verificationOptions.documentLoader,
+    });
+    const credentialContexts = buildCredentialContextMap(presentation);
+    const cedarOptions = delegationOptions.cedar ?? {};
+    const delegationResult = await verifyVPWithDelegation({
+      expandedPresentation,
+      credentialContexts,
+      documentLoader: verificationOptions.documentLoader,
+      failOnUnauthorizedClaims: delegationOptions.failOnUnauthorizedClaims ?? false,
+      policies: cedarOptions.policies,
+      cedar: cedarOptions.cedar,
+    });
+    const delegationVerified = delegationResult.decision === 'allow';
+    return {
+      ...result,
+      delegationResult,
+      verified: result.verified && delegationVerified,
+    };
+  } catch (error) {
+    return {
+      ...result,
+      delegationResult: {
+        decision: 'deny',
+        failures: [
+          {
+            code: 'DELEGATION_VALIDATION_ERROR',
+            message: error?.message ?? 'Delegation or policy validation failed',
+            stack: error?.stack,
+          },
+        ],
+      },
+      verified: false,
+      error,
+    };
+  }
+}
+
+function shouldRunDelegationValidation(presentation, delegationOptions = {}) {
+  if (delegationOptions.failOnUnauthorizedClaims) {
+    return true;
+  }
+  const cedarOptions = delegationOptions.cedar;
+  if (cedarOptions?.policies || cedarOptions?.cedar) {
+    return true;
+  }
+  return presentationContainsDelegationCredential(presentation);
+}
+
+function presentationContainsDelegationCredential(presentation) {
+  const credentials = jsonld.getValues(presentation, 'verifiableCredential') ?? [];
+  return credentials.some((credential) => hasDelegationCredentialType(credential));
+}
+
+function hasDelegationCredentialType(credential) {
+  if (!credential) {
+    return false;
+  }
+  const rawTypes = credential.type ?? credential['@type'];
+  let types = [];
+  if (Array.isArray(rawTypes)) {
+    types = rawTypes;
+  } else if (rawTypes) {
+    types = [rawTypes];
+  }
+  return types.some(
+    (type) => typeof type === 'string'
+      && (DELEGATION_TYPE_URIS.has(type) || type.endsWith('#DelegationCredential')),
+  );
+}
+
+function buildCredentialContextMap(presentation) {
+  const contexts = new Map();
+  const credentials = jsonld.getValues(presentation, 'verifiableCredential') ?? [];
+  credentials.forEach((credential) => {
+    const { id } = credential;
+    if (typeof id === 'string' && credential['@context']) {
+      contexts.set(id, credential['@context']);
+    }
+  });
+  return contexts;
+}
+
 export async function verifyPresentationCredentials(
   presentation,
   options = {},
@@ -113,6 +225,9 @@ export async function verifyPresentationCredentials(
  * @property {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
  * @property {object} [presentationPurpose] - A purpose other than the default AuthenticationProofPurpose
  * @property {object} [documentLoader] - A document loader, can be null and use the default
+ * @property {boolean} [failOnUnauthorizedClaims] - When true, delegation chains that emit unauthorized claims cause verification to fail
+ * @property {object} [policies] - Optional delegation policy bundle forwarded to @docknetwork/vc-delegation-engine
+ * @property {object} [cedarAuth] - Optional cedar authorization configuration forwarded to @docknetwork/vc-delegation-engine
  */
 
 /**
@@ -152,6 +267,10 @@ export async function verifyPresentation(presentation, options = {}) {
     controller,
     suite = [],
   } = options;
+  const delegationOptions = {
+    failOnUnauthorizedClaims: options.failOnUnauthorizedClaims,
+    cedar: options.cedarAuth,
+  };
 
   // Build verification options
   const verificationOptions = {
@@ -174,14 +293,23 @@ export async function verifyPresentation(presentation, options = {}) {
     verificationOptions,
   );
   try {
-    // Skip proof validation for unsigned
-    if (unsignedPresentation) {
-      return { verified, results: [presentation], credentialResults };
-    }
-
     // Early out incase credentials arent verified
     if (!verified) {
       return { verified, results: [presentation], credentialResults };
+    }
+
+    // Skip proof validation for unsigned
+    if (unsignedPresentation) {
+      return await optionalDelegationValidation(
+        {
+          verified,
+          presentation,
+          results: [presentation],
+          credentialResults,
+        },
+        verificationOptions,
+        delegationOptions,
+      );
     }
 
     // Get proof purpose
@@ -200,12 +328,13 @@ export async function verifyPresentation(presentation, options = {}) {
     });
 
     // Return results
-    return {
+    return await optionalDelegationValidation({
+      presentation,
       presentationResult,
       credentialResults,
       verified: verified && presentationResult.verified,
       error: presentationResult.error,
-    };
+    }, verificationOptions, delegationOptions);
   } catch (error) {
     // Error occured when verifying presentation, catch and return error
     return {
@@ -215,7 +344,6 @@ export async function verifyPresentation(presentation, options = {}) {
     };
   }
 }
-
 /**
  * Sign a Verifiable Presentation
  * @param {object} presentation - the one to be signed

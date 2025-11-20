@@ -10,7 +10,7 @@ A focused Javascript engine for evaluating delegated credentials in Verifiable P
 
 - **Cedar Policy Integration**: Helper APIs build ready-to-run [Cedar](https://www.cedarpolicy.com/) authorization requests (entities, context, and policies) and execute them through `@cedar-policy/cedar-wasm`, letting you layer fine-grained policy checks on top of delegation results.
 
-- **JSON-LD & Rify Utilities**: Normalization helpers, JSON-LD compaction, and Rify premises/rules generation simplify interoperating with linked data credentials and inference engines.
+- **JSON-LD & Rify Utilities**: Normalization helpers, JSON-LD compaction, and [Rify](https://www.npmjs.com/package/rify) premises/rules generation simplify interoperating with linked data credentials and inference engines.
 
 - **Robust Failure Diagnostics**: Typed `DelegationError` codes, unauthorized-claim detection, and summarized evaluation objects make it easier to surface meaningful errors to clients and observability pipelines.
 

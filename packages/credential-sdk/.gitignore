@@ -1,0 +1,4 @@
+# Performance test results
+performance-results/
+*.performance.json
+dashboard.html

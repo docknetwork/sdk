@@ -51,7 +51,7 @@ echo "   - Verbose output: ENABLED"
 echo ""
 
 # Run with garbage collection enabled for accurate memory measurements
-node --expose-gc node_modules/.bin/jest tests/tracking-proof-performance/proof-performance-export.test.js \
+node --expose-gc node_modules/.bin/jest tests/tracking-proof-performance/proof-performance.test.js \
     --verbose \
     --testTimeout=120000 \
     --maxWorkers=1 \
@@ -63,6 +63,8 @@ echo ""
 if [ $EXIT_CODE -eq 0 ]; then
     echo "✅ Performance tests completed successfully!"
     echo ""
+    # Wait for performance results to be fully written to disk
+    sleep 2
     echo "📊 Generating interactive dashboard..."
     node tests/tracking-proof-performance/generate-dashboard.js
 else

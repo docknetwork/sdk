@@ -1,5 +1,7 @@
 // Mock fetch
 import mockFetch from "../mocks/fetch";
+import fs from "fs";
+import path from "path";
 
 import {
     issueCredential,
@@ -11,7 +13,7 @@ import testingKeys from "../data/test-keys";
 
 mockFetch();
 
-// Performance tracking utilities
+// Performance tracking utilities with JSON export
 class PerformanceTracker {
     constructor(name) {
         this.name = name;
@@ -37,7 +39,7 @@ class PerformanceTracker {
     }
 
     getResults() {
-        const durationMs = Number(this.endTime - this.startTime) / 1_000_000; // Convert nanoseconds to milliseconds
+        const durationMs = Number(this.endTime - this.startTime) / 1_000_000;
 
         const memoryDelta = {
             rss: this.endMemory.rss - this.startMemory.rss,
@@ -48,25 +50,36 @@ class PerformanceTracker {
 
         return {
             name: this.name,
+            timestamp: new Date().toISOString(),
             duration: {
-                ms: durationMs.toFixed(2),
-                seconds: (durationMs / 1000).toFixed(3),
+                ms: parseFloat(durationMs.toFixed(2)),
+                seconds: parseFloat((durationMs / 1000).toFixed(3)),
             },
             memory: {
-                start: this.formatMemory(this.startMemory),
-                end: this.formatMemory(this.endMemory),
-                delta: this.formatMemory(memoryDelta),
+                start: {
+                    rss: this.startMemory.rss,
+                    heapTotal: this.startMemory.heapTotal,
+                    heapUsed: this.startMemory.heapUsed,
+                    external: this.startMemory.external,
+                },
+                end: {
+                    rss: this.endMemory.rss,
+                    heapTotal: this.endMemory.heapTotal,
+                    heapUsed: this.endMemory.heapUsed,
+                    external: this.endMemory.external,
+                },
+                delta: {
+                    rss: memoryDelta.rss,
+                    heapTotal: memoryDelta.heapTotal,
+                    heapUsed: memoryDelta.heapUsed,
+                    external: memoryDelta.external,
+                },
             },
         };
     }
 
-    formatMemory(mem) {
-        return {
-            rss: `${(mem.rss / 1024 / 1024).toFixed(2)} MB`,
-            heapTotal: `${(mem.heapTotal / 1024 / 1024).toFixed(2)} MB`,
-            heapUsed: `${(mem.heapUsed / 1024 / 1024).toFixed(2)} MB`,
-            external: `${(mem.external / 1024 / 1024).toFixed(2)} MB`,
-        };
+    formatMemory(bytes) {
+        return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
     }
 
     printResults() {
@@ -77,20 +90,20 @@ class PerformanceTracker {
         console.log(`⏱️  Duration: ${results.duration.ms} ms(${results.duration.seconds}s)`);
         console.log(`\n📊 Memory Usage: `);
         console.log(`   Start: `);
-        console.log(`     - RSS:        ${results.memory.start.rss} `);
-        console.log(`     - Heap Total: ${results.memory.start.heapTotal} `);
-        console.log(`     - Heap Used:  ${results.memory.start.heapUsed} `);
-        console.log(`     - External:   ${results.memory.start.external} `);
+        console.log(`     - RSS:        ${this.formatMemory(results.memory.start.rss)} `);
+        console.log(`     - Heap Total: ${this.formatMemory(results.memory.start.heapTotal)} `);
+        console.log(`     - Heap Used:  ${this.formatMemory(results.memory.start.heapUsed)} `);
+        console.log(`     - External:   ${this.formatMemory(results.memory.start.external)} `);
         console.log(`   End: `);
-        console.log(`     - RSS:        ${results.memory.end.rss} `);
-        console.log(`     - Heap Total: ${results.memory.end.heapTotal} `);
-        console.log(`     - Heap Used:  ${results.memory.end.heapUsed} `);
-        console.log(`     - External:   ${results.memory.end.external} `);
+        console.log(`     - RSS:        ${this.formatMemory(results.memory.end.rss)} `);
+        console.log(`     - Heap Total: ${this.formatMemory(results.memory.end.heapTotal)} `);
+        console.log(`     - Heap Used:  ${this.formatMemory(results.memory.end.heapUsed)} `);
+        console.log(`     - External:   ${this.formatMemory(results.memory.end.external)} `);
         console.log(`   Delta(Change): `);
-        console.log(`     - RSS:        ${results.memory.delta.rss} `);
-        console.log(`     - Heap Total: ${results.memory.delta.heapTotal} `);
-        console.log(`     - Heap Used:  ${results.memory.delta.heapUsed} `);
-        console.log(`     - External:   ${results.memory.delta.external} `);
+        console.log(`     - RSS:        ${this.formatMemory(results.memory.delta.rss)} `);
+        console.log(`     - Heap Total: ${this.formatMemory(results.memory.delta.heapTotal)} `);
+        console.log(`     - Heap Used:  ${this.formatMemory(results.memory.delta.heapUsed)} `);
+        console.log(`     - External:   ${this.formatMemory(results.memory.delta.external)} `);
         console.log(`${"=".repeat(80)} \n`);
 
         return results;
@@ -126,13 +139,24 @@ function getSamplePresentation(credentials) {
     };
 }
 
-// Performance test suite
-describe("Proof Generation & Verification Performance Tests", () => {
-    // Store results for summary
+// Performance test suite with JSON export
+describe("Proof Performance Tests with JSON Export", () => {
     const performanceResults = [];
+    const outputDir = path.join(process.cwd(), "performance-results");
+    const outputFile = path.join(
+        outputDir,
+        `performance-${new Date().toISOString().replace(/:/g, "-")}.json`
+    );
+
+    beforeAll(() => {
+        // Create output directory if it doesn't exist
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+    });
 
     afterAll(() => {
-        // Print summary of all tests
+        // Print summary
         console.log(`\n${"#".repeat(80)} `);
         console.log("PERFORMANCE TEST SUMMARY");
         console.log(`${"#".repeat(80)} \n`);
@@ -140,11 +164,32 @@ describe("Proof Generation & Verification Performance Tests", () => {
         performanceResults.forEach((result, index) => {
             console.log(`${index + 1}. ${result.name} `);
             console.log(`   Duration: ${result.duration.ms} ms`);
-            console.log(`   Memory Delta(Heap Used): ${result.memory.delta.heapUsed} `);
+            console.log(`   Memory Delta(Heap Used): ${(result.memory.delta.heapUsed / 1024 / 1024).toFixed(2)} MB`);
             console.log("");
         });
 
         console.log(`${"#".repeat(80)} \n`);
+
+        // Export results to JSON
+        const exportData = {
+            metadata: {
+                testDate: new Date().toISOString(),
+                nodeVersion: process.version,
+                platform: process.platform,
+                arch: process.arch,
+                totalTests: performanceResults.length,
+            },
+            results: performanceResults,
+            summary: {
+                totalDuration: performanceResults.reduce((sum, r) => sum + r.duration.ms, 0),
+                averageDuration: performanceResults.reduce((sum, r) => sum + r.duration.ms, 0) / performanceResults.length,
+                totalMemoryDelta: performanceResults.reduce((sum, r) => sum + r.memory.delta.heapUsed, 0),
+                averageMemoryDelta: performanceResults.reduce((sum, r) => sum + r.memory.delta.heapUsed, 0) / performanceResults.length,
+            },
+        };
+
+        fs.writeFileSync(outputFile, JSON.stringify(exportData, null, 2));
+        console.log(`\n✅ Performance results exported to: ${outputFile} \n`);
     });
 
     testingKeys.forEach((testKey) => {
@@ -152,7 +197,7 @@ describe("Proof Generation & Verification Performance Tests", () => {
 
         describe(`Performance Tests for ${keyDocument.type}(${sigType})`, () => {
 
-            test("Measure credential issuance (proof generation) performance", async () => {
+            test("Credential issuance performance", async () => {
                 const tracker = new PerformanceTracker(
                     `Credential Issuance - ${sigType} `
                 );
@@ -167,13 +212,11 @@ describe("Proof Generation & Verification Performance Tests", () => {
                 const results = tracker.printResults();
                 performanceResults.push(results);
 
-                // Verify the credential was actually created
                 expect(credential.proof).toBeDefined();
                 expect(credential.proof.type).toBe(sigType);
             }, 60000);
 
-            test("Measure credential verification (proof verification) performance", async () => {
-                // First, issue a credential
+            test("Credential verification performance", async () => {
                 const credential = await issueCredential(
                     testKey.keyDocument,
                     getSampleCredential()
@@ -190,13 +233,11 @@ describe("Proof Generation & Verification Performance Tests", () => {
                 const perfResults = tracker.printResults();
                 performanceResults.push(perfResults);
 
-                // Verify the verification was successful
                 expect(result.verified).toBe(true);
             }, 60000);
 
-            // Test JWT format if not JsonWebKey (which can't use proofValue)
             if (keyDocument.type !== "JsonWebKey2020") {
-                test("Measure credential issuance with proofValue format", async () => {
+                test("Credential issuance with proofValue", async () => {
                     const tracker = new PerformanceTracker(
                         `Credential Issuance(proofValue) - ${sigType} `
                     );
@@ -222,7 +263,7 @@ describe("Proof Generation & Verification Performance Tests", () => {
                 }, 60000);
             }
 
-            test("Measure JWT credential issuance performance", async () => {
+            test("JWT credential issuance performance", async () => {
                 const tracker = new PerformanceTracker(
                     `JWT Credential Issuance - ${sigType} `
                 );
@@ -247,8 +288,7 @@ describe("Proof Generation & Verification Performance Tests", () => {
                 expect(typeof credential).toBe("string");
             }, 60000);
 
-            test("Measure JWT credential verification performance", async () => {
-                // First, issue a JWT credential
+            test("JWT credential verification performance", async () => {
                 const jwtCredential = await issueCredential(
                     testKey.keyDocument,
                     getSampleCredential(),
@@ -275,8 +315,7 @@ describe("Proof Generation & Verification Performance Tests", () => {
                 expect(result.verified).toBe(true);
             }, 60000);
 
-            test("Measure presentation signing performance", async () => {
-                // First, create a credential
+            test("Presentation signing performance", async () => {
                 const credential = await issueCredential(
                     testKey.keyDocument,
                     getSampleCredential()
@@ -304,8 +343,7 @@ describe("Proof Generation & Verification Performance Tests", () => {
                 expect(signedPresentation.proof.type).toBe(sigType);
             }, 60000);
 
-            test("Measure presentation verification performance", async () => {
-                // First, create and sign a presentation
+            test("Presentation verification performance", async () => {
                 const credential = await issueCredential(
                     testKey.keyDocument,
                     getSampleCredential()
@@ -336,7 +374,7 @@ describe("Proof Generation & Verification Performance Tests", () => {
                 expect(result.presentationResult.verified).toBe(true);
             }, 60000);
 
-            test("Measure batch credential issuance performance (10 credentials)", async () => {
+            test("Batch credential issuance (10 credentials)", async () => {
                 const tracker = new PerformanceTracker(
                     `Batch Issuance(10 credentials) - ${sigType} `
                 );
@@ -358,8 +396,7 @@ describe("Proof Generation & Verification Performance Tests", () => {
                 });
             }, 120000);
 
-            test("Measure batch credential verification performance (10 credentials)", async () => {
-                // First, create 10 credentials
+            test("Batch credential verification (10 credentials)", async () => {
                 const credentials = await Promise.all(
                     Array.from({ length: 10 }, () =>
                         issueCredential(testKey.keyDocument, getSampleCredential())

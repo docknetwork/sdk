@@ -60,12 +60,21 @@ export class CheqdAPI extends AbstractApiProvider {
 
   #spawn;
 
+  #connectionConfig;
+
+  #sdkFactory;
+
   /**
    * Creates a new instance of the CheqdAPI object, call init to initialize
    * @constructor
    */
-  constructor() {
+  constructor({ sdkFactory } = {}) {
     super();
+    if (sdkFactory != null && typeof sdkFactory !== 'function') {
+      throw new Error('`sdkFactory` must be a function');
+    }
+
+    this.#sdkFactory = sdkFactory ?? createCheqdSDK;
   }
 
   /**
@@ -186,7 +195,7 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {string} [configuration.network]
    * @returns {Promise<this>}
    */
-  async init({ url, wallet, network } = {}) {
+  async init({ url, urls, wallet, network } = {}) {
     if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
       throw new Error(
         `Invalid network provided: \`${network}\`, expected one of \`${fmtIterable(
@@ -196,6 +205,8 @@ export class CheqdAPI extends AbstractApiProvider {
     } else if (wallet == null) {
       throw new Error('`wallet` must be provided');
     }
+
+    const rpcUrls = this.#normalizeUrls(url, urls);
 
     this.ensureNotInitialized();
 
@@ -215,18 +226,20 @@ export class CheqdAPI extends AbstractApiProvider {
       [CheqdCreateResource, MsgCreateResourcePayload],
     );
 
-    const options = {
-      modules: [DIDModule, ResourceModule, FeemarketModule],
-      rpcUrl: url,
-      endpoint: url,
+    const { sdk, options } = await this.#connectWithFallback(
+      rpcUrls,
       wallet,
       network,
-    };
-    const sdk = await createCheqdSDK(options);
+    );
 
     this.ensureNotInitialized();
     this.#sdk = sdk;
     this.#spawn = pLimit(1);
+    this.#connectionConfig = {
+      urls: rpcUrls,
+      wallet,
+      network,
+    };
     this.#sdk.signer.endpoint = options.endpoint; // HACK: cheqd SDK doesnt pass this with createCheqdSDK yet
 
     return this;
@@ -387,11 +400,12 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   async reconnect() {
-    const {
-      sdk: {
-        options: { rpcUrl, network, wallet },
-      },
-    } = this.ensureInitialized();
+    this.ensureInitialized();
+    const { urls, wallet, network } = this.#connectionConfig ?? {};
+
+    if (!urls?.length) {
+      throw new Error('Cannot reconnect because no RPC URLs are configured');
+    }
 
     return await retry(
       async () => {
@@ -402,13 +416,81 @@ export class CheqdAPI extends AbstractApiProvider {
         }
 
         return await this.init({
-          url: rpcUrl,
+          urls,
           network,
           wallet,
         });
       },
       { delay: 5e2, timeLimit: 1e4 },
     );
+  }
+
+  #normalizeUrls(url, urls) {
+    const orderedUrls = [];
+    const pushIfValid = (candidate, { prepend = false } = {}) => {
+      if (typeof candidate !== 'string') {
+        return;
+      }
+      const trimmed = candidate.trim();
+      if (trimmed === '') {
+        return;
+      }
+      if (prepend) {
+        orderedUrls.unshift(trimmed);
+      } else {
+        orderedUrls.push(trimmed);
+      }
+    };
+
+    if (Array.isArray(urls)) {
+      urls.forEach((candidate) => pushIfValid(candidate));
+    } else {
+      pushIfValid(urls);
+    }
+    pushIfValid(url, { prepend: true });
+
+    const uniqueUrls = orderedUrls.filter(
+      (candidate, index, self) => self.indexOf(candidate) === index,
+    );
+
+    if (!uniqueUrls.length) {
+      throw new Error('At least one RPC `url` must be provided');
+    }
+
+    return uniqueUrls;
+  }
+
+  async #connectWithFallback(urls, wallet, network) {
+    let lastError;
+
+    for (const candidateUrl of urls) {
+      try {
+        return await this.#createSdk(candidateUrl, wallet, network);
+      } catch (error) {
+        lastError = error;
+        console.error(`Failed to connect to Cheqd RPC endpoint \`${candidateUrl}\``, error);
+      }
+    }
+
+    const details = lastError ? ` Last error: ${lastError.message ?? lastError}` : '';
+    throw new Error(
+      `Unable to connect to any provided Cheqd RPC endpoint: \`${fmtIterable(urls)}\`.${details}`,
+    );
+  }
+
+  async #createSdk(rpcUrl, wallet, network) {
+    const options = {
+      modules: [DIDModule, ResourceModule, FeemarketModule],
+      rpcUrl,
+      endpoint: rpcUrl,
+      wallet,
+      network,
+    };
+
+    const sdk = await this.#sdkFactory(options);
+    await sdk.signer.getHeight();
+
+    return { sdk, options };
   }
 
   types() {

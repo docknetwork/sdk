@@ -195,7 +195,12 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {string} [configuration.network]
    * @returns {Promise<this>}
    */
-  async init({ url, urls, wallet, network } = {}) {
+  async init({
+    url,
+    urls,
+    wallet,
+    network,
+  } = {}) {
     if (network !== CheqdNetwork.Mainnet && network !== CheqdNetwork.Testnet) {
       throw new Error(
         `Invalid network provided: \`${network}\`, expected one of \`${fmtIterable(
@@ -461,21 +466,25 @@ export class CheqdAPI extends AbstractApiProvider {
   }
 
   async #connectWithFallback(urls, wallet, network) {
-    let lastError;
+    const attemptConnection = async (index, lastError) => {
+      if (index >= urls.length) {
+        const details = lastError ? ` Last error: ${lastError.message ?? lastError}` : '';
+        throw new Error(
+          `Unable to connect to any provided Cheqd RPC endpoint: \`${fmtIterable(urls)}\`.${details}`,
+        );
+      }
 
-    for (const candidateUrl of urls) {
+      const candidateUrl = urls[index];
+
       try {
         return await this.#createSdk(candidateUrl, wallet, network);
       } catch (error) {
-        lastError = error;
         console.error(`Failed to connect to Cheqd RPC endpoint \`${candidateUrl}\``, error);
+        return await attemptConnection(index + 1, error);
       }
-    }
+    };
 
-    const details = lastError ? ` Last error: ${lastError.message ?? lastError}` : '';
-    throw new Error(
-      `Unable to connect to any provided Cheqd RPC endpoint: \`${fmtIterable(urls)}\`.${details}`,
-    );
+    return await attemptConnection(0);
   }
 
   async #createSdk(rpcUrl, wallet, network) {

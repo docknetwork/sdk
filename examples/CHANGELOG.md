@@ -1,13 +1,21 @@
 # @docknetwork/sdk-examples
 
+## 0.21.11
+
+### Patch Changes
+
+- Delegation engine
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@4.0.8
+  - @docknetwork/cheqd-blockchain-api@4.0.7
+  - @docknetwork/credential-sdk@0.54.11
+
 ## 0.21.10
 
 ### Patch Changes
 
-- VC delegation engine
 - Updated dependencies
-  - @docknetwork/cheqd-blockchain-modules@4.0.7
-  - @docknetwork/credential-sdk@0.54.10
+  - @docknetwork/cheqd-blockchain-api@4.0.6
 
 ## 0.21.9
 

@@ -1,0 +1,57 @@
+{
+  "name": "@docknetwork/vc-delegation-engine",
+  "version": "1.0.2",
+  "description": "",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.js"
+    }
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build:esm": "esbuild src/index.js --bundle --format=esm --platform=node --sourcemap --outfile=dist/esm/index.js --external:@cedar-policy/cedar-wasm/nodejs --external:jsonld --external:rify",
+    "build:cjs": "esbuild src/index.js --bundle --format=cjs --platform=node --sourcemap --outfile=dist/cjs/index.cjs --external:@cedar-policy/cedar-wasm/nodejs --external:jsonld --external:rify",
+    "build:types": "tsc -p tsconfig.build.json",
+    "build": "yarn clean && yarn build:esm && yarn build:cjs && yarn build:types",
+    "lint": "eslint \"src/**/*.js\" \"tests/**/*.js\"",
+    "docs-disabled": "rm -rf out && mkdir out && touch out/.nojekyll && jsdoc src -r -c ../../.jsdoc -d out/reference",
+    "test": "vitest run --coverage ./tests",
+    "prepublishOnly": "yarn build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docknetwork/sdk"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "base64url": "^3.0.1",
+    "jsonpath-plus": "^10.1.0",
+    "jsonld": "^6.0.0",
+    "rify": "^0.7.1"
+  },
+  "peerDependencies": {
+    "@cedar-policy/cedar-wasm": "^4.5.0"
+  },
+  "devDependencies": {
+    "@cedar-policy/cedar-wasm": "^4.5.0",
+    "@types/minimatch": "^6.0.0",
+    "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "^2.0.2",
+    "esbuild": "^0.21.5",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,5 +1,15 @@
 # @docknetwork/benchmarks
 
+## 0.4.11
+
+### Patch Changes
+
+- Delegation engine
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@4.0.8
+  - @docknetwork/cheqd-blockchain-api@4.0.7
+  - @docknetwork/credential-sdk@0.54.11
+
 ## 0.4.10
 
 ### Patch Changes

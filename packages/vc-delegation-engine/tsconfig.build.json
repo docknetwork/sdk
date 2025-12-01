@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "allowJs": true,
+    "checkJs": false,
+    "skipLibCheck": true,
+    "outDir": "dist/types",
+    "rootDir": "src",
+    "types": ["node"],
+    "typeRoots": ["./types", "./node_modules/@types"]
+  },
+  "include": ["src/**/*.js", "types/**/*.d.ts"]
+}
+

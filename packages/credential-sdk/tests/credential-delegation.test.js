@@ -1,3 +1,6 @@
+import { MAY_CLAIM_IRI } from '@docknetwork/vc-delegation-engine';
+import * as cedar from '@cedar-policy/cedar-wasm/nodejs';
+
 import {
   issueCredential,
   signPresentation,
@@ -5,8 +8,6 @@ import {
   documentLoader as credentialDocumentLoader,
 } from '../src/vc/index.js';
 import { VC_ISSUE_TYPE_JWT } from '../src/vc/credentials.js';
-import { MAY_CLAIM_IRI } from '@docknetwork/vc-delegation-engine';
-import * as cedar from '@cedar-policy/cedar-wasm/nodejs';
 
 const AUTHORITY_DID = 'did:example:authority';
 const DELEGATE_DID = 'did:example:delegator';
@@ -319,6 +320,36 @@ describe('credential delegation integration', () => {
     expect(result.delegationResult?.failures ?? []).toHaveLength(0);
   });
 
+  it('basic forbidden policy', async () => {
+    const {
+      verifiableCredentials,
+      holderDid,
+      holderKey,
+    } = await buildDelegationChain({});
+    const presentation = await signDelegationPresentation({
+      verifiableCredential: verifiableCredentials,
+      holder: holderDid,
+      holderKey,
+    });
+    const policy = `forbid(
+        principal in Credential::Chain::"Action:Verify",
+        action == Credential::Action::"Verify",
+        resource in Credential::Chain::"Action:Verify"
+      ) when {
+        // Max depth of 3 delegated credentials
+        context.tailDepth > 0
+      };`;
+    const result = await verifyPresentation(presentation, {
+      challenge: CHALLENGE,
+      domain: DOMAIN,
+      failOnUnauthorizedClaims: true,
+      cedarAuth: { policies: policy, cedar },
+      documentLoader: exampleDocumentLoader,
+    });
+    expect(result.verified).toBe(false);
+    expect(result.delegationResult?.decision).toBe('deny');
+  });
+
   it('verifies longer delegation chains', async () => {
     const {
       verifiableCredentials,
@@ -447,4 +478,3 @@ describe('credential delegation integration', () => {
     expect(standaloneSummary).toBeDefined();
   });
 });
-

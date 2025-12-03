@@ -202,8 +202,8 @@ async function main() {
   const verification = await verifyPresentation(signedPresentation, {
     challenge: CHALLENGE,
     domain: DOMAIN,
-    failOnUnauthorizedClaims: true,
     documentLoader: exampleDocumentLoader,
+    failOnUnauthorizedClaims: true,
     cedarAuth: {
       policies: cedarPolicies,
       cedar,

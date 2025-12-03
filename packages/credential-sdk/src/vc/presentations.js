@@ -8,7 +8,7 @@ import {
   CredentialSchema,
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
-import { verifyVPWithDelegation } from '@docknetwork/vc-delegation-engine';
+import { authorizeEvaluationsWithCedar, verifyVPWithDelegation } from '@docknetwork/vc-delegation-engine';
 import { getPrivateStatus, verifyCredential } from './credentials';
 /// import DIDResolver from "../resolver/did/did-resolver"; // eslint-disable-line
 import { isCredVerGte060 } from './crypto/common/DockCryptoSignature';
@@ -104,15 +104,29 @@ async function optionalDelegationValidation(
     });
     const credentialContexts = buildCredentialContextMap(presentation);
     const cedarOptions = delegationOptions.cedar ?? {};
+    const { policies } = cedarOptions;
     const delegationResult = await verifyVPWithDelegation({
       expandedPresentation,
       credentialContexts,
       documentLoader: verificationOptions.documentLoader,
-      failOnUnauthorizedClaims: delegationOptions.failOnUnauthorizedClaims ?? false,
-      policies: cedarOptions.policies,
+      failOnUnauthorizedClaims: delegationOptions.failOnUnauthorizedClaims ?? true,
       cedar: cedarOptions.cedar,
+      policies,
     });
+
     const delegationVerified = delegationResult.decision === 'allow';
+    if (delegationVerified && policies) {
+      const authorizationOutcome = authorizeEvaluationsWithCedar({
+        cedar: cedarOptions.cedar,
+        evaluations: delegationResult.evaluations,
+        policies,
+      });
+
+      if (authorizationOutcome.decision !== 'allow') {
+        throw new Error('Cedar policy evaluation denied');
+      }
+    }
+
     return {
       ...result,
       delegationResult,
@@ -142,7 +156,7 @@ function shouldRunDelegationValidation(presentation, delegationOptions = {}) {
     return true;
   }
   const cedarOptions = delegationOptions.cedar;
-  if (cedarOptions?.policies || cedarOptions?.cedar) {
+  if (cedarOptions?.policies) {
     return true;
   }
   return presentationContainsDelegationCredential(presentation);

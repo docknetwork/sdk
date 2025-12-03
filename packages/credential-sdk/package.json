@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/credential-sdk",
-  "version": "0.54.11",
+  "version": "0.54.12",
   "license": "MIT",
   "type": "module",
   "files": [

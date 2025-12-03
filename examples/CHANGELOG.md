@@ -1,5 +1,13 @@
 # @docknetwork/sdk-examples
 
+## 0.21.12
+
+### Patch Changes
+
+- Allow cedar validation without delegation
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.12
+
 ## 0.21.11
 
 ### Patch Changes

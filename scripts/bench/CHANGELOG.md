@@ -1,5 +1,12 @@
 # @docknetwork/benchmarks
 
+## 0.4.13
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.54.13
+
 ## 0.4.12
 
 ### Patch Changes

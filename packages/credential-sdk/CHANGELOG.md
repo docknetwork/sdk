@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.13
+
+### Patch Changes
+
+- Fix running delegation logic when not required
+
 ## 0.54.12
 
 ### Patch Changes

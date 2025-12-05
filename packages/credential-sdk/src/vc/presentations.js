@@ -152,9 +152,6 @@ async function optionalDelegationValidation(
 }
 
 function shouldRunDelegationValidation(presentation, delegationOptions = {}) {
-  if (delegationOptions.failOnUnauthorizedClaims) {
-    return true;
-  }
   const cedarOptions = delegationOptions.cedar;
   if (cedarOptions?.policies) {
     return true;

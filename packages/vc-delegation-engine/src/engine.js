@@ -456,6 +456,30 @@ export async function verifyVPWithDelegation({
         skippedCredentials,
       };
     }
+
+    // Early out failure if missing credential from chain
+    normalizedCredentials.forEach((credential) => {
+      const { id, previousCredentialId, rootCredentialId } = credential;
+      if (previousCredentialId && !normalizedById.has(previousCredentialId)) {
+        throw new DelegationError(
+          DelegationErrorCodes.MISSING_CREDENTIAL,
+          `Missing credential ${previousCredentialId} referenced as previous by ${id}`,
+        );
+      }
+      if (!rootCredentialId || typeof rootCredentialId !== 'string' || rootCredentialId.length === 0) {
+        throw new DelegationError(
+          DelegationErrorCodes.INVALID_CREDENTIAL,
+          `Delegation credential ${id} is missing rootCredentialId`,
+        );
+      }
+      if (!normalizedById.has(rootCredentialId)) {
+        throw new DelegationError(
+          DelegationErrorCodes.MISSING_CREDENTIAL,
+          `Missing root credential ${rootCredentialId} referenced by ${id}`,
+        );
+      }
+    });
+
     const tailCredentials = normalizedCredentials.filter((vc) => !referencedPreviousIds.has(vc.id));
     if (tailCredentials.length === 0) {
       throw new DelegationError(

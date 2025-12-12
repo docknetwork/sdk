@@ -3,6 +3,7 @@ import {
 } from 'vitest';
 import jsonld from 'jsonld';
 import { verifyVPWithDelegation } from '../../src/engine.js';
+import { DelegationErrorCodes } from '../../src/errors.js';
 import {
   VC_TYPE,
   VC_VC,
@@ -17,6 +18,8 @@ import {
 
 const ROOT_CREDENTIAL_ID = 'urn:cred:root';
 const LEAF_CREDENTIAL_ID = 'urn:cred:leaf';
+const MISSING_PREVIOUS_ID = 'urn:cred:missing-prev';
+const UNKNOWN_ROOT_REFERENCE = 'urn:cred:missing-root';
 const W3C_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const ISSUER_ROOT = 'did:root';
 const SUBJECT_DELEGATE = 'did:delegate';
@@ -123,6 +126,94 @@ describe('engine', () => {
     expect(jsonld.compact).toHaveBeenCalledTimes(2);
     expect(result.decision).toBe('allow');
     expect(result.evaluations).toHaveLength(1);
+  });
+
+  it('denies when a credential references a missing previous credential', async () => {
+    const presentation = [
+      {
+        '@type': [VC_TYPE],
+        [VC_VC]: [
+          {
+            '@graph': [
+              {
+                '@id': LEAF_CREDENTIAL_ID,
+                '@type': [VC_TYPE_DELEGATION_CREDENTIAL],
+                [VC_ISSUER]: [{ '@id': SUBJECT_DELEGATE }],
+                [VC_SUBJECT]: [{ '@id': SUBJECT_HOLDER }],
+                [VC_ROOT_CREDENTIAL_ID]: [{ '@id': LEAF_CREDENTIAL_ID }],
+                [VC_PREVIOUS_CREDENTIAL_ID]: [{ '@id': MISSING_PREVIOUS_ID }],
+              },
+            ],
+          },
+        ],
+        [SECURITY_PROOF]: [
+          {
+            [SECURITY_VERIFICATION_METHOD]: [{ '@id': `${SUBJECT_DELEGATE}#key` }],
+          },
+        ],
+      },
+    ];
+    const contexts = new Map([[LEAF_CREDENTIAL_ID, [W3C_CONTEXT]]]);
+
+    const result = await verifyVPWithDelegation({
+      expandedPresentation: presentation,
+      credentialContexts: contexts,
+    });
+
+    expect(result.decision).toBe('deny');
+    expect(result.failures?.[0]?.code).toBe(DelegationErrorCodes.MISSING_CREDENTIAL);
+    expect(result.failures?.[0]?.message).toContain(MISSING_PREVIOUS_ID);
+  });
+
+  it('denies when a credential references a root credential that is not present', async () => {
+    const presentation = [
+      {
+        '@type': [VC_TYPE],
+        [VC_VC]: [
+          {
+            '@graph': [
+              {
+                '@id': ROOT_CREDENTIAL_ID,
+                '@type': [VC_TYPE_DELEGATION_CREDENTIAL],
+                [VC_ISSUER]: [{ '@id': ISSUER_ROOT }],
+                [VC_SUBJECT]: [{ '@id': SUBJECT_DELEGATE }],
+                [VC_ROOT_CREDENTIAL_ID]: [{ '@id': ROOT_CREDENTIAL_ID }],
+              },
+            ],
+          },
+          {
+            '@graph': [
+              {
+                '@id': LEAF_CREDENTIAL_ID,
+                '@type': [VC_TYPE_DELEGATION_CREDENTIAL],
+                [VC_ISSUER]: [{ '@id': SUBJECT_DELEGATE }],
+                [VC_SUBJECT]: [{ '@id': SUBJECT_HOLDER }],
+                [VC_ROOT_CREDENTIAL_ID]: [{ '@id': UNKNOWN_ROOT_REFERENCE }],
+                [VC_PREVIOUS_CREDENTIAL_ID]: [{ '@id': ROOT_CREDENTIAL_ID }],
+              },
+            ],
+          },
+        ],
+        [SECURITY_PROOF]: [
+          {
+            [SECURITY_VERIFICATION_METHOD]: [{ '@id': `${ISSUER_ROOT}#key` }],
+          },
+        ],
+      },
+    ];
+    const contexts = new Map([
+      [ROOT_CREDENTIAL_ID, [W3C_CONTEXT]],
+      [LEAF_CREDENTIAL_ID, [W3C_CONTEXT]],
+    ]);
+
+    const result = await verifyVPWithDelegation({
+      expandedPresentation: presentation,
+      credentialContexts: contexts,
+    });
+
+    expect(result.decision).toBe('deny');
+    expect(result.failures?.[0]?.code).toBe(DelegationErrorCodes.MISSING_CREDENTIAL);
+    expect(result.failures?.[0]?.message).toContain(UNKNOWN_ROOT_REFERENCE);
   });
   it('fails when credential contexts are missing', async () => {
     const result = await verifyVPWithDelegation({

@@ -30,6 +30,7 @@ import { summarizeDelegationChain, summarizeStandaloneCredential } from './summa
 import { DelegationError, DelegationErrorCodes, normalizeDelegationFailure } from './errors.js';
 
 const CONTROL_PREDICATES = new Set(['allows', 'delegatesTo', 'listsClaim', 'inheritsParent']);
+const DELEGATION_TYPE_NAME = shortenTerm(VC_TYPE_DELEGATION_CREDENTIAL);
 const RESERVED_RESOURCE_TYPES = new Set([
   `${VC_NS}VerifiableCredential`,
   'VerifiableCredential',
@@ -456,6 +457,36 @@ export async function verifyVPWithDelegation({
         skippedCredentials,
       };
     }
+
+    // Early out failure if missing credential from chain
+    normalizedCredentials.forEach((credential) => {
+      const {
+        id, previousCredentialId, rootCredentialId, type,
+      } = credential;
+      const isDelegationCredential = Array.isArray(type) && type.includes(DELEGATION_TYPE_NAME);
+      if (!isDelegationCredential) {
+        return;
+      }
+      if (previousCredentialId && !normalizedById.has(previousCredentialId)) {
+        throw new DelegationError(
+          DelegationErrorCodes.MISSING_CREDENTIAL,
+          `Missing credential ${previousCredentialId} referenced as previous by ${id}`,
+        );
+      }
+      if (!rootCredentialId || typeof rootCredentialId !== 'string' || rootCredentialId.length === 0) {
+        throw new DelegationError(
+          DelegationErrorCodes.INVALID_CREDENTIAL,
+          `Delegation credential ${id} is missing rootCredentialId`,
+        );
+      }
+      if (!normalizedById.has(rootCredentialId)) {
+        throw new DelegationError(
+          DelegationErrorCodes.MISSING_CREDENTIAL,
+          `Missing root credential ${rootCredentialId} referenced by ${id}`,
+        );
+      }
+    });
+
     const tailCredentials = normalizedCredentials.filter((vc) => !referencedPreviousIds.has(vc.id));
     if (tailCredentials.length === 0) {
       throw new DelegationError(

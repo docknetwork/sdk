@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.15
+
+### Patch Changes
+
+- SDK utilities to generate presentations from PEX requests
+
 ## 0.54.14
 
 ### Patch Changes

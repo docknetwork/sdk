@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/credential-sdk",
-  "version": "0.54.14",
+  "version": "0.54.15",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -36,13 +36,16 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
+    "@astronautlabs/jsonpath": "^1.1.2",
     "@digitalcredentials/vc-status-list": "^9.0.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0",
+    "@docknetwork/vc-delegation-engine": "1.0.3",
     "@juanelas/base64": "^1.1.5",
+    "@sphereon/pex": "^5.0.0-unstable.28",
     "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.26.0",
     "@stablelib/ed25519": "^1.0.0",
-    "blake2b": "2.1.4",
     "@transmute/json-web-signature": "^0.7.0-unstable.82",
+    "blake2b": "2.1.4",
     "blakejs": "^1.2.1",
     "bs58": "^5.0.0",
     "deep-equal": "^2.2.3",
@@ -61,17 +64,16 @@
     "semver": "^7.6.0",
     "uuid": "^10.0.0",
     "uuidv4": "^6.2.13",
-    "varint": "^6.0.0",
-    "@docknetwork/vc-delegation-engine": "1.0.3"
+    "varint": "^6.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",
     "@babel/core": "^7.24.3",
     "@babel/node": "^7.23.9",
-    "@comunica/query-sparql-rdfjs": "^4.0.2",
     "@babel/plugin-syntax-import-attributes": "^7.25.6",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/preset-env": "^7.24.3",
+    "@comunica/query-sparql-rdfjs": "^4.0.2",
     "@helia/strings": "^3.0.5",
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-babel": "^6.0.4",

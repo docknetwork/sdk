@@ -18,6 +18,7 @@ import delegationCredentialContext from './contexts/delegation-credential.json';
 import statusList21Context from './contexts/status-list-21';
 import privateStatusList21Context from './contexts/private-status-list-21';
 import sphereonId from './contexts/sphereon-wallet-identity-v1.json';
+import citizenshipContext from './contexts/citizen-v1.json';
 
 // Lookup of following URLs will lead to loading data from the context directory, this is done as the Sr25519 keys are not
 // supported in any W3C standard and vc-js has them stored locally. This is a temporary solution.
@@ -36,6 +37,7 @@ export default new Map([
   ['https://www.w3.org/ns/odrl.jsonld', odrl],
   ['https://schema.org', schema],
   ['http://schema.org', schema],
+  ['https://w3id.org/citizenship/v1', citizenshipContext],
   ['https://www.dock.io/2020/credentials/context/sr25519', sr25519Context],
   ['https://w3id.org/security/v1', secContextV1],
   ['https://w3id.org/security/v2', secContext],

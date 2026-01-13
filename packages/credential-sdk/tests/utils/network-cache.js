@@ -1,3 +1,5 @@
+import dockBbsV1Context from "../../src/vc/contexts/dock-bbs-v1.json";
+
 export default {
   "https://ld.truvera.io/credentials/extensions-v1": {
     "@context": {
@@ -6,6 +8,22 @@ export default {
       "description": "https://ld.truvera.io/extensions/v1/#description",
       "logo": "https://ld.truvera.io/extensions/v1/#logo",
       "DockVerifiableCredential": "https://ld.truvera.io/extensions/v1/#DockVerifiableCredential"
+    }
+  },
+  "https://ld.dock.io/security/bbs/v1": dockBbsV1Context,
+  "https://identity.foundation/presentation-exchange/submission/v1": {
+    "@context": {
+      "@version": 1.1,
+      "PresentationSubmission": {
+        "@id": "https://identity.foundation/presentation-exchange/#presentation-submission",
+        "@context": {
+          "@version": 1.1,
+          "presentation_submission": {
+            "@id": "https://identity.foundation/presentation-exchange/#presentation-submission",
+            "@type": "@json"
+          }
+        }
+      }
     }
   },
   "https://schema.truvera.io/BasicCredential-V2-1703777584571.json": {

@@ -1,4 +1,4 @@
-import { ArrayWithoutPrototypeMethods, ensureArrayLike } from '../../utils';
+import { ArrayWithoutPrototypeMethods, ensureArrayLike } from '../../utils/types';
 import { withExtendedStaticProperties } from '../../utils/inheritance';
 import { maybeEq, maybeFrom } from '../../utils/interfaces';
 import withBase from './with-base';

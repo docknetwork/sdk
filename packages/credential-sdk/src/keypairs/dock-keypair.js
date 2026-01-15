@@ -1,7 +1,8 @@
 import {
   withExtendedPrototypeProperties,
   withExtendedStaticProperties,
-} from '../utils';
+} from '../utils/inheritance';
+
 import { randomAsHex } from '../utils/types/bytes';
 
 /**

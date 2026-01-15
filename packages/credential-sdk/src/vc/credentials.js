@@ -35,7 +35,6 @@ import {
   getKeyFromDIDDocument,
   processIfKvac,
 } from './helpers';
-import { ensureValidDatetime } from '../utils';
 
 import {
   EcdsaSecp256k1Signature2019,
@@ -60,6 +59,7 @@ import {
 } from './crypto';
 import { signJWS } from './jws';
 import Bls12381BBDT16MACProofDock2024 from './crypto/Bls12381BBDT16MACProofDock2024';
+import { ensureValidDatetime } from '../utils/ident/ensure-ident';
 
 export const VC_ISSUE_TYPE_JSONLD = 'jsonld';
 export const VC_ISSUE_TYPE_PROOFVALUE = 'proofValue';

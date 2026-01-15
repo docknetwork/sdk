@@ -1,5 +1,6 @@
 import { DockDIDQualifier } from '../constants';
-import { decodeFromSS58, encodeAsSS58, isHex } from '../../../../utils';
+import { decodeFromSS58, encodeAsSS58 } from '../../../../utils/encoding';
+import { isHex } from '../../../../utils/types';
 import {
   withQualifier,
   TypedBytes,

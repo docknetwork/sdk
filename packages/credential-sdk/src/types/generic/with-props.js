@@ -1,4 +1,5 @@
-import { isEqualToOrPrototypeOf, mapObj } from '../../utils';
+import { mapObj } from '../../utils/types';
+import { isEqualToOrPrototypeOf } from '../../utils/inheritance';
 import TypedEnum from './typed-enum';
 import TypedStruct from './typed-struct';
 

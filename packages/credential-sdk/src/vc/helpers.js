@@ -1,6 +1,4 @@
-import jsonld from 'jsonld';
 import { JsonWebKey } from '@transmute/json-web-signature';
-import defaultDocumentLoader from './document-loader';
 
 import {
   EcdsaSecp256k1VerKeyName,
@@ -17,6 +15,7 @@ import {
   JsonWebSignature2020,
   Ed25519Signature2020,
 } from './crypto';
+
 import {
   Bls12381BBDT16DockVerKeyName,
   Bls12381BBDT16MacDockName,
@@ -25,6 +24,8 @@ import {
 import Bls12381BBDT16MACDock2024 from './crypto/Bls12381BBDT16MACDock2024';
 import { DidKeypair } from '../keypairs';
 import { possibleVerificationMethodRefs } from '../types/did/document/verification-method-ref';
+
+export * from './jsonld';
 
 /**
  * @typedef {object} KeyDoc The Options to use in the function createUser.
@@ -107,25 +108,6 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
     keyDoc,
     keypair,
   });
-}
-
-/**
- * Helper method to ensure credential is valid according to the context
- * @param credential
- */
-export async function expandJSONLD(credential, options = {}) {
-  if (options.documentLoader && options.resolver) {
-    throw new Error(
-      'Passing resolver and documentLoader results in resolver being ignored, please re-factor.',
-    );
-  }
-
-  const expanded = await jsonld.expand(credential, {
-    ...options,
-    documentLoader:
-      options.documentLoader || defaultDocumentLoader(options.resolver),
-  });
-  return expanded[0];
 }
 
 export function potentialToArray(a) {

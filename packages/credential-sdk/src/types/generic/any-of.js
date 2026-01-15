@@ -1,4 +1,4 @@
-import { fmtIterable } from '../../utils';
+import { fmtIterable } from '../../utils/types';
 import withFrom from './with-from';
 
 class NeverInstantiated {

@@ -12,7 +12,7 @@ import {
 } from '../../constants';
 import DidOrDidMethodKeySignature from '../signature';
 import { DidMethodKeySignatureValue } from './did-method-key-signature';
-import { decodeFromBase58btc, encodeAsBase58btc } from '../../../../../utils';
+import { decodeFromBase58btc, encodeAsBase58btc } from '../../../../../utils/encoding';
 
 export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
   static Qualifier = DidMethodKeyQualifier;

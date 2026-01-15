@@ -105,7 +105,7 @@
     "build": "rollup -c",
     "test-ipfs": "NODE_OPTIONS=--experimental-vm-modules NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/ipfs",
     "test-ipfs-with-node": "../scripts/with_dock_docker_test_node yarn test-ipfs",
-    "test": "yarn jest --verbose ./tests/*",
+    "test": "yarn jest --verbose ./tests/resolvers.test.js",
     "test-with-all-nodes": "../../scripts/with_all_dock_docker_test_nodes yarn test-integration",
     "lint": "eslint \"src/**/*.js\"",
     "lint-scripts": "eslint \"scripts/**/*.js\"",

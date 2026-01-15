@@ -4,7 +4,7 @@
 
 import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
-import { expandJSONLD } from './helpers';
+import { expandJSONLD } from './jsonld';
 import { Bls12381BBDT16MacProofDockName } from './crypto/constants';
 import { possibleDids } from '../types/did/onchain/typed-did';
 

@@ -1,4 +1,4 @@
-import { u8aToString } from '../../utils';
+import { u8aToString } from '../../utils/types';
 
 export default function withFromJSONBytes(klass) {
   const name = `withFromJSONBytes(${klass.name})`;

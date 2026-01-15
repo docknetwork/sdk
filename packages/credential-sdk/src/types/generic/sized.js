@@ -2,7 +2,7 @@ import {
   allObjectPropertiesIncludingPrototypes,
   ensureNumber,
   withExtendedStaticProperties,
-} from '../../utils';
+} from '../../utils/types';
 
 /**
  * Extends supplied class to check that its itstance lenght is always equal to the `static Size` property

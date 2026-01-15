@@ -8,10 +8,15 @@ import {
   withQualifier,
 } from '../../../generic';
 import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from './cheqd-did';
+
 import {
   withExtendedStaticProperties,
+} from '../../../../utils/inheritance';
+
+import {
   isHexWithGivenByteSize,
-} from '../../../../utils';
+} from '../../../../utils/types';
+
 import DidOrDidMethodKeySignature from './signature';
 
 export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {

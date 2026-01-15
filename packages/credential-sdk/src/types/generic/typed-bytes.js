@@ -5,7 +5,7 @@ import {
   u8aToHex,
   u8aToU8a,
 } from '../../utils/types/bytes';
-import { ArrayWithoutPrototypeMethods } from '../../utils';
+import { ArrayWithoutPrototypeMethods } from '../../utils/types';
 import withBase from './with-base';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';

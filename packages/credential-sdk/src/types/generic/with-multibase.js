@@ -1,8 +1,9 @@
 import withFrom from './with-from';
 import {
-  isEqualToOrPrototypeOf,
   u8aToString,
-} from '../../utils';
+} from '../../utils/types';
+import { isEqualToOrPrototypeOf } from '../../utils/inheritance';
+
 import TypedEnum from './typed-enum';
 import { encodeAsMultibase, decodeFromMultibase } from '../../utils/encoding/multibase';
 

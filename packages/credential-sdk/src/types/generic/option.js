@@ -1,4 +1,4 @@
-import { NotAConstructor } from '../../utils';
+import { NotAConstructor } from '../../utils/types';
 
 /**
  * Extends `fromApi`/`fromJSON`/`from` methods of the provided class to check for the `null`'ish (`None`) values.

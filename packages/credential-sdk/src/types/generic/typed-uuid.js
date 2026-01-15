@@ -3,7 +3,7 @@ import {
 } from 'uuid';
 import { sha256 } from 'js-sha256';
 import TypedBytes from './typed-bytes';
-import { normalizeOrConvertStringToU8a, valueNumberOrBytes } from '../../utils';
+import { normalizeOrConvertStringToU8a, valueNumberOrBytes } from '../../utils/types';
 
 export default class TypedUUID extends TypedBytes {
   constructor(id) {

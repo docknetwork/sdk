@@ -3,10 +3,13 @@ import { signPresentation, verifyPresentation } from './presentations';
 import {
   ensureObjectWithId,
   ensureString,
-  ensureURI,
   isObject,
   getUniqueElementsFromArray,
-} from '../utils';
+} from '../utils/types';
+
+import {
+  ensureURI,
+} from '../utils/ident/ensure-ident';
 
 import VerifiableCredential from './verifiable-credential';
 // import DIDResolver from "../resolver/did/did-resolver"; // eslint-disable-line

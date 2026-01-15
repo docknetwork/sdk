@@ -1,5 +1,5 @@
 /* eslint-disable  max-classes-per-file */
-import { fmtIterable } from '../../utils';
+import { fmtIterable } from '../../utils/types';
 import {
   isEqualToOrPrototypeOf,
   withExtendedStaticProperties,

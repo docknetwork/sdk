@@ -1,12 +1,16 @@
 import withFrom from './with-from';
 import {
-  decodeFromBase58,
-  encodeAsBase58,
-  isEqualToOrPrototypeOf,
   u8aToString,
   stringToU8a,
-  maybeToJSONString,
-} from '../../utils';
+} from '../../utils/types';
+
+import {
+  decodeFromBase58,
+  encodeAsBase58,
+} from '../../utils/encoding';
+
+import { maybeToJSONString } from '../../utils/interfaces';
+import { isEqualToOrPrototypeOf } from '../../utils/inheritance';
 import TypedEnum from './typed-enum';
 
 export default function withBase58(klass) {

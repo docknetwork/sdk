@@ -1,4 +1,4 @@
-import { stringToU8a } from '../../utils';
+import { stringToU8a } from '../../utils/types';
 import {
   withExtendedStaticProperties,
   withExtendedPrototypeProperties,

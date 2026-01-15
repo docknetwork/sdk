@@ -5,7 +5,7 @@ import {
 } from '../../utils/inheritance';
 import { maybeFrom } from '../../utils/interfaces';
 import withFrom from './with-from';
-import { fmtIterable } from '../../utils';
+import { fmtIterable } from '../../utils/types';
 import TypedString from './typed-string';
 
 /**

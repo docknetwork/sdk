@@ -1,5 +1,7 @@
 import TypedEnum from './typed-enum';
-import { fmtIterable, isEqualToOrPrototypeOf, maybeNew } from '../../utils';
+import { fmtIterable } from '../../utils/types';
+import { maybeNew } from '../../utils/interfaces';
+import { isEqualToOrPrototypeOf } from '../../utils/inheritance';
 
 /**
  * Extends supplied class which must be a successor of `TypedEnum` in a way that every of the methods

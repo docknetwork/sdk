@@ -8,10 +8,10 @@ import {
   ensureObjectWithId,
   isObject,
   ensureString,
-  ensureURI,
-  ensureValidDatetime,
   getUniqueElementsFromArray,
-} from '../utils';
+} from '../utils/types';
+
+import { ensureURI, ensureValidDatetime } from '../utils/ident/ensure-ident';
 
 /**
  * @typedef {object} VerifiableCredentialVerificationResult The credential verification result

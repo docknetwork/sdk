@@ -244,17 +244,21 @@ export class CheqdAPI extends AbstractApiProvider {
     };
     this.#sdk.signer.endpoint = options.endpoint; // HACK: cheqd SDK doesnt pass this with createCheqdSDK yet
 
-    if (options.gasPrice) {
+    if (options.gasPrice || !options.endpoint) {
       this.setGasPrice(options.gasPrice);
     } else {
-      const querier = (await CheqdQuerier.connectWithExtension(
-        rpcUrls[0],
-        setupFeemarketExtension,
-      ));
+      try {
+        const querier = (await CheqdQuerier.connectWithExtension(
+          options.endpoint,
+          setupFeemarketExtension,
+        ));
 
-      const feemarketModule = new FeemarketModule(this.#sdk.signer, querier);
-      const gasPrice = await feemarketModule.queryGasPrice('ncheq');
-      this.setGasPrice(gasPrice?.price ? GasPrice.fromString(`${gasPrice.price.amount}${gasPrice.price.denom}`) : undefined);
+        const feemarketModule = new FeemarketModule(this.#sdk.signer, querier);
+        const gasPrice = await feemarketModule.queryGasPrice('ncheq');
+        this.setGasPrice(gasPrice?.price ? GasPrice.fromString(`${gasPrice.price.amount}${gasPrice.price.denom}`) : undefined);
+      } catch (e) {
+        this.setGasPrice(options.gasPrice);
+      }
     }
 
     return this;

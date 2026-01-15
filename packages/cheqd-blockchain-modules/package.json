@@ -41,7 +41,7 @@
     "@babel/plugin-syntax-import-attributes": "^7.25.6",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/preset-env": "^7.24.3",
-    "@docknetwork/cheqd-blockchain-api": "4.1.0",
+    "@docknetwork/cheqd-blockchain-api": "4.1.1",
     "@docknetwork/credential-sdk": "^0.54.11",
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-babel": "^6.0.4",

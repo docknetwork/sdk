@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 4.1.1
+
+### Patch Changes
+
+- Proper cheqd fee estimation
+
 ## 4.1.0
 
 ### Minor Changes

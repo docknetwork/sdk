@@ -1,5 +1,12 @@
 # @docknetwork/benchmarks
 
+## 0.4.18
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-api@4.1.1
+
 ## 0.4.17
 
 ### Patch Changes

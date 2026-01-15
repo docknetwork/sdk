@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.16
+
+### Patch Changes
+
+- Fix new PEX utility exports
+
 ## 0.54.15
 
 ### Patch Changes

@@ -3,7 +3,7 @@ import {
   blobFromBase64,
   isBase64OrDataUrl,
   pexToBounds,
-} from "../src/utils/pex-bounds";
+} from "../src/pex/pex-bounds";
 
 describe("pex-bounds utilities", () => {
   const sampleCredential = {

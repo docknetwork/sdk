@@ -26,8 +26,8 @@ import {
   generatePresentationFromPexRequest,
   GeneratePresentationStatus,
   evaluatePresentationAgainstDefinition,
-} from "../src/utils/pex-utils";
-import * as pexBounds from "../src/utils/pex-bounds";
+} from "../src/pex/pex-utils";
+import * as pexBounds from "../src/pex/pex-bounds";
 
 mockFetch();
 

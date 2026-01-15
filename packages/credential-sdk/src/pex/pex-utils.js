@@ -1,6 +1,7 @@
 import { PEX, PresentationSubmissionLocation, Status } from '@sphereon/pex';
 import { JSONPath } from '@astronautlabs/jsonpath';
 import { v4 as uuidv4 } from 'uuid';
+
 import VerifiablePresentation from '../vc/verifiable-presentation';
 import Presentation from '../vc/presentation';
 import { applyEnforceBounds } from './pex-bounds';

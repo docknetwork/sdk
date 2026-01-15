@@ -8,5 +8,3 @@ export * from './pattern-matcher';
 export * from './ident';
 export * from './error';
 export * from './assert';
-export * from './pex-utils';
-export * from './pex-bounds';

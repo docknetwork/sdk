@@ -17,6 +17,8 @@ import {
   // eslint-disable-next-line no-unused-vars
   CheqdSDK,
   calculateDidFee,
+  CheqdQuerier,
+  setupFeemarketExtension,
 } from '@cheqd/sdk';
 import {
   DidRef,
@@ -241,7 +243,19 @@ export class CheqdAPI extends AbstractApiProvider {
       network,
     };
     this.#sdk.signer.endpoint = options.endpoint; // HACK: cheqd SDK doesnt pass this with createCheqdSDK yet
-    this.setGasPrice(options.gasPrice);
+
+    if (options.gasPrice) {
+      this.setGasPrice(options.gasPrice);
+    } else {
+      const querier = (await CheqdQuerier.connectWithExtension(
+        rpcUrls[0],
+        setupFeemarketExtension,
+      ));
+
+      const feemarketModule = new FeemarketModule(this.#sdk.signer, querier);
+      const gasPrice = await feemarketModule.queryGasPrice('ncheq');
+      this.setGasPrice(gasPrice?.price ? GasPrice.fromString(`${gasPrice.price.amount}${gasPrice.price.denom}`) : undefined);
+    }
 
     return this;
   }

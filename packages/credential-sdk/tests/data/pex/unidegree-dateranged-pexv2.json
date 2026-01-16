@@ -1,0 +1,36 @@
+{
+  "presentation_definition": {
+    "name": "unidegree date range",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "unidegree date range",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.type[*]"
+              ],
+              "filter": {
+                "const": "UniversityDegree"
+              }
+            },
+            {
+              "path": [
+                "$.credentialSubject.dateEarned"
+              ],
+              "filter": {
+                "type": "string",
+                "format": "date",
+                "formatMaximum": "2030-12-31",
+                "formatMinimum": "2000-01-01"
+              },
+              "predicate": "required"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

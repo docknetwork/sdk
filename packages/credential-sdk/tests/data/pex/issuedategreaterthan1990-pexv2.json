@@ -1,0 +1,25 @@
+{
+  "presentation_definition": {
+    "name": "issue date greater than 1990",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "issue date greater than 1990",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": ["$.issuanceDate"],
+              "filter": {
+                "type": "string",
+                "format": "date-time",
+                "formatMinimum": "1990-10-05T14:38:34.852Z"
+              },
+              "predicate": "required"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "presentation_definition": {
+    "name": "number range (invalid path)",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "number range",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": "$.",
+              "filter": {
+                "type": "number",
+                "exclusiveMaximum": 123123,
+                "exclusiveMinimum": 0
+              },
+              "predicate": "required"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "presentation_definition": {
+    "name": "Credit Score Check",
+    "id": "31e2f0f1-6b70-411d-b239-56aed5321884",
+    "purpose": "Proof that your Credit Score is good: above 800",
+    "input_descriptors": [
+      {
+          "id": "Credential 1",
+          "name": "CIBC: Credit Score Check",
+          "purpose": "Proof that your Credit Score is good: above 800",
+          "constraints": {
+              "fields": [
+                  {
+                      "path": [
+                          "$.credentialSchema.id"
+                      ],
+                      "filter": {
+                          "const": "https://schema.truvera.io/CreditScore-V1-1732907844039.json"
+                      }
+                  },
+                  {
+                      "path": [
+                          "$.credentialSubject.creditScore"
+                      ],
+                      "filter": {
+                          "const": 800
+                      },
+                      "predicate": "required"
+                  },
+                  {
+                      "path": [
+                          "$.credentialSubject.bankruptcies"
+                      ],
+                      "filter": {
+                          "const": 0
+                      },
+                      "optional": false,
+                      "predicate": "required"
+                  }
+              ]
+          }
+      }
+  ]
+  }
+}

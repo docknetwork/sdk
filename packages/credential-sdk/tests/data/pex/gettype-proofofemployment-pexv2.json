@@ -1,0 +1,25 @@
+{
+  "presentation_definition": {
+    "name": "get type ProofOfEmployment",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "get type ProofOfEmployment",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.type[*]"
+              ],
+              "filter": {
+                "const": "ProofOfEmployment"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+ 

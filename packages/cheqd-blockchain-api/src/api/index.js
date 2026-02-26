@@ -309,7 +309,8 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {BigInt}
    */
   async calculateFee(txOrTxs, signerAddress, estimatedGas = null, multiplier = 1.3, memo = '') {
-    const gasEstimation = estimatedGas ?? (await this.simulate(signerAddress, Array.isArray(txOrTxs) ? txOrTxs : [txOrTxs], memo));
+    const txs = this.constructor.txToJSON(txOrTxs);
+    const gasEstimation = estimatedGas ?? (await this.sdk.signer.simulate(signerAddress, txs, memo));
     const usedFee = calculateDidFee(Math.round(gasEstimation * multiplier), this.gasPrice);
     return usedFee.amount[0];
   }

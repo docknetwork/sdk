@@ -1285,13 +1285,13 @@
     human-id "^4.1.1"
     prettier "^2.7.1"
 
-"@cheqd/sdk@5.4.3":
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/@cheqd/sdk/-/sdk-5.4.3.tgz#8601953faaff65ba516ebfdfc0ed47699c189b18"
-  integrity sha512-ewi08YKsOkqwlYlHg8ocxOhuuXQQprq9+XoGY5ZR+5i3zpw2CggDHiSPfSjrF8EhVFk0JcMo3vfFRoksdjpb8w==
+"@cheqd/sdk@5.5.0":
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/@cheqd/sdk/-/sdk-5.5.0.tgz#12724edf804ab14142f5767611b47bbc67d52705"
+  integrity sha512-vtmu8GsGSvR0w08kRX1CXI+lwU5K+qJg+zxh3rQiSsid36DiakmrQAJF2bNsGhyDYDT0GjObsKohHxoiBXX0pw==
   dependencies:
     "@cheqd/ts-proto" "^4.2.0"
-    "@cheqd/ts-proto-cjs" "npm:@cheqd/ts-proto@^2.6.0"
+    "@cheqd/ts-proto-cjs" "npm:@cheqd/ts-proto@~2.6.0"
     "@cosmjs/amino" "^0.36.2"
     "@cosmjs/amino-cjs" "npm:@cosmjs/amino@~0.30.1"
     "@cosmjs/crypto" "^0.36.2"
@@ -1332,7 +1332,7 @@
     uuid "^13.0.0"
     uuid-cjs "npm:uuid@~10.0.0"
 
-"@cheqd/ts-proto-cjs@npm:@cheqd/ts-proto@^2.6.0":
+"@cheqd/ts-proto-cjs@npm:@cheqd/ts-proto@~2.6.0":
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@cheqd/ts-proto/-/ts-proto-2.6.0.tgz#b020a0db8e44667d93c423fc5fdb44999b75ba6f"
   integrity sha512-0hbAFZzt4jvEQqCp0SjSM05f0l5HR4MhrWdlF4bk1jmHAz8U/FgCqXTBIJZ9nGG7RASX9t9MPbmhPOh6ED+4ow==

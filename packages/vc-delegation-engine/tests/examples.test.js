@@ -113,7 +113,8 @@ describe('delegation engine examples', () => {
       pharmacyPresentations.guardianDenied,
       pharmacyPolicies,
     );
-    expect(deniedResult.authorization.decision).toBe('deny');
+    expect(deniedResult.verification.decision).toBe('deny');
+    expect(deniedResult.verification.failures.some((f) => f.code === 'POLICY_CAPABILITY_INVALID')).toBe(true);
   });
 
   it('accepts multi-delegation presentation', async () => {

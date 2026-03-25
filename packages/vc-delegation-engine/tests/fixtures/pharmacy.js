@@ -1,3 +1,13 @@
+import pharmacyDelegationPolicyDoc from './delegation-pharmacy-policy.json' with { type: 'json' };
+
+export { pharmacyDelegationPolicyDoc };
+
+/** SHA-256 hex of json-canonicalize(policy document) */
+export const PHARMACY_DELEGATION_POLICY_DIGEST =
+  'c1eec4edab98e8c71446016d870d0b4520516d937d16717d6458f2a6a0b2b44d';
+
+export const PHARMACY_DELEGATION_POLICY_ID = pharmacyDelegationPolicyDoc.id;
+
 export const pharmacyPolicy = `
 permit(
   principal in Credential::Chain::"Action:Verify",
@@ -27,9 +37,25 @@ const BASE_DELEGATION_CONTEXT = [
   'https://ld.truvera.io/credentials/delegation',
 ];
 
+const VC_DATES = {
+  issuanceDate: '2026-03-20T12:00:00Z',
+  expirationDate: '2026-06-10T12:00:00Z',
+};
+
+const CAPABILITY_CONTEXT = {
+  '@version': 1.1,
+  ex: 'https://example.org/credentials#',
+  allowedClaims: 'ex:allowedClaims',
+  prescriptionResourceIds: 'ex:prescriptionResourceIds',
+  canPickUp: { '@id': 'ex:canPickUp', '@type': 'http://www.w3.org/2001/XMLSchema#boolean' },
+  canPay: { '@id': 'ex:canPay', '@type': 'http://www.w3.org/2001/XMLSchema#boolean' },
+  canCancel: { '@id': 'ex:canCancel', '@type': 'http://www.w3.org/2001/XMLSchema#boolean' },
+};
+
 export const PRESCRIPTION_CREDENTIAL = {
   '@context': [
     ...BASE_DELEGATION_CONTEXT,
+    CAPABILITY_CONTEXT,
     {
       '@version': 1.1,
       ex: 'https://example.org/credentials#',
@@ -40,14 +66,22 @@ export const PRESCRIPTION_CREDENTIAL = {
   id: 'urn:cred:pres-001',
   type: ['VerifiableCredential', 'Prescription', 'DelegationCredential'],
   issuer: 'did:test:doctor',
+  issuanceDate: VC_DATES.issuanceDate,
+  expirationDate: VC_DATES.expirationDate,
   rootCredentialId: 'urn:cred:pres-001',
-  delegationPolicyId: 'urn:uuid:4f4f0f7b-4c55-4c88-bc44-43f2e7eb2f10',
-  delegationPolicyDigest:
-    '3f2d2d6f2d7b6e0e9b0cfd5b6ac1e8f5f31d2d41e8d39d6b8d36b1d4c3a8d72a',
+  delegationPolicyId: PHARMACY_DELEGATION_POLICY_ID,
+  delegationPolicyDigest: PHARMACY_DELEGATION_POLICY_DIGEST,
+  delegationRoleId: 'pharmacy',
   credentialSubject: {
     id: 'did:test:pharmacy',
     'https://rdf.dock.io/alpha/2021#mayClaim': ['Cancel', 'PickUp', 'Pay'],
     prescribes: { id: 'urn:rx:789' },
+    allowedClaims: ['PickUp', 'Pay'],
+    prescriptionResourceIds: ['urn:rx:789'],
+    canPickUp: true,
+    canPay: true,
+    PickUp: true,
+    Pay: true,
   },
 };
 
@@ -69,6 +103,7 @@ export const PRESENTATION_FIELDS = {
 export const PRESCRIPTION_USAGE_BASE_FIELDS = {
   '@context': [
     ...BASE_DELEGATION_CONTEXT,
+    CAPABILITY_CONTEXT,
     {
       '@version': 1.1,
       ex: 'https://example.org/credentials#',
@@ -91,13 +126,19 @@ export const pharmacyPresentations = {
         id: 'urn:cred:pp-001',
         type: ['VerifiableCredential', 'PrescriptionUsage', 'DelegationCredential'],
         issuer: 'did:test:pharmacy',
+        issuanceDate: VC_DATES.issuanceDate,
+        expirationDate: VC_DATES.expirationDate,
         previousCredentialId: 'urn:cred:pres-001',
         rootCredentialId: 'urn:cred:pres-001',
+        delegationRoleId: 'patient',
         credentialSubject: {
           id: 'did:test:patient',
           'https://rdf.dock.io/alpha/2021#mayClaim': ['PickUp', 'Pay'],
           PickUp: true,
           Pay: true,
+          allowedClaims: ['PickUp'],
+          prescriptionResourceIds: ['urn:rx:789'],
+          canPickUp: true,
         },
       },
       {
@@ -105,11 +146,14 @@ export const pharmacyPresentations = {
         id: 'urn:cred:pg-001',
         type: ['VerifiableCredential', 'PrescriptionUsage'],
         issuer: 'did:test:patient',
+        issuanceDate: VC_DATES.issuanceDate,
+        expirationDate: VC_DATES.expirationDate,
         previousCredentialId: 'urn:cred:pp-001',
         rootCredentialId: 'urn:cred:pres-001',
         credentialSubject: {
           id: 'did:test:guardian',
           PickUp: true,
+          canPickUp: true,
         },
       },
     ],
@@ -124,13 +168,19 @@ export const pharmacyPresentations = {
         id: 'urn:cred:pp-001',
         type: ['VerifiableCredential', 'PrescriptionUsage', 'DelegationCredential'],
         issuer: 'did:test:pharmacy',
+        issuanceDate: VC_DATES.issuanceDate,
+        expirationDate: VC_DATES.expirationDate,
         previousCredentialId: 'urn:cred:pres-001',
         rootCredentialId: 'urn:cred:pres-001',
+        delegationRoleId: 'patient',
         credentialSubject: {
           'https://rdf.dock.io/alpha/2021#mayClaim': ['PickUp', 'Pay'],
           id: 'did:test:patient',
           PickUp: true,
           Pay: true,
+          allowedClaims: ['PickUp'],
+          prescriptionResourceIds: ['urn:rx:789'],
+          canPickUp: true,
         },
       },
     ],
@@ -145,13 +195,19 @@ export const pharmacyPresentations = {
         id: 'urn:cred:pp-001',
         type: ['VerifiableCredential', 'PrescriptionUsage', 'DelegationCredential'],
         issuer: 'did:test:pharmacy',
+        issuanceDate: VC_DATES.issuanceDate,
+        expirationDate: VC_DATES.expirationDate,
         previousCredentialId: 'urn:cred:pres-001',
         rootCredentialId: 'urn:cred:pres-001',
+        delegationRoleId: 'patient',
         credentialSubject: {
           id: 'did:test:patient',
           'https://rdf.dock.io/alpha/2021#mayClaim': ['PickUp', 'Pay'],
           PickUp: true,
           Pay: true,
+          allowedClaims: ['PickUp'],
+          prescriptionResourceIds: ['urn:rx:789'],
+          canPickUp: true,
         },
       },
       {
@@ -159,12 +215,15 @@ export const pharmacyPresentations = {
         id: 'urn:cred:pg-001',
         type: ['VerifiableCredential', 'PrescriptionUsage'],
         issuer: 'did:test:patient',
+        issuanceDate: VC_DATES.issuanceDate,
+        expirationDate: VC_DATES.expirationDate,
         previousCredentialId: 'urn:cred:pp-001',
         rootCredentialId: 'urn:cred:pres-001',
         credentialSubject: {
           id: 'did:test:guardian',
           PickUp: false,
           Pay: true,
+          canPickUp: false,
         },
       },
     ],

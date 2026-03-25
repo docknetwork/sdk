@@ -1,6 +1,5 @@
-import cachedUris from './contexts';
-import Resolver from "../resolver/generic/resolver"; // eslint-disable-line
-import jsonFetch from '../utils/json-fetch';
+import cachedUris from './contexts.js';
+import jsonFetch from '../utils/json-fetch.js';
 
 function parseEmbeddedDataURI(embedded) {
   // Strip new lines
@@ -29,10 +28,15 @@ function parseEmbeddedDataURI(embedded) {
 }
 
 /**
+ * @typedef {Object} DocumentLoaderResolver
+ * @property {function(string): boolean} [supports]
+ * @property {function(string): Promise<*>} [resolve]
+ */
+
+/**
  * Takes a resolver and returns a function that returns a document or throws an error when the document
  * cannot be found.
- * @param {Resolver} [resolver] - The resolver is optional but should be passed when
- * `DID`s / `StatusList2021Credential`s / `Blob`s / revocation registries and other documents need to be resolved.
+ * @param {DocumentLoaderResolver|null} [resolver] - Optional resolver for DID / status list / blob URLs when not served from the built-in context cache.
  * @returns {loadDocument} - the returned function
  */
 function documentLoader(resolver = null) {
@@ -55,7 +59,7 @@ function documentLoader(resolver = null) {
     } else {
       // Strip ending slash from uri to determine cache key
       const cacheKey = uriString.endsWith('/')
-        ? uriString.substring(0, uri.length - 1)
+        ? uriString.substring(0, uriString.length - 1)
         : uriString;
 
       // Check its not in data cache

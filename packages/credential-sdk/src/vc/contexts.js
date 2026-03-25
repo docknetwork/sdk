@@ -1,24 +1,24 @@
-import vcExamplesV1 from './contexts/vc-examples-v1';
-import ed25519V1Context from './contexts/ed25519-2020-v1-context.json';
-import sr25519Context from './contexts/sr25519-context.json';
-import secContext from './contexts/security_context';
-import secContextV1 from './contexts/security-v1.json';
-import didV1Context from './contexts/did-v1-updated.json';
-import credV1Context from './contexts/credential-v1-updated.json';
-import schema from './contexts/schema.json';
-import odrl from './contexts/odrl.json';
-import bbsV1Context from './contexts/bbs-v1.json';
-import dockBBSV1Context from './contexts/dock-bbs-v1.json';
-import dockBBS23V1Context from './contexts/dock-bbs23-v1.json';
-import dockPSV1Context from './contexts/dock-ps-v1.json';
-import dockBBDT16V1Context from './contexts/dock-bbdt16-v1.json';
-import dockPrettyVCContext from './contexts/prettyvc.json';
-import jws2020V1Context from './contexts/jws-2020-v1.json';
-import delegationCredentialContext from './contexts/delegation-credential.json';
-import statusList21Context from './contexts/status-list-21';
-import privateStatusList21Context from './contexts/private-status-list-21';
-import sphereonId from './contexts/sphereon-wallet-identity-v1.json';
-import citizenshipContext from './contexts/citizen-v1.json';
+import vcExamplesV1 from './contexts/vc-examples-v1.js';
+import ed25519V1Context from './contexts/ed25519-2020-v1-context.json' with { type: 'json' };
+import sr25519Context from './contexts/sr25519-context.json' with { type: 'json' };
+import secContext from './contexts/security_context.js';
+import secContextV1 from './contexts/security-v1.json' with { type: 'json' };
+import didV1Context from './contexts/did-v1-updated.json' with { type: 'json' };
+import credV1Context from './contexts/credential-v1-updated.json' with { type: 'json' };
+import schema from './contexts/schema.json' with { type: 'json' };
+import odrl from './contexts/odrl.json' with { type: 'json' };
+import bbsV1Context from './contexts/bbs-v1.json' with { type: 'json' };
+import dockBBSV1Context from './contexts/dock-bbs-v1.json' with { type: 'json' };
+import dockBBS23V1Context from './contexts/dock-bbs23-v1.json' with { type: 'json' };
+import dockPSV1Context from './contexts/dock-ps-v1.json' with { type: 'json' };
+import dockBBDT16V1Context from './contexts/dock-bbdt16-v1.json' with { type: 'json' };
+import dockPrettyVCContext from './contexts/prettyvc.json' with { type: 'json' };
+import jws2020V1Context from './contexts/jws-2020-v1.json' with { type: 'json' };
+import delegationCredentialContext from './contexts/delegation-credential.json' with { type: 'json' };
+import statusList21Context from './contexts/status-list-21.js';
+import privateStatusList21Context from './contexts/private-status-list-21.js';
+import sphereonId from './contexts/sphereon-wallet-identity-v1.json' with { type: 'json' };
+import citizenshipContext from './contexts/citizen-v1.json' with { type: 'json' };
 
 // Lookup of following URLs will lead to loading data from the context directory, this is done as the Sr25519 keys are not
 // supported in any W3C standard and vc-js has them stored locally. This is a temporary solution.

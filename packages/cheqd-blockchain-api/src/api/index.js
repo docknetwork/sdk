@@ -1,5 +1,4 @@
 import { AbstractApiProvider } from '@docknetwork/credential-sdk/modules/abstract/common';
-import { GasPrice } from '@cosmjs/stargate';
 import {
   maybeToJSONString,
   fmtIterable,
@@ -17,8 +16,6 @@ import {
   // eslint-disable-next-line no-unused-vars
   CheqdSDK,
   calculateDidFee,
-  CheqdQuerier,
-  setupFeemarketExtension,
 } from '@cheqd/sdk';
 import {
   DidRef,
@@ -243,32 +240,11 @@ export class CheqdAPI extends AbstractApiProvider {
       network,
     };
     this.#sdk.signer.endpoint = options.endpoint; // HACK: cheqd SDK doesnt pass this with createCheqdSDK yet
-
-    if (options.gasPrice || !options.endpoint) {
-      this.setGasPrice(options.gasPrice);
-    } else {
-      try {
-        const querier = (await CheqdQuerier.connectWithExtension(
-          options.endpoint,
-          setupFeemarketExtension,
-        ));
-
-        const feemarketModule = new FeemarketModule(this.#sdk.signer, querier);
-        const gasPrice = await feemarketModule.queryGasPrice('ncheq');
-        this.setGasPrice(gasPrice?.price ? GasPrice.fromString(`${gasPrice.price.amount}${gasPrice.price.denom}`) : undefined);
-      } catch (e) {
-        this.setGasPrice(options.gasPrice);
-      }
-    }
-
     return this;
   }
 
-  /**
-   * Sets the gas price for fee estimation
-   */
-  setGasPrice(gasPrice) {
-    this.gasPrice = gasPrice ?? GasPrice.fromString('5000ncheq');
+  get gasPrice() {
+    return this.#sdk.options.gasPrice;
   }
 
   /**
@@ -308,9 +284,8 @@ export class CheqdAPI extends AbstractApiProvider {
    * @param {object|Array<object>} txOrTxs
    * @returns {BigInt}
    */
-  async calculateFee(txOrTxs, signerAddress, estimatedGas = null, multiplier = 1.3, memo = '') {
-    const txs = this.constructor.txToJSON(txOrTxs);
-    const gasEstimation = estimatedGas ?? (await this.sdk.signer.simulate(signerAddress, txs, memo));
+  async calculateFee(txOrTxs, signerAddress, estimatedGas = null, multiplier = 3.5, memo = '') {
+    const gasEstimation = estimatedGas ?? (await this.simulate(signerAddress, Array.isArray(txOrTxs) ? txOrTxs : [txOrTxs], memo));
     const usedFee = calculateDidFee(Math.round(gasEstimation * multiplier), this.gasPrice);
     return usedFee.amount[0];
   }
@@ -410,8 +385,9 @@ export class CheqdAPI extends AbstractApiProvider {
     const txJSON = this.constructor.txToJSON(tx);
 
     const estimatedGas = gas ?? (await this.estimateGas(tx, sender));
+    const finalFee = fee ?? (await this.calculateFee(tx, sender, estimatedGas));
     const paymentObj = payment || {
-      amount: [].concat(fee ?? (await this.calculateFee(tx, sender, estimatedGas))),
+      amount: [].concat(finalFee),
       gas: estimatedGas,
       payer: sender,
     };

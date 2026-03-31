@@ -1,0 +1,46 @@
+{
+  "presentation_definition": {
+    "name": "unidegree earned date between",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "unidegree earned date between",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.type[*]"
+              ],
+              "filter": {
+                "const": "UniversityDegree"
+              }
+            },
+            {
+              "path": [
+                "$.credentialSubject.dateEarned"
+              ],
+              "filter": {
+                "type": "string",
+                "format": "date",
+                "formatMinimum": "1999-01-01"
+              },
+              "predicate": "required"
+            },
+            {
+              "path": [
+                "$.credentialSubject.dateEarned"
+              ],
+              "filter": {
+                "type": "string",
+                "format": "date",
+                "formatMaximum": "2050-12-31"
+              },
+              "predicate": "required"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

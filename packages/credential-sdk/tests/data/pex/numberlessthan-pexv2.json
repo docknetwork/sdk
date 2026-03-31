@@ -1,0 +1,26 @@
+{
+  "presentation_definition": {
+    "name": "number less than 0",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "number less than 0",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.credentialSubject.number"
+              ],
+              "filter": {
+                "type": "number",
+                "exclusiveMaximum": 123123
+              },
+              "predicate": "required"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

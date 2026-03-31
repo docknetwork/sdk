@@ -1,0 +1,35 @@
+{
+  "presentation_definition": {
+    "name": "uni degree date greater than",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "uni degree date greater than",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.type[*]"
+              ],
+              "filter": {
+                "const": "UniversityDegree"
+              }
+            },
+            {
+              "path": [
+                "$.credentialSubject.dateEarned"
+              ],
+              "filter": {
+                "type": "string",
+                "format": "date",
+                "formatMinimum": "1999-01-01"
+              },
+              "predicate": "required"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

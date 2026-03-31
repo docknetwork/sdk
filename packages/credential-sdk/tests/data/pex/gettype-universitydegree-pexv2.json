@@ -1,0 +1,25 @@
+{
+  "presentation_definition": {
+    "name": "get type UniversityDegree",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "get type UniversityDegree",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.type[*]"
+              ],
+              "filter": {
+                "const": "UniversityDegree"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+ 

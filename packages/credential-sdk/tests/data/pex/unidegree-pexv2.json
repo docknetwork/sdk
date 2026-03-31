@@ -1,0 +1,34 @@
+{
+  "presentation_definition": {
+    "name": "Is UniversityDegree and fields exist",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "test degree",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.credentialSubject.id"
+              ]
+            },
+            {
+              "path": [
+                "$.type[*]"
+              ],
+              "filter": {
+                "const": "UniversityDegree"
+              }
+            },
+            {
+              "path": [
+                "$.credentialSubject.dateEarned"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

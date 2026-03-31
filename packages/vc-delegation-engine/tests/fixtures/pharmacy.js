@@ -41,6 +41,9 @@ export const PRESCRIPTION_CREDENTIAL = {
   type: ['VerifiableCredential', 'Prescription', 'DelegationCredential'],
   issuer: 'did:test:doctor',
   rootCredentialId: 'urn:cred:pres-001',
+  delegationPolicyId: 'urn:uuid:4f4f0f7b-4c55-4c88-bc44-43f2e7eb2f10',
+  delegationPolicyDigest:
+    '3f2d2d6f2d7b6e0e9b0cfd5b6ac1e8f5f31d2d41e8d39d6b8d36b1d4c3a8d72a',
   credentialSubject: {
     id: 'did:test:pharmacy',
     'https://rdf.dock.io/alpha/2021#mayClaim': ['Cancel', 'PickUp', 'Pay'],

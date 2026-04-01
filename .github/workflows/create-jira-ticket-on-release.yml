@@ -1,0 +1,31 @@
+name: Create Jira Ticket on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  create-jira-ticket:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+      - run: yarn install --frozen-lockfile --ignore-scripts
+
+      - name: Create Jira ticket
+        env:
+          JIRA_API_KEY: ${{ secrets.JIRA_API_KEY }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_DOMAIN: ${{ secrets.JIRA_DOMAIN }}
+        run: node scripts/create-jira-ticket-on-release.js
+
+      - name: Output release information
+        run: |
+          echo "Release created: ${{ github.event.release.name }}"
+          echo "Release tag: ${{ github.event.release.tag_name }}"
+          echo "Release URL: ${{ github.event.release.html_url }}"

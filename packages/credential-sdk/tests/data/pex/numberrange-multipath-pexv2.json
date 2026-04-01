@@ -1,0 +1,28 @@
+{
+  "presentation_definition": {
+    "name": "number range multi path",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "number range multi path",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.credentialSubject.number",
+                "$.credentialSubject.numberTwo"
+              ],
+              "filter": {
+                "type": "number",
+                "exclusiveMaximum": 123123,
+                "exclusiveMinimum": 0
+              },
+              "predicate": "required"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

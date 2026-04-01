@@ -1,12 +1,15 @@
 import { ArrayWithoutPrototypeMethods, ensureArrayLike } from '../../utils';
 import { withExtendedStaticProperties } from '../../utils/inheritance';
-import { maybeEq, maybeFrom, maybeToJSON } from '../../utils/interfaces';
+import { maybeEq, maybeFrom } from '../../utils/interfaces';
 import withBase from './with-base';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
 
 /**
- * An `Array` of items where each item is an instance of the associated `Class`.
+ * An Array of items where each item is an instance of the associated Class.
+ * The array enforces type consistency by converting items to the specified Class
+ * during construction, push, and unshift operations. It provides additional utilities
+ * for equality checks and difference calculations between arrays.
  */
 class TypedArray extends withBase(ArrayWithoutPrototypeMethods) {
   /**
@@ -47,8 +50,8 @@ class TypedArray extends withBase(ArrayWithoutPrototypeMethods) {
     );
   }
 
-  toJSON() {
-    return [...Array.prototype.values.call(this)].map(maybeToJSON);
+  apply(fn) {
+    return [...this].map(fn);
   }
 
   static fromApi(arr) {
@@ -87,9 +90,13 @@ class TypedArray extends withBase(ArrayWithoutPrototypeMethods) {
 
   diff(other) {
     return {
-      added: this.filter((item) => other.every((curItem) => !curItem.eq(item))),
-      removed: other.filter((item) => this.every((nextItem) => !nextItem.eq(item))),
+      added: this.filter((item) => other.every((curItem) => !maybeEq(curItem, item))),
+      removed: other.filter((item) => this.every((nextItem) => !maybeEq(nextItem, item))),
     };
+  }
+
+  toJSON() {
+    return [...this].map((item) => (item.toJSON ? item.toJSON() : item));
   }
 }
 

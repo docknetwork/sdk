@@ -29,6 +29,5 @@ turbo-debug.log*
 npm-debug.log*
 package-lock.json
 tsconfig*buildinfo
-yarn-debug.log*
-yarn-error.log*
 out/
+*.log

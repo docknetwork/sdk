@@ -1,24 +1,27 @@
 import {
   Blob,
-  CheqdBlobId,
   CheqdBlobWithId,
-  CheqdDid,
+  CheqdCreateResource,
 } from '@docknetwork/credential-sdk/types';
-import { option } from '@docknetwork/credential-sdk/types/generic';
-import { CheqdCreateResource, createInternalCheqdModule } from '../common';
+import { createInternalCheqdModule, validateResource } from '../common';
+
+const Name = 'Blob';
+const Type = 'blob';
 
 const methods = {
   new: (blobWithId) => {
-    const { blob, id } = CheqdBlobWithId.from(blobWithId);
-    const [did, uuid] = id;
+    const {
+      blob,
+      id: [did, uuid],
+    } = CheqdBlobWithId.from(blobWithId);
 
     return new CheqdCreateResource(
-      CheqdDid.from(did).value,
+      did.value.value,
       uuid,
       '1.0',
       [],
-      'Blob',
-      'blob',
+      Name,
+      Type,
       blob,
     );
   },
@@ -27,15 +30,19 @@ const methods = {
 export default class CheqdInternalBlobModule extends createInternalCheqdModule(
   methods,
 ) {
-  static Prop = 'resource';
-
   static MsgNames = {
     new: 'MsgCreateResource',
   };
 
   async blob(blobId) {
-    return option(Blob).from(
-      (await this.resource(...CheqdBlobId.from(blobId)))?.resource?.data,
+    const { BlobId } = this.types;
+
+    return Blob.from(
+      validateResource(
+        await this.resource(...BlobId.from(blobId).value),
+        Name,
+        Type,
+      ),
     );
   }
 }

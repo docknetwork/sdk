@@ -1,7 +1,7 @@
 import { Ed255192020SigName, Ed255192020VerKeyName } from './constants';
 import Ed25519VerificationKey2020 from './Ed25519VerificationKey2020';
 import CustomLinkedDataSignature from './common/CustomLinkedDataSignature';
-import { valueBytes } from '../../utils/bytes';
+import { valueBytes } from '../../utils/types/bytes';
 
 const SUITE_CONTEXT_URL = 'https://w3id.org/security/suites/ed25519-2020/v1';
 

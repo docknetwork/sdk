@@ -5,11 +5,11 @@ import {
   ensureString,
   ensureURI,
   isObject,
-} from '../utils/type-helpers';
+  getUniqueElementsFromArray,
+} from '../utils';
 
-import { getUniqueElementsFromArray } from '../utils/misc';
 import VerifiableCredential from './verifiable-credential';
-import DIDResolver from "../resolver/did/did-resolver"; // eslint-disable-line
+// import DIDResolver from "../resolver/did/did-resolver"; // eslint-disable-line
 
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1';
 const DEFAULT_TYPE = 'VerifiablePresentation';
@@ -137,7 +137,7 @@ class VerifiablePresentation {
   }
 
   /**
-   * Add a Verifiable Credential to this Presentation. Duplicates will be ignored.
+   * Add a Verifiable Credential to this Presentation.
    * @param {object} credential -  Verifiable Credential for the presentation
    * @returns {VerifiablePresentation}
    */
@@ -147,16 +147,13 @@ class VerifiablePresentation {
       cred = credential.toJSON();
     }
     ensureObjectWithId(cred, 'credential');
-    this.credentials = getUniqueElementsFromArray(
-      [...this.credentials, cred],
-      JSON.stringify,
-    );
+    this.credentials.push(cred);
 
     return this;
   }
 
   /**
-   * Add multiple Verifiable Credentials to this Presentation. Duplicates will be ignored.
+   * Add multiple Verifiable Credentials to this Presentation.
    * @param {Array<object>} credentials -  Verifiable Credential for the presentation
    * @returns {VerifiablePresentation}
    */

@@ -42,7 +42,7 @@ machine-verifiable.
 ## Issuing
 
 To issue a verifiable credential, the issuer needs to have a public key that is accessible by the holder and verifier to verify the
-signature (in `proof`) in the credential. Though the VCDM spec does not mandate it, an issuer in Dock must have a DID on chain.
+signature (in `proof`) in the credential. Though the VCDM spec does not mandate it, an issuer using Truvera Credential SDK must have a DID on chain.
 This DID is present in the credential in the `issuer` field. An example credential where both the issuer and holder have Dock DIDs
 
 ```js
@@ -123,10 +123,10 @@ on chain and learn the public key. An example presentation signed by the holder
 ## Revocation
 
 If the credential is revocable, the issuer must specify how the revocation check must be done in the `credentialStatus` field.
-On Dock, credential revocation is managed with a revocation registry. There can be multiple registries on chain and each
+With Truvera Credential SDK, credential revocation is managed with a revocation registry. There can be multiple registries on chain and each
 registry has a unique id. It is recommended that the revocation authority creates a new registry for each credential type.
 While issuing the credential, issuer embeds the revocation registry's id in the credential in the `credentialStatus` field.
-An example credential with Dock revocation registry
+An example credential with Truvera revocation registry
 
 ```js
 {
@@ -159,6 +159,6 @@ An example credential with Dock revocation registry
 To revoke a credential, the revocation authority (might be same as the issuer), puts a hash of the credential id in the revocation registry.
 To check the revocation status of a credential, hash the credential id and query the registry id specified in the credential.
 The revocation of a credential can be undone if the revocation registry supports undoing. Moreover, currently, each registry is
-owned by a single DID so that DID can revoke a credential or undo the revocation. In future, Dock will support ownership of
+owned by a single DID so that DID can revoke a credential or undo the revocation. In future, Truvera will support ownership of
 the registry with mulitple DIDs and in different fashions, like any one of the owner DIDs could revoke or a threshold is needed,
 etc. To learn more about revocation registries, refer the [revocation section](./tutorial_revocation.md) of the documentation.

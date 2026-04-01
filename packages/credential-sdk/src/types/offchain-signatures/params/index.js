@@ -38,3 +38,4 @@ export class BBDT16Params extends OffchainSignatureParams {
 OffchainSignatureParams.bindVariants(BBSParams, BBSPlusParams, PSParams);
 
 export * from './value';
+export * from './id';

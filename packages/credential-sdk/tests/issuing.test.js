@@ -79,6 +79,7 @@ testingKeys.forEach((testKey) => {
       expect(credential.proof.verificationMethod).toBe(keyUrl);
 
       const result = await verifyCredential(credential);
+      console.log(result.errors);
       expect(result.verified).toBe(true);
       expect(result.results[0].proof).toBeDefined();
       expect(result.results[0].proof.proofPurpose).toBe("assertionMethod");
@@ -329,7 +330,7 @@ testingKeys.forEach((testKey) => {
       const credential = new VerifiableCredential(sampleId);
       expect(() => {
         credential.addContext(123);
-      }).toThrowError("needs to be a string.");
+      }).toThrowError(/needs to be a string/);
 
       expect(() => {
         credential.setStatus({ some: "value", type: "something" });
@@ -429,10 +430,10 @@ testingKeys.forEach((testKey) => {
       const vp = new VerifiablePresentation(sampleId);
       expect(() => {
         vp.addContext(123);
-      }).toThrowError("needs to be a string.");
+      }).toThrowError(/needs to be a string/);
       expect(() => {
         vp.addContext("123");
-      }).toThrowError("needs to be a valid URI.");
+      }).toThrowError(/needs to be a valid URI/);
 
       expect(() => {
         vp.addCredential({ some: "value" });

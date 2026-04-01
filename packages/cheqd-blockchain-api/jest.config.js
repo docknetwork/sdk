@@ -1,6 +1,14 @@
 export default {
   bail: true,
-  moduleNameMapper: {},
+  moduleNameMapper: {
+    "^@docknetwork/credential-sdk/(.*)$":
+      "<rootDir>/../credential-sdk/dist/esm/$1",
+    "^@cheqd/sdk(.*)$": "<rootDir>/../../node_modules/@cheqd/sdk/build/cjs/$1",
+    "^uint8arrays$": "<rootDir>/../../node_modules/uint8arrays/dist/src",
+    "^file-type$": "<rootDir>/../../node_modules/file-type/index.js",
+    "^multiformats/(.*)$":
+      "<rootDir>/../../node_modules/multiformats/dist/src/$1",
+  },
   clearMocks: true,
   testTimeout: 30000,
   testEnvironment: "./tests/test-environment",
@@ -8,7 +16,7 @@ export default {
     "^.+\\.(ts|js)$": ["babel-jest", { rootMode: "upward" }],
   },
   transformIgnorePatterns: [
-    "/node_modules/(?!@polkadot|@babel|multiformats|@docknetwork|@stablelib|@cheqd|file-type)",
+    "/node_modules/(?!@polkadot|@babel|multiformats|@docknetwork|@stablelib|@cheqd|file-type|uint8arrays|multiformats|strtok3|peek-readable|token-types|uint8array-extra|p-limit|yocto-queue)",
   ],
   workerIdleMemoryLimit: "1G",
   verbose: true,

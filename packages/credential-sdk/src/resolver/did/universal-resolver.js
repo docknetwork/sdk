@@ -1,4 +1,4 @@
-import { NoDIDError } from '../../modules/did/errors';
+import { NoDIDError } from '../../modules/abstract/did/errors';
 import { Resolver, WILDCARD } from '../generic';
 import jsonFetch from '../../utils/json-fetch';
 
@@ -6,9 +6,9 @@ import jsonFetch from '../../utils/json-fetch';
  * Resolves `DID`s with wildcard method: `did:*:`.
  */
 export default class UniversalResolver extends Resolver {
-  static PREFIX = 'did';
+  prefix = 'did';
 
-  static METHOD = WILDCARD;
+  method = WILDCARD;
 
   /**
    * Create an adapter to a

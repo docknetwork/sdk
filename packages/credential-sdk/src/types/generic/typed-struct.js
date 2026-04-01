@@ -2,7 +2,7 @@ import {
   validateProperties,
   withExtendedStaticProperties,
 } from '../../utils/inheritance';
-import { maybeToJSON, maybeEq, maybeFrom } from '../../utils/interfaces';
+import { maybeEq, maybeFrom } from '../../utils/interfaces';
 import withBase from './with-base';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
@@ -40,9 +40,9 @@ class TypedStruct extends withBase(class StructBase {}) {
     Object.seal(this);
   }
 
-  toJSON() {
+  apply(fn) {
     return Object.fromEntries(
-      Object.entries(this).map(([key, value]) => [key, maybeToJSON(value)]),
+      Object.entries(this).map(([key, value]) => [key, fn(value)]),
     );
   }
 
@@ -73,6 +73,15 @@ class TypedStruct extends withBase(class StructBase {}) {
 
   toString() {
     return JSON.stringify(this.toJSON());
+  }
+
+  toJSON() {
+    const result = {};
+    for (const key of Object.keys(this)) {
+      const value = this[key];
+      result[key] = value && typeof value.toJSON === 'function' ? value.toJSON() : value;
+    }
+    return result;
   }
 }
 

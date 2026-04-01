@@ -2,6 +2,7 @@ import b58 from 'bs58';
 import * as base64 from '@juanelas/base64';
 import { Ed25519VerKeyName, Ed255192020VerKeyName } from './constants';
 import Ed25519VerificationKey2018 from './Ed25519VerificationKey2018';
+import { decodeFromMultibase } from '../../utils/encoding/multibase';
 
 export default class Ed25519VerificationKey2020 extends Ed25519VerificationKey2018 {
   /**
@@ -24,6 +25,17 @@ export default class Ed25519VerificationKey2020 extends Ed25519VerificationKey20
 
     if (verificationMethod.publicKeyBase64) {
       return new this(base64.decode(verificationMethod.publicKeyBase64));
+    }
+
+    const secMultibase = verificationMethod['sec:publicKeyMultibase'];
+    const multiBase = verificationMethod.publicKeyMultibase || (
+      typeof secMultibase === 'object'
+        ? secMultibase['@value']
+        : secMultibase
+    );
+
+    if (multiBase) {
+      return new this(decodeFromMultibase(multiBase).slice(2));
     }
 
     throw new Error(

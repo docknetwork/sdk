@@ -1,5 +1,5 @@
 import b58 from 'bs58';
-import { u8aToU8a } from '../../../utils/bytes';
+import { u8aToU8a } from '../../../utils/types/bytes';
 import { withExtendedStaticProperties } from '../../../utils/inheritance';
 
 /**

@@ -1,4 +1,3 @@
-import MultiResolver from './multi-resolver';
 import Resolver from './resolver';
 import { WILDCARD } from './const';
 import { ensureItemsAllowed } from '../utils';
@@ -11,44 +10,39 @@ import { ensureItemsAllowed } from '../utils';
  * @param {object} [config={}]
  * @param {Array<string> | string | symbol} [config.prefix=WILDCARD]
  * @param {Array<string> | string | symbol} [config.method=WILDCARD]
- * @returns {Resolver<T> | MultiResolver<T>}
+ * @returns {Resolver<T> | ResolverRouter<T>}
  */
 export const createResolver = (
   resolverOrFn,
   { prefix = WILDCARD, method = WILDCARD } = {},
-) => {
-  const isMulti = Array.isArray(prefix) || Array.isArray(method);
-  const baseClass = isMulti ? MultiResolver : Resolver;
+) => new (class ResolverCreatedUsingCreateResolver extends Resolver {
+  prefix = prefix;
 
-  return new (class ResolverCreatedUsingCreateResolver extends baseClass {
-    static PREFIX = prefix;
+  method = method;
 
-    static METHOD = method;
+  constructor() {
+    super();
 
-    constructor() {
-      super();
-
-      const isFn = typeof resolverOrFn === 'function';
-      if (!isFn && resolverOrFn instanceof Resolver) {
-        ensureItemsAllowed(
-          [].concat(resolverOrFn.constructor.PREFIX),
-          [].concat(this.constructor.PREFIX),
-          WILDCARD,
-        );
-        ensureItemsAllowed(
-          [].concat(resolverOrFn.constructor.METHOD),
-          [].concat(this.constructor.METHOD),
-          WILDCARD,
-        );
-      }
-
-      this.resolve = isFn
-        ? resolverOrFn
-        : resolverOrFn.resolve.bind(resolverOrFn);
+    const isFn = typeof resolverOrFn === 'function';
+    if (!isFn && resolverOrFn instanceof Resolver) {
+      ensureItemsAllowed(
+        [].concat(resolverOrFn.prefix),
+        [].concat(this.prefix),
+        WILDCARD,
+      );
+      ensureItemsAllowed(
+        [].concat(resolverOrFn.method),
+        [].concat(this.method),
+        WILDCARD,
+      );
     }
 
-    async resolve(_id) {
-      throw new Error('Unimplemented');
-    }
-  })();
-};
+    this.resolve = isFn
+      ? resolverOrFn
+      : resolverOrFn.resolve.bind(resolverOrFn);
+  }
+
+  async resolve(_id) {
+    throw new Error('Unimplemented');
+  }
+})();

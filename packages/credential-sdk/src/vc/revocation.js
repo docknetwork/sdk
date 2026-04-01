@@ -5,8 +5,7 @@ import {
   VB_ACCUMULATOR_22,
   KB_UNI_ACCUMULATOR_24,
 } from '@docknetwork/crypto-wasm-ts';
-import { randomAsHex, u8aToHex } from '../utils/bytes';
-import { OneOfPolicy } from '../types/policy';
+import { randomAsHex, u8aToHex } from '../utils/types/bytes';
 
 import {
   RevRegType,
@@ -21,7 +20,8 @@ export const RevRegIdByteSize = 32;
 // Each entry in revocation registry has byte size `RevEntryByteSize`
 export const RevEntryByteSize = 32;
 
-const LD_SEC_TERM = 'https://ld.dock.io/security#';
+const LD_SEC_TERM = 'https://ld.truvera.io/security#';
+const LD_SEC_TERM_LEGACY = 'https://ld.dock.io/security#';
 
 /**
  * Return `credentialStatus` according to W3C spec when the revocation status is checked on Dock
@@ -77,7 +77,12 @@ export function getCredentialStatus(expanded) {
   return status;
 }
 
-const ldTypeGen = (typ) => [typ, `${LD_SEC_TERM}${typ}`, `/${typ}`];
+const ldTypeGen = (typ) => [
+  typ,
+  `${LD_SEC_TERM}${typ}`,
+  `${LD_SEC_TERM_LEGACY}${typ}`,
+  `/${typ}`,
+];
 const REV_REG_LD_TYPES = [RevRegType].flatMap(ldTypeGen);
 const ACCUMULATOR_LD_TYPES = [VB_ACCUMULATOR_22, KB_UNI_ACCUMULATOR_24].flatMap(
   ldTypeGen,
@@ -142,5 +147,3 @@ export async function checkRevocationRegistryStatus(
 
   return { verified: true };
 }
-
-export { OneOfPolicy, RevRegType, DockRevRegQualifier };

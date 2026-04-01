@@ -1,22 +1,5 @@
-import { CheqdAPI } from "@docknetwork/cheqd-blockchain-api";
-import { CheqdTestnetDid } from "@docknetwork/credential-sdk/types";
-import didModuleTests from "@docknetwork/credential-sdk/generate-tests/did-module";
-import CheqdDIDModule from "../src/did/module";
-import { faucet } from "./constants";
+import { generateDIDModuleTests } from "@docknetwork/credential-sdk/modules/tests";
+import { CheqdParamsId } from "@docknetwork/credential-sdk/types";
+import { tests } from "./common";
 
-describe("DIDModule", () => {
-  const cheqd = new CheqdAPI();
-
-  beforeAll(async () => {
-    await cheqd.init({
-      url: process.env.ENDPOINT_URL || "http://localhost:26657",
-      mnemonic: faucet.mnemonic,
-    });
-  });
-
-  afterAll(async () => {
-    await cheqd.disconnect();
-  });
-
-  didModuleTests({ did: new CheqdDIDModule(cheqd) }, { DID: CheqdTestnetDid });
-});
+tests("DIDModule", generateDIDModuleTests, { ParamsId: CheqdParamsId });

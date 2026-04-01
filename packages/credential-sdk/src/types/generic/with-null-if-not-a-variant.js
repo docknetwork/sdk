@@ -1,5 +1,5 @@
 import TypedEnum from './typed-enum';
-import { fmtIter, isEqualToOrPrototypeOf, maybeNew } from '../../utils';
+import { fmtIterable, isEqualToOrPrototypeOf, maybeNew } from '../../utils';
 
 /**
  * Extends supplied class which must be a successor of `TypedEnum` in a way that every of the methods
@@ -26,7 +26,7 @@ export default function withNullIfNotAVariant(klass) {
         const keys = Object.keys(value);
         if (keys.length !== 1) {
           throw new Error(
-            `Expected object with 1 key, received \`${value}\` with keys: ${fmtIter(
+            `Expected object with 1 key, received \`${value}\` with keys: ${fmtIterable(
               keys,
             )} by ${this.name}`,
           );

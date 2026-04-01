@@ -1,6 +1,4 @@
-import { isEqualToOrPrototypeOf } from '../../utils';
-import TypedEnum from './typed-enum';
-import TypedStruct from './typed-struct';
+import withProps from './with-props';
 
 /**
  * Extends supplied class which must be a successor of `TypedStruct`/`TypedEnum` by adding/overriding
@@ -20,36 +18,5 @@ export default function withProp(
   PropClass,
   handleNested = withProp,
 ) {
-  const name = `withProp(${klass.name}, ${prop})`;
-  const isStruct = isEqualToOrPrototypeOf(TypedStruct, klass);
-  const isEnum = isEqualToOrPrototypeOf(TypedEnum, klass);
-  if (!isStruct && !isEnum) {
-    throw new Error(`Unexpected class provided: \`${klass}\``);
-  }
-
-  if (isStruct) {
-    const obj = {
-      [name]: class extends klass {
-        static Classes = {
-          ...klass.Classes,
-          [prop]: PropClass,
-        };
-      },
-    };
-
-    return obj[name];
-  } else {
-    const obj = {
-      [name]:
-        klass.Class != null
-          ? class extends klass {
-            static Class = handleNested(klass.Class, prop, PropClass);
-          }
-          : class extends klass {
-            static Variants = klass.Variants.map((variant) => handleNested(variant, prop, PropClass));
-          },
-    };
-
-    return obj[name];
-  }
+  return withProps(klass, { [prop]: PropClass }, (k, _) => handleNested(k, prop, PropClass));
 }

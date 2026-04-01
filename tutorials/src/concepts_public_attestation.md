@@ -4,7 +4,7 @@ This feature should be considered _Alpha_.
 
 [RFC](https://github.com/docknetwork/planning/blob/master/rfc/0014-public-attestation.md)
 
-VCDM Verifiable credentials are a way to prove an _attestation_. Valid credentials prove statements of the form `Issuer claims X`, where `X` is itself a statement. One property of verifiable credentials is that the holder may keep them private simply by not sharing them with other parties. That property will be sometimes useful, sometimes not. VCDM crededentials are private and therefore not automatically discoverable but Public Attestations give a decentralized identity the ability to post claims that _are_ discoverable by any party. For Dock DIDs, attestations are linked on-chain but Public Attestations are not specicfic to Dock. Other DID methods can implement public attestations by including them in DID documents.
+VCDM Verifiable credentials are a way to prove an _attestation_. Valid credentials prove statements of the form `Issuer claims X`, where `X` is itself a statement. One property of verifiable credentials is that the holder may keep them private simply by not sharing them with other parties. That property will be sometimes useful, sometimes not. VCDM crededentials are private and therefore not automatically discoverable but Public Attestations give a decentralized identity the ability to post claims that _are_ discoverable by any party. For Dock DIDs, attestations are linked on-chain but Public Attestations are not specicfic to Dock Labs. Other DID methods can implement public attestations by including them in DID documents.
 
 Public Attestations are posted as RDF documents. Since RDF can represent, or link to, arbitrary types of data, Public Attestations can be used to publish arbitrary content.
 
@@ -16,7 +16,7 @@ If `DID attestsDocumentContent DOC` then for every statement `X` in `DOC` `DID c
 
 Two IRI schemes are supported for pionting to attested documents: DIDs and ipfs links. DIDs are dereferenced and interpreted as [json-ld](https://www.w3.org/TR/json-ld/). Ipfs links are dereferenced and interpreted as [turtle](https://www.w3.org/TR/turtle/) documents. The sdk makes it easy to dereferece DIDs and ipfs attestation documents but the Public Attestation concept is extendable to other types of IRI, like [hashlinks](https://tools.ietf.org/html/draft-sporny-hashlink-06) or [data URIs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs).
 
-For Dock DIDs public attestation are made by [setting the attestation for the DID](https://github.com/docknetwork/sdk/blob/61cbaaf61e11cc8cc57d8582095bffafecd794b9/src/modules/did.js#L94) on-chain. Changing the value of an attestation effectively revokes the previous attestation and issues a new one. A DIDs attestation can also be set to `None`, which is equivalent to attesting an empty claimgraph. Dock DIDs have their attestation set to `None` by default. A Dock DID with attestation set to `None` will not contain the `attestsDocumentContents` key.
+For Dock DIDs public attestation are made by [setting the attestation for the DID](https://github.com/docknetwork/sdk/blob/61cbaaf61e11cc8cc57d8582095bffafecd794b9/src/modules/abstract/did.js#L94) on-chain. Changing the value of an attestation effectively revokes the previous attestation and issues a new one. A DIDs attestation can also be set to `None`, which is equivalent to attesting an empty claimgraph. Dock DIDs have their attestation set to `None` by default. A Dock DID with attestation set to `None` will not contain the `attestsDocumentContents` key.
 
 ### Example of A DID attesting to a document in ipfs
 
@@ -61,7 +61,7 @@ Fact 2:
 
 ### Example of A DID attesting to multiple documents
 
-While it is valid DIDs to include multiple attested IRIs in a single DID document, Dock artificially limits the number of attestation to one per Dock DID. This is to encourage off-chain (ipfs) data storage. If a DID wishes to attests to multiple documents, there are two suggested options: 1) merge the two documents into a single document or 2) attest to a single document which in turn notes an `attestsDocumentContents` for each of it's children. The following is an example of option "2)".
+While it is valid DIDs to include multiple attested IRIs in a single DID document, Dock Labs artificially limits the number of attestation to one per Dock DID. This is to encourage off-chain (ipfs) data storage. If a DID wishes to attests to multiple documents, there are two suggested options: 1) merge the two documents into a single document or 2) attest to a single document which in turn notes an `attestsDocumentContents` for each of it's children. The following is an example of option "2)".
 
 `did:ex:ex`:
 

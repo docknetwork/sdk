@@ -24,7 +24,7 @@ exports[`ensureMatchesPattern $anyOf 4`] = `
 ]
 `;
 
-exports[`ensureMatchesPattern $instanceOf 1`] = `"Invalid value provided, expected instance of \`Function\`, received instance of \`Object\`"`;
+exports[`ensureMatchesPattern $instanceOf 1`] = `"Expected \`[object Object]\` with constructor \`Object\` to be an instance of \`Function\`"`;
 
 exports[`ensureMatchesPattern $instanceOf 2`] = `[]`;
 

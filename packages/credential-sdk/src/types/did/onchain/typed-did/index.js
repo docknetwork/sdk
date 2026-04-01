@@ -1,89 +1,100 @@
 import { DidMethodKeyPublicKey, DidMethodKeySignature } from './did-method-key';
 import DockDidValue, { DockDidSignature } from './dock-did-value';
-import { TypedEnum, TypedTuple, withQualifier } from '../../../generic';
-import { CheqdDid } from './cheqd-did';
-import { withExtendedStaticProperties } from '../../../../utils';
+import {
+  TypedEnum,
+  TypedTuple,
+  TypedUUID,
+  createConverter,
+  withQualifier,
+} from '../../../generic';
+import { CheqdDid, CheqdMainnetDid, CheqdTestnetDid } from './cheqd-did';
+import {
+  withExtendedStaticProperties,
+  isHexWithGivenByteSize,
+} from '../../../../utils';
 import DidOrDidMethodKeySignature from './signature';
 
-export const DockDidOrDidMethodKey = withQualifier(
-  class DockDidOrDidMethodKey extends TypedEnum {
-    /**
-     * Instantiates a random `dock:did:*`.
-     */
-    static random() {
-      return new this(this.Class.random());
+export class DockDidOrDidMethodKey extends withQualifier(TypedEnum, true) {
+  /**
+   * Instantiates a random `dock:did:*`.
+   */
+  static random() {
+    return new this(this.Class.random());
+  }
+
+  signWith(keyPair, bytes) {
+    return this.value.signWith(keyPair, bytes);
+  }
+
+  /**
+   * Creates signature for the state change with supplied arguments.
+   *
+   * @param apiProvider
+   * @param name
+   * @param payload
+   * @param keyRef
+   * @returns {object}
+   */
+  async signStateChange(apiProvider, name, payload, keyRef) {
+    const { LOG_STATE_CHANGE } = process.env;
+    if (Number(LOG_STATE_CHANGE) || Boolean(LOG_STATE_CHANGE)) {
+      console.dir(payload, { depth: null });
     }
+    const bytes = await apiProvider.stateChangeBytes(name, payload);
 
-    signWith(keyPair, bytes) {
-      return this.value.signWith(keyPair, bytes);
+    return this.signWith(keyRef, bytes);
+  }
+
+  /**
+   * Creates a transaction that will modify the chain state.
+   *
+   * @param api
+   * @param method
+   * @param name
+   * @param payload
+   * @param keyRef
+   */
+  async changeState(api, method, name, payload, keyRef) {
+    return await method(
+      payload,
+      await this.signStateChange(api, name, payload, keyRef),
+    );
+  }
+
+  toString() {
+    return String(this.value);
+  }
+
+  static fromApi(value) {
+    if (value.isDock) {
+      return super.from(value.asDock);
+    } else {
+      return super.fromApi(value);
     }
+  }
 
-    /**
-     * Creates signature for the state change with supplied arguments.
-     *
-     * @param apiProvider
-     * @param name
-     * @param payload
-     * @param keyRef
-     * @returns {object}
-     */
-    async signStateChange(apiProvider, name, payload, keyRef) {
-      const { LOG_STATE_CHANGE } = process.env;
-      if (Number(LOG_STATE_CHANGE) || Boolean(LOG_STATE_CHANGE)) {
-        console.dir(payload, { depth: null });
-      }
-      const bytes = await apiProvider.stateChangeBytes(name, payload);
-
-      return this.signWith(keyRef, bytes);
+  static fromJSON(json) {
+    if (json?.dock) {
+      return super.fromJSON({ did: json?.dock });
+    } else {
+      return super.fromJSON(json);
     }
+  }
 
-    /**
-     * Creates a transaction that will modify the chain state.
-     *
-     * @param api
-     * @param method
-     * @param name
-     * @param payload
-     * @param keyRef
-     */
-    async changeState(api, method, name, payload, keyRef) {
-      return await method(
-        payload,
-        await this.signStateChange(api, name, payload, keyRef),
-      );
-    }
-
-    toString() {
-      return String(this.value);
-    }
-
-    static fromApi(value) {
-      if (value.isDock) {
-        return super.from(value.asDock);
-      } else {
-        return super.fromApi(value);
-      }
-    }
-
-    static fromJSON(json) {
-      if (json?.dock) {
-        return super.fromJSON({ did: json?.dock });
-      } else {
-        return super.fromJSON(json);
-      }
-    }
-
-    static from(value) {
+  static from(value) {
+    if (isHexWithGivenByteSize(String(value), 32)) {
       // eslint-disable-next-line no-use-before-define
-      if (value instanceof NamespaceDid) {
-        return super.from(value.isDock ? { did: value.asDock } : value);
-      } else {
-        return super.from(value);
-      }
+      return new DockDid(value);
     }
-  },
-  true,
-);
+
+    // eslint-disable-next-line no-use-before-define
+    if (value instanceof NamespaceDid) {
+      return super.from(value.isDock ? { did: value.asDock } : value);
+    } else {
+      return super.from(value);
+    }
+  }
+}
 
 export class DockDid extends DockDidOrDidMethodKey {
   static Class = DockDidValue;
@@ -107,66 +118,55 @@ export class DidMethodKey extends DockDidOrDidMethodKey {
 
 DockDidOrDidMethodKey.bindVariants(DockDid, DidMethodKey);
 
-class DockDidValueToString extends DockDidValue {
+export class NamespaceDid extends withQualifier(TypedEnum, true) {
+  toCheqdPayload() {
+    return String(this);
+  }
+
   toJSON() {
     return String(this);
   }
-}
 
-class DidMethodKeyPublicKeyToString extends DidMethodKeyPublicKey {
-  toJSON() {
-    return String(this);
+  static fromApi(value) {
+    if (value.isDid) {
+      return super.from({ dock: value.asDid });
+    } else {
+      return super.fromApi(value);
+    }
+  }
+
+  static fromJSON(json) {
+    if (json?.did && Object.keys(json).length === 1) {
+      return super.fromJSON({ dock: json.did });
+    } else {
+      return super.fromJSON(json);
+    }
+  }
+
+  static from(value) {
+    return super.from(
+      value instanceof DockDidOrDidMethodKey && value.isDid
+        ? { dock: value.asDid }
+        : value,
+    );
   }
 }
 
-export const NamespaceDid = withQualifier(
-  class extends TypedEnum {
-    toJSON() {
-      return String(this);
-    }
-
-    static fromApi(value) {
-      if (value.isDid) {
-        return super.from({ dock: value.asDid });
-      } else {
-        return super.fromApi(value);
-      }
-    }
-
-    static fromJSON(json) {
-      if (json?.did && Object.keys(json).length === 1) {
-        return super.fromJSON({ dock: json.did });
-      } else {
-        return super.fromJSON(json);
-      }
-    }
-
-    static from(value) {
-      return super.from(
-        value instanceof DockDidOrDidMethodKey && value.isDid
-          ? { dock: value.asDid }
-          : value,
-      );
-    }
-  },
-  true,
-);
-
-class DockNamespaceDid extends NamespaceDid {
+export class DockNamespaceDid extends NamespaceDid {
   static Qualifier = 'did:dock:';
 
   static Type = 'dock';
 
-  static Class = DockDidValueToString;
+  static Class = DockDidValue;
 }
-class DidNamespaceKey extends NamespaceDid {
+export class DidNamespaceKey extends NamespaceDid {
   static Qualifier = 'did:key:';
 
   static Type = 'didMethodKey';
 
-  static Class = DidMethodKeyPublicKeyToString;
+  static Class = DidMethodKeyPublicKey;
 }
-class CheqdNamespaceDid extends NamespaceDid {
+export class CheqdNamespaceDid extends NamespaceDid {
   static Qualifier = 'did:cheqd:';
 
   static Type = 'cheqd';
@@ -176,14 +176,30 @@ class CheqdNamespaceDid extends NamespaceDid {
 
 NamespaceDid.bindVariants(DockNamespaceDid, DidNamespaceKey, CheqdNamespaceDid);
 
-export class DIDRef extends withExtendedStaticProperties(
+for (const Class of [CheqdTestnetDid, CheqdMainnetDid]) {
+  const fromFn = Class.from;
+
+  Class.from = function from(value) {
+    try {
+      return new this(
+        TypedUUID.fromDockIdent(DockNamespaceDid.from(value), 'did:cheqd:'),
+      );
+    } catch {
+      return fromFn.call(this, value);
+    }
+  };
+}
+
+export class DidRef extends withExtendedStaticProperties(
   ['Ident'],
   withQualifier(TypedTuple),
 ) {
   static Qualifier = '';
 
+  static Did = NamespaceDid;
+
   static get Classes() {
-    return [NamespaceDid, this.Ident];
+    return [this.Did, this.Ident];
   }
 
   static random(did) {
@@ -217,13 +233,59 @@ export class DIDRef extends withExtendedStaticProperties(
   }
 
   toJSON() {
-    return this.toString();
+    return String(this);
+  }
+}
+
+export class CheqdDidRef extends withQualifier(DidRef) {
+  static Did = CheqdDid;
+
+  static fromUnqualifiedString(str) {
+    const lastColon = str.lastIndexOf(':');
+    const did = `did:cheqd:${str.slice(0, lastColon)}`;
+    const id = str.slice(lastColon + 1);
+
+    return new this(did, id);
+  }
+
+  toJSON() {
+    return String(this);
+  }
+
+  toEncodedString() {
+    const { did, value } = this;
+
+    let prefix = '';
+    if (did.isTestnet) {
+      prefix = 'testnet';
+    } else if (did.isMainnet) {
+      prefix = 'mainnet';
+    } else {
+      throw new Error(
+        `Can't determine DID type: \`${did}\`, instance of \`${did.constructor.name}\``,
+      );
+    }
+
+    return `${prefix}:${did.toEncodedString()}:${value}`;
   }
 }
 
 DidOrDidMethodKeySignature.bindVariants(
   DockDidSignature,
   DidMethodKeySignature,
+);
+
+/**
+ * Retrieve all possible stringified representations of DIDs that can be derived from the provided Dock DID.
+ *
+ * @param {*} did
+ * @returns {Array<string>}
+ */
+export const possibleDids = createConverter(
+  String,
+  DockDid,
+  CheqdTestnetDid,
+  CheqdMainnetDid,
 );
 
 export { DockDidValue, DidMethodKeyPublicKey };

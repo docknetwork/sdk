@@ -1,12 +1,21 @@
 import {
   parse, validate, stringify, v4,
 } from 'uuid';
+import { sha256 } from 'js-sha256';
 import TypedBytes from './typed-bytes';
-import { normalizeOrConvertStringToU8a } from '../../utils';
+import { normalizeOrConvertStringToU8a, valueNumberOrBytes } from '../../utils';
 
 export default class TypedUUID extends TypedBytes {
   constructor(id) {
-    super(validate(id) ? parse(id) : id);
+    if (typeof id === 'string') {
+      if (!validate(id)) {
+        throw new Error(`Invalid UUID: \`${id}\``);
+      }
+
+      super(parse(id));
+    } else {
+      super(id);
+    }
 
     if (!validate(this.value)) {
       throw new Error(`Invalid UUID: ${this.value}`);
@@ -19,6 +28,26 @@ export default class TypedUUID extends TypedBytes {
 
   toString() {
     return this.value;
+  }
+
+  toJSON() {
+    return String(this);
+  }
+
+  static fromDockIdent(dockIdent, prefix = []) {
+    const { CHEQD_MIGRATION_PREFIX } = process.env;
+
+    let prefixBytes = normalizeOrConvertStringToU8a(prefix);
+    if (CHEQD_MIGRATION_PREFIX) {
+      prefixBytes = [
+        ...prefixBytes,
+        ...normalizeOrConvertStringToU8a(CHEQD_MIGRATION_PREFIX),
+      ];
+    }
+    const identBytes = valueNumberOrBytes(dockIdent);
+    const hash = sha256.digest([...prefixBytes, ...identBytes]);
+
+    return this.fromBytesAdapt(hash);
   }
 
   static fromBytesAdapt(bytesOrString) {

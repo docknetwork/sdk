@@ -1,7 +1,7 @@
 // Mock fetch
 
 import VerifiableCredential from "../src/vc/verifiable-credential";
-import { Schema } from "../src/modules/schema";
+import { Schema } from "../src/modules/abstract/schema";
 import { DockBlobId } from "../src/types/blob";
 
 import { expandJSONLD } from "../src/vc/helpers";

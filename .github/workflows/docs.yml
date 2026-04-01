@@ -14,9 +14,9 @@ jobs:
           persist-credentials: false
 
       - name: Setup Node JS
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: "22.x"
 
       - name: Install and Build 🔧 # Only need to install jsdoc package here and then run docs script
         run: |

@@ -1,17 +1,45 @@
 import {
   AbstractDIDModule,
   NoDIDError,
-} from '@docknetwork/credential-sdk/modules/did';
-import {
-  CheqdDIDDocument,
-  CheqdDid,
-} from '@docknetwork/credential-sdk/types/did';
+} from '@docknetwork/credential-sdk/modules/abstract/did';
 import { DIDDocument } from '@docknetwork/credential-sdk/types';
 import { CheqdDIDModuleInternal } from './internal';
-import injectCheqd from '../common/inject-cheqd';
+import withCheqd from '../common/with-cheqd';
 import CheqdAttestModule from '../attest/module';
 
-export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
+// We must manually fix the DIDCommMessaging service object to be in line with what cheqd expects
+// which is actually incorrect according to the DIDComm spec!
+function fixServiceInTransaction(tx) {
+  const services = tx?.value?.payload?.service;
+  if (services && Array.isArray(services)) {
+    [...services].map((service, idx) => {
+      const endpoints = [...service.serviceEndpoint];
+      if (service.serviceType.toString() === '"DIDCommMessaging"') {
+        const serviceEndpoint = endpoints[0].value;
+        if (serviceEndpoint.accept || serviceEndpoint.recipientKeys || serviceEndpoint.routingKeys || serviceEndpoint.priority) {
+          const uris = endpoints.map((endpoint) => endpoint.value.uri);
+
+          // eslint-disable-next-line no-param-reassign
+          tx.value.payload.service[idx] = {
+            id: service.id,
+            serviceType: 'DIDCommMessaging',
+            serviceEndpoint: uris,
+            recipientKeys: serviceEndpoint.recipientKeys || [],
+            routingKeys: serviceEndpoint.routingKeys || [],
+            accept: serviceEndpoint.accept || [],
+            priority: serviceEndpoint.priority || 0,
+          };
+        }
+      }
+
+      return service;
+    });
+  }
+
+  return tx;
+}
+
+export default class CheqdDIDModule extends withCheqd(AbstractDIDModule) {
   static CheqdOnly = CheqdDIDModuleInternal;
 
   constructor(...args) {
@@ -28,22 +56,24 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
       );
     }
 
-    return await this.cheqdOnly.tx.createDidDocument(didDocument, didSigners);
+    const tx = await this.cheqdOnly.tx.createDidDocument(didDocument, didSigners);
+    return fixServiceInTransaction(tx);
   }
 
   async updateDocumentTx(document, didSigners) {
     const didDocument = DIDDocument.from(document);
     if (didDocument.attests != null) {
-      const currentDocument = await this.getDocument(didDocument.id);
+      const currentAttest = await this.attest.getAttests(didDocument.id);
 
-      if (!didDocument.attests.eq(currentDocument.attests)) {
+      if (!didDocument.attests.eq(currentAttest)) {
         throw new Error(
           '`attests` modifications are not supported in the `updateDocument` transaction.',
         );
       }
     }
 
-    return await this.cheqdOnly.tx.updateDidDocument(didDocument, didSigners);
+    const tx = await this.cheqdOnly.tx.updateDidDocument(didDocument, didSigners);
+    return fixServiceInTransaction(tx);
   }
 
   async removeDocumentTx(document, didSigners) {
@@ -57,7 +87,7 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
    * @return {Promise<DIDDocument>} The DID document.
    */
   async getDocument(did) {
-    const cheqdDid = CheqdDid.from(did);
+    const cheqdDid = this.types.Did.from(did);
 
     let doc = null;
     try {
@@ -72,10 +102,10 @@ export default class CheqdDIDModule extends injectCheqd(AbstractDIDModule) {
       }
     }
     if (doc == null) {
-      throw new NoDIDError(cheqdDid);
+      throw new NoDIDError(did);
     }
 
-    return CheqdDIDDocument.from(doc)
+    return this.types.DidDocument.from(doc)
       .toDIDDocument()
       .setAttests(await this.attest.getAttests(cheqdDid));
   }

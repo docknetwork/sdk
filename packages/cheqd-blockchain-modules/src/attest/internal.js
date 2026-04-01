@@ -1,38 +1,43 @@
-import { CheqdDid, Iri } from '@docknetwork/credential-sdk/types';
-import { TypedUUID, option } from '@docknetwork/credential-sdk/types/generic';
-import { CheqdCreateResource, createInternalCheqdModule } from '../common';
+import { Iri, CheqdCreateResource } from '@docknetwork/credential-sdk/types';
+import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
+import { createInternalCheqdModule, validateResource } from '../common';
+
+const Name = 'Attestation';
+const Type = 'attest';
 
 const methods = {
-  setClaim: (iri, targetDid) => new CheqdCreateResource(
-    CheqdDid.from(targetDid).value,
-    TypedUUID.random(),
-    '1.0',
-    [],
-    'Attestation',
-    'attest',
-    Iri.from(iri),
-  ),
+  setClaim(iri, targetDid) {
+    return new CheqdCreateResource(
+      this.types.Did.from(targetDid).value,
+      TypedUUID.random(),
+      '1.0',
+      [],
+      Name,
+      Type,
+      Iri.from(iri),
+    );
+  },
 };
 
 export default class CheqdInternalAttestModule extends createInternalCheqdModule(
   methods,
 ) {
-  static Prop = 'resource';
-
   static MsgNames = {
     setClaim: 'MsgCreateResource',
   };
 
   async attest(did, attestId) {
-    return option(Iri).from(
-      (await this.resource(did, attestId))?.resource?.data,
+    return Iri.from(
+      validateResource(await this.resource(did, attestId), Name, Type),
     );
   }
 
   async attestId(did) {
-    return await this.latestResourceIdBy(
+    const res = await this.latestResourceMetadataBy(
       did,
-      (resource) => resource.resourceType === 'attest',
+      (meta) => meta.resourceType === 'attest',
     );
+
+    return res?.id;
   }
 }

@@ -6,6 +6,7 @@ import jsonld from 'jsonld';
 import jsigs from 'jsonld-signatures';
 import { expandJSONLD } from './helpers';
 import { Bls12381BBDT16MacProofDockName } from './crypto/constants';
+import { possibleDids } from '../types/did/onchain/typed-did';
 
 const { AssertionProofPurpose } = jsigs.purposes;
 
@@ -85,7 +86,11 @@ export default class CredentialIssuancePurpose extends AssertionProofPurpose {
         throw new Error('Credential issuer is required.');
       }
 
-      if (result.controller.id !== issuer[0]['@id']) {
+      if (
+        possibleDids(issuer[0]['@id']).every(
+          (did) => did !== result.controller.id,
+        )
+      ) {
         throw new Error(
           'Credential issuer must match the verification method controller.',
         );

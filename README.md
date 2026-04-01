@@ -18,11 +18,9 @@ You are welcome to explore the [tutorials](./tutorials) and [examples](./example
 
 ## Monorepository Packages
 
-This repository builds five packages:
+Features four packages, such as
 
 - [`@docknetwork/credential-sdk`](./packages/credential-sdk) - An API-agnostic Javascript library for working with Verifiable Credentials, DIDs, Claim Deduction, and more.
-- [`@docknetwork/dock-blockchain-api`](./packages/dock-blockchain-api) - A Javascript library built with PolkadotJS, for use with the [Dock Substrate Node] (https://github.com/docknetwork/dock-substrate) or our public main/test networks.*
-- [`@docknetwork/dock-blockchain-modules`](./packages/dock-blockchain-modules) - A JavaScript library designed for handling credential SDK elements (DIDS, Accumulators, etc) on the Dock blockchain.
 - [`@docknetwork/cheqd-blockchain-api`](./packages/cheqd-blockchain-api) - A Javascript library built atop of `@cheqd/sdk` that allows to interact with the `Cheqd` blockchain.
 - [`@docknetwork/cheqd-blockchain-modules`](./packages/cheqd-blockchain-modules) - A JavaScript library created for managing credential SDK components such as DIDs, accumulators etc on the Cheqd blockchain.
 

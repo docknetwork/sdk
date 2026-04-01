@@ -26,7 +26,7 @@ export default class Bls12381PSSignatureDock2023 extends DockCryptoSignature {
       },
       Bls12381PSSigDockSigName,
       Bls12381PSKeyPairDock2023,
-      'https://ld.dock.io/security/ps/v1',
+      'https://ld.truvera.io/security/ps/v1',
     );
   }
 }

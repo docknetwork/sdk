@@ -10,9 +10,9 @@ jobs:
           persist-credentials: false
 
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: "22.x"
 
       - name: Install, lint, type check and generate docs # Not uploading the docs.
         run: |

@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/credential-sdk",
-  "version": "0.3.0",
+  "version": "0.54.16",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -9,38 +9,51 @@
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
+      "require": "./dist/cjs/index.cjs",
       "default": "./dist/esm/index.js"
     },
     "./*": {
+      "import": "./dist/esm/*/index.js",
+      "require": "./dist/cjs/*/index.cjs",
+      "default": "./dist/esm/*/index.js"
+    },
+    "./src/*": {
       "import": "./dist/esm/*",
       "require": "./dist/cjs/*",
       "default": "./dist/esm/*"
     }
+  },
+  "resolutions": {
+    "@digitalbazaar/http-client": "^3.4.1",
+    "jsonld/@digitalbazaar/http-client": "^3.4.1",
+    "@transmute/jsonld/jsonld/@digitalbazaar/http-client": "^3.4.1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/docknetwork/sdk"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
-    "@comunica/actor-init-sparql-rdfjs": "^1.22.3",
-    "@digitalcredentials/vc-status-list": "^8.0.0",
+    "@astronautlabs/jsonpath": "^1.1.2",
+    "@digitalcredentials/vc-status-list": "^9.0.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0",
+    "@docknetwork/vc-delegation-engine": "1.0.3",
     "@juanelas/base64": "^1.1.5",
-    "@stablelib/ed25519": "^2.0.0",
-    "@subsquid/ss58-codec": "latest",
+    "@sphereon/pex": "^5.0.0-unstable.28",
+    "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.26.0",
+    "@stablelib/ed25519": "^1.0.0",
     "@transmute/json-web-signature": "^0.7.0-unstable.82",
+    "blake2b": "2.1.4",
     "blakejs": "^1.2.1",
     "bs58": "^5.0.0",
     "deep-equal": "^2.2.3",
-    "elliptic": "6.5.7",
+    "elliptic": "6.6.1",
     "js-sha256": "^0.11.0",
     "json-canonicalize": "1.0.4",
     "json-stringify-deterministic": "^1.0.12",
-    "jsonld": "^5.0.0",
+    "jsonld": "^6.0.0",
     "jsonld-signatures": "^9.3.1",
     "jsonschema": "1.4.1",
     "key-did-resolver": "^1.4.0",
@@ -60,6 +73,7 @@
     "@babel/plugin-syntax-import-attributes": "^7.25.6",
     "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/preset-env": "^7.24.3",
+    "@comunica/query-sparql-rdfjs": "^4.0.2",
     "@helia/strings": "^3.0.5",
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-babel": "^6.0.4",
@@ -68,7 +82,6 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-wasm": "^5.1.0",
     "@types/jest": "^29.5.12",
-    "aws-sdk": "^2.1057.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^29.7.0",
     "eslint": "^8.0.0",
@@ -82,7 +95,7 @@
     "jest-environment-node": "^29.7.0",
     "jsdoc": "^3.6.3",
     "jsdoc-typeof-plugin": "^1.0.0",
-    "rollup": "2.78.0",
+    "rollup": "2.79.2",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-multi-input": "^1.3.2",
     "rollup-plugin-node-polyfills": "^0.2.1",
@@ -92,7 +105,7 @@
     "build": "rollup -c",
     "test-ipfs": "NODE_OPTIONS=--experimental-vm-modules NODE_ENV=production jest --verbose --runInBand --forceExit ./tests/ipfs",
     "test-ipfs-with-node": "../scripts/with_dock_docker_test_node yarn test-ipfs",
-    "test": "yarn jest --verbose ./tests",
+    "test": "yarn jest --verbose ./tests/*",
     "test-with-all-nodes": "../../scripts/with_all_dock_docker_test_nodes yarn test-integration",
     "lint": "eslint \"src/**/*.js\"",
     "lint-scripts": "eslint \"scripts/**/*.js\"",

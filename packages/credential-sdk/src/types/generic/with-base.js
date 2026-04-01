@@ -1,10 +1,12 @@
+import { stringToU8a } from '../../utils';
 import {
   withExtendedStaticProperties,
   withExtendedPrototypeProperties,
 } from '../../utils/inheritance';
-import { applyToValue, maybeEq } from '../../utils/interfaces';
+import { maybeEq, maybeToJSON } from '../../utils/interfaces';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
+import withFromJSONBytes from './with-from-json-bytes';
 
 /**
  * Enhances provided class by adding prototype methods `toString`/`eq`, static `from` and requiring
@@ -54,7 +56,33 @@ export default function withBase(klass) {
        * @returns {object} The JSON representation of the instance.
        */
       toJSON() {
+        return this.apply(maybeToJSON);
+      }
+
+      /**
+       * Recursively applies supplied function to the underlying values.
+       * @template T
+       * @param {function(this): T} _fn
+       * @returns {T}
+       */
+      apply(_fn) {
         throw new Error('Unimplemented');
+      }
+
+      /**
+       * Converts the instance to a stringified JSON representation.
+       * @returns {string} The JSON representation of the instance.
+       */
+      toJSONString() {
+        return JSON.stringify(this.toJSON());
+      }
+
+      /**
+       * Converts the instance to bytes of the stringified JSON representation.
+       * @returns {Uint8Array} The JSON representation of the instance.
+       */
+      toJSONStringBytes() {
+        return stringToU8a(this.toJSONString());
       }
 
       /**
@@ -63,24 +91,6 @@ export default function withBase(klass) {
        */
       toString() {
         return JSON.stringify(this.toJSON());
-      }
-
-      /**
-       * Applies supplied function to the underlying value if `check` returns `true`.
-       * Otherwise, attempts to do the same on the inner value.
-       *
-       * @template T
-       * @param {function(this): T} fn
-       * @returns {T}
-       */
-      applyToValue(check, fn) {
-        if (check(this)) {
-          return fn(this);
-        }
-        const { value } = this;
-        const hasValue = typeof value !== 'undefined';
-
-        return applyToValue(check, fn, value ?? this, hasValue);
       }
 
       /**
@@ -98,8 +108,8 @@ export default function withBase(klass) {
   return withExtendedStaticProperties(
     ['fromJSON', 'fromApi'],
     withExtendedPrototypeProperties(
-      ['toJSON'],
-      withEq(withCatchNull(classes[name])),
+      ['apply'],
+      withFromJSONBytes(withEq(withCatchNull(classes[name]))),
     ),
   );
 }

@@ -1,25 +1,37 @@
-import AbstractBlobModule from '@docknetwork/credential-sdk/modules/blob/module';
-import { NoBlobError } from '@docknetwork/credential-sdk/modules/blob/errors';
-import { CheqdBlobId } from '@docknetwork/credential-sdk/types';
-import { injectCheqd } from '../common';
+import { AbstractBlobModule } from '@docknetwork/credential-sdk/modules';
+import { NoBlobError } from '@docknetwork/credential-sdk/modules/abstract/blob';
+import { NoResourceError, withCheqd } from '../common';
 import CheqdInternalBlobModule from './internal';
 import { OwnerWithBlob } from './types';
 
-export default class CheqdBlobModule extends injectCheqd(AbstractBlobModule) {
+export default class CheqdBlobModule extends withCheqd(AbstractBlobModule) {
   static CheqdOnly = CheqdInternalBlobModule;
 
-  async newTx(blobWithId, targetDid, didKeypair) {
-    return await this.cheqdOnly.tx.new(blobWithId, targetDid, didKeypair);
+  /**
+   * Write a new blob on chain.
+   * @param blobWithId
+   * @param didKeypair - The key id used by the signer. This will be used by the verifier (node) to fetch the public key for verification
+   * @returns {Promise<*>}
+   */
+  async newTx(blobWithId, didKeypair) {
+    return await this.cheqdOnly.tx.new(blobWithId, didKeypair);
   }
 
+  /**
+   * Retrieves blob with owner from chain.
+   * Throws an error in case if blob with supplied identifier doesn't exist.
+   * @param {*} blobId
+   * @returns {OwnerWithBlob}
+   */
   async get(blobId) {
-    const id = CheqdBlobId.from(blobId);
-    const blob = await this.cheqdOnly.blob(id);
+    const { BlobId } = this.types;
 
-    if (blob == null) {
-      throw new NoBlobError(id);
+    const id = BlobId.from(blobId);
+
+    try {
+      return new OwnerWithBlob(id.value[0], await this.cheqdOnly.blob(id));
+    } catch (err) {
+      throw err instanceof NoResourceError ? new NoBlobError(id) : err;
     }
-
-    return new OwnerWithBlob(id[0], blob);
   }
 }

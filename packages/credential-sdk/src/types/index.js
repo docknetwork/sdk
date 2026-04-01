@@ -2,6 +2,7 @@ export * from './blob';
 export * from './attest';
 export * from './did';
 export * from './offchain-signatures';
+export * from './payload';
 export * from './policy';
 export * from './public-keys';
 export * from './signatures';

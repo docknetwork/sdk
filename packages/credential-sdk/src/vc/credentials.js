@@ -15,12 +15,19 @@ import defaultDocumentLoader from './document-loader';
 import { getAndValidateSchemaIfPresent } from './schema';
 import {
   checkRevocationRegistryStatus,
-  DockRevRegQualifier,
   getCredentialStatus,
   isAccumulatorRevocationStatus,
   isRegistryRevocationStatus,
-  RevRegType,
 } from './revocation';
+import {
+  DockRevRegQualifier,
+  RevRegType,
+  DEFAULT_CONTEXT_V1_URL,
+  credentialContextField,
+  PrivateStatusList2021EntryType,
+  StatusList2021EntryType,
+  PrivateStatusList2021Qualifier,
+} from './constants';
 
 import {
   getSuiteFromKeyDoc,
@@ -28,15 +35,7 @@ import {
   getKeyFromDIDDocument,
   processIfKvac,
 } from './helpers';
-import {
-  DEFAULT_CONTEXT_V1_URL,
-  credentialContextField,
-  PrivateStatusList2021EntryType,
-  DockStatusList2021Qualifier,
-  StatusList2021EntryType,
-  PrivateStatusList2021Qualifier,
-} from './constants';
-import { ensureValidDatetime } from '../utils/type-helpers';
+import { ensureValidDatetime } from '../utils';
 
 import {
   EcdsaSecp256k1Signature2019,
@@ -58,7 +57,7 @@ import {
   Bls12381BBS23SigDockSigName,
   Bls12381BBDT16MacDockName,
   Bls12381BBDT16MacProofDockName,
-} from './custom_crypto';
+} from './crypto';
 import { signJWS } from './jws';
 import Bls12381BBDT16MACProofDock2024 from './crypto/Bls12381BBDT16MACProofDock2024';
 
@@ -168,7 +167,7 @@ export function checkCredentialJSONLD(credential) {
  * @param {object} credential - An object that could be a VerifiableCredential.
  * @throws {Error}
  */
-export function checkCredentialRequired(credential) {
+export function checkCredentialRequired(credential, isJWT) {
   // Ensure first context is DEFAULT_CONTEXT_V1_URL
   if (credential['@context'][0] !== DEFAULT_CONTEXT_V1_URL) {
     throw new Error(
@@ -181,26 +180,23 @@ export function checkCredentialRequired(credential) {
     throw new Error('"type" property is required.');
   }
 
-  // Ensure credential has subject
-  if (!credential.credentialSubject) {
-    throw new Error('"credentialSubject" property is required.');
-  }
+  // Ensure issuer and issue date is valid, only for non-jwt as that is defined in the header
+  if (!isJWT) {
+    const issuer = getId(credential.issuer);
+    if (!issuer) {
+      throw new Error(
+        `"issuer" must be an object with ID property or a string. Got: ${credential.issuer}`,
+      );
+    } else if (!issuer.includes(':')) {
+      throw new Error('"issuer" id must be in URL format.');
+    }
 
-  // Ensure issuer is valid
-  const issuer = getId(credential.issuer);
-  if (!issuer) {
-    throw new Error(
-      `"issuer" must be an object with ID property or a string. Got: ${credential.issuer}`,
-    );
-  } else if (!issuer.includes(':')) {
-    throw new Error('"issuer" id must be in URL format.');
-  }
-
-  // Ensure there is an issuance date, if exists
-  if (!credential.issuanceDate) {
-    throw new Error('"issuanceDate" property is required.');
-  } else {
-    ensureValidDatetime(credential.issuanceDate);
+    // Ensure there is an issuance date, if exists
+    if (!credential.issuanceDate) {
+      throw new Error('"issuanceDate" property is required.');
+    } else {
+      ensureValidDatetime(credential.issuanceDate);
+    }
   }
 }
 
@@ -229,8 +225,8 @@ export function checkCredentialOptional(credential) {
  * @param {object} credential - An object that could be a VerifiableCredential.
  * @throws {Error}
  */
-export function checkCredential(credential) {
-  checkCredentialRequired(credential);
+export function checkCredential(credential, isJWT) {
+  checkCredentialRequired(credential, isJWT);
   checkCredentialOptional(credential);
   checkCredentialJSONLD(credential);
 }
@@ -295,7 +291,7 @@ export async function verifyCredential(
   }
 
   // Check credential is valid
-  checkCredential(credential);
+  checkCredential(credential, isJWT);
 
   // Check expiration date
   if (verifyDates && 'expirationDate' in credential) {
@@ -517,6 +513,11 @@ export async function issueCredential(
   // Ensure credential is valid
   checkCredential(cred);
 
+  // Ensure credential has subject
+  if (!cred.credentialSubject) {
+    throw new Error('"credentialSubject" property is required.');
+  }
+
   // Should use JWT format?
   if (useJWT) {
     // Format to VC JWT spec
@@ -693,13 +694,14 @@ export function addStatusList21EntryToCredential(
   purpose,
 ) {
   validateStatusPurpose(purpose);
+
   return {
     ...cred,
     credentialStatus: {
-      id: `${DockStatusList2021Qualifier}${statusListCredentialId}#${statusListCredentialIndex}`,
+      id: `${statusListCredentialId}#${statusListCredentialIndex}`,
       type: StatusList2021EntryType,
       statusListIndex: String(statusListCredentialIndex),
-      statusListCredential: `${DockStatusList2021Qualifier}${statusListCredentialId}`,
+      statusListCredential: String(statusListCredentialId),
       statusPurpose: purpose,
     },
   };

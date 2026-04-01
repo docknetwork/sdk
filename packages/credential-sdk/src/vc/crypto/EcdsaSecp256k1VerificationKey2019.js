@@ -1,8 +1,9 @@
 import b58 from 'bs58';
 import * as base64 from '@juanelas/base64';
-import { u8aToU8a } from '../../utils/bytes';
+import { u8aToU8a } from '../../utils/types/bytes';
 import { EcdsaSecp256k1VerKeyName } from './constants';
 import Secp256k1Keypair from '../../keypairs/keypair-secp256k1';
+import { decodeFromMultibase } from '../../utils/encoding/multibase';
 
 export default class EcdsaSecp256k1VerificationKey2019 {
   constructor(publicKey) {
@@ -30,6 +31,17 @@ export default class EcdsaSecp256k1VerificationKey2019 {
 
     if (verificationMethod.publicKeyBase64) {
       return new this(base64.decode(verificationMethod.publicKeyBase64));
+    }
+
+    const secMultibase = verificationMethod['sec:publicKeyMultibase'];
+    const multiBase = verificationMethod.publicKeyMultibase || (
+      typeof secMultibase === 'object'
+        ? secMultibase['@value']
+        : secMultibase
+    );
+
+    if (multiBase) {
+      return new this(decodeFromMultibase(multiBase).slice(2));
     }
 
     throw new Error(

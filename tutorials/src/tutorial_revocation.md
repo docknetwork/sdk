@@ -4,8 +4,8 @@ This guide provides instructions for managing credential revocation using `Statu
 
 ## Prerequisites
 
-- Ensure you have access to Dock's Credential SDK and Blockchain API.
-- The Dock API is initialized and connected to the blockchain.
+- Ensure you have access to Truvera's Credential SDK and Blockchain API.
+- The Truvera API is initialized and connected to the blockchain.
 - You have a valid issuer DID registered on the Dock network.
 
 ## Steps to Manage Revocation

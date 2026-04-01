@@ -1,4 +1,8 @@
-import { allProperties, withExtendedStaticProperties } from '../../utils';
+import {
+  allObjectPropertiesIncludingPrototypes,
+  ensureNumber,
+  withExtendedStaticProperties,
+} from '../../utils';
 
 /**
  * Extends supplied class to check that its itstance lenght is always equal to the `static Size` property
@@ -9,20 +13,31 @@ import { allProperties, withExtendedStaticProperties } from '../../utils';
  * @param {function(*): number} getSize
  * @returns {C}
  */
-export default function sized(klass, getSize = ({ length }) => length) {
+export default function sized(klass) {
   const name = `Sized<${klass.name}>`;
-  const methods = [...allProperties(klass.prototype)].filter(
+  const methods = [
+    ...allObjectPropertiesIncludingPrototypes(klass.prototype),
+  ].filter(
     (prop) => typeof klass.prototype[prop] === 'function' && prop !== 'constructor',
   );
 
   const obj = {
     [name]: class extends klass {
+      /**
+       * @static
+       * @type {number}
+       * Size of the underlying data.
+       */
       static Size;
 
       constructor(...args) {
         super(...args);
 
         this.ensureValidSize();
+      }
+
+      getSize() {
+        return ensureNumber(this.length);
       }
 
       ensureValidSize() {
@@ -34,7 +49,7 @@ export default function sized(klass, getSize = ({ length }) => length) {
           );
         }
 
-        const size = getSize(this);
+        const size = this.getSize();
 
         if (size !== Size) {
           throw new Error(

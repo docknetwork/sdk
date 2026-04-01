@@ -1,4 +1,4 @@
-import { ensureMatchesPattern } from "../src/utils/misc";
+import { ensureMatchesPattern } from "../src/utils";
 
 const checkError = (fn) => {
   let thrown = false;

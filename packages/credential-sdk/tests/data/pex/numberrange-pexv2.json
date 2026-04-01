@@ -1,0 +1,27 @@
+{
+  "presentation_definition": {
+    "name": "number range",
+    "input_descriptors": [
+      {
+        "id": "Credential 1",
+        "name": "number range",
+        "purpose": "test",
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.credentialSubject.number"
+              ],
+              "filter": {
+                "type": "number",
+                "exclusiveMaximum": 123123,
+                "exclusiveMinimum": 0
+              },
+              "predicate": "required"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

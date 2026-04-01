@@ -31,10 +31,6 @@ export async function validateCredentialSchema(
     : [credentialSubject];
   for (let i = 0; i < subjects.length; i++) {
     const subject = { ...subjects[i] };
-    if (!requiresID) {
-      // The id will not be part of schema. The spec mentioned that id will be popped off from subject
-      delete subject[credentialIDField];
-    }
 
     // eslint-disable-next-line
     const compacted = await jsonld.compact(subject, context, {
@@ -42,8 +38,14 @@ export async function validateCredentialSchema(
     });
     delete compacted[credentialContextField];
 
+    // Check emptyness/JSON-LD errors before removing ID to avoid edge case of credential with ID field only
     if (Object.keys(compacted).length === 0) {
       throw new Error('Compacted subject is empty, likely invalid');
+    }
+
+    if (!requiresID) {
+      // The id will not be part of schema. The spec mentioned that id will be popped off from subject
+      delete compacted.id;
     }
 
     const schemaObj = schema.schema || schema;

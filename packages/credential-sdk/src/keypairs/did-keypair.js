@@ -1,6 +1,6 @@
-import DockKeypair from './keypair';
+import DockKeypair from './dock-keypair';
 import { DidKey } from '../types/did/onchain/did-key';
-import { VerificationMethodRefOrIdentRef } from '../types/did/document';
+import VerificationMethodRefOrIdentRef from '../types/did/document/verification-method-ref-or-ident-ref';
 import { ensureInstanceOf } from '../utils';
 import { DidMethodKey } from '../types/did/onchain/typed-did';
 
@@ -11,16 +11,12 @@ export default class DidKeypair {
   /**
    * Constructs a `DidKeypair` instance from the supplied keypair.
    *
-   * @param {VerificationMethodRef} keyRef - The reference of the verification method.
+   * @param {VerificationMethodRefOrIdentRef} keyRef - The reference of the verification method.
    * @param {DockKeypair} keyPair - Key pair provided.
    */
   constructor(keyRef, keyPair) {
-    const ref = VerificationMethodRefOrIdentRef.from(keyRef);
-
-    ensureInstanceOf(keyPair, DockKeypair);
-
-    this.verificationMethodId = ref;
-    this.keyPair = keyPair;
+    this.verificationMethodId = VerificationMethodRefOrIdentRef.from(keyRef);
+    this.keyPair = ensureInstanceOf(keyPair, DockKeypair);
   }
 
   /**
@@ -47,7 +43,7 @@ export default class DidKeypair {
   /**
    * Creates a new `DidKey` instance from the public key of the current key pair.
    *
-   * @param {Array} verRels - Array of verification relationships.
+   * @param {?number} verRels - Number indicating verification relationships.
    * @return The new instance of `DidKey`.
    */
   didKey(verRels) {
@@ -80,5 +76,17 @@ export default class DidKeypair {
    */
   sign(message) {
     return this.keyPair.sign(message);
+  }
+
+  /**
+   * Detects a key prefix from a key document
+   *
+   * @return The DidKeypair instance
+   */
+  static detectKeyPrefix(keyDocument) {
+    if (typeof keyDocument.id === 'string') {
+      return keyDocument.id.split('#')[1]?.split('-')[0] || 'keys';
+    }
+    return 'keys';
   }
 }

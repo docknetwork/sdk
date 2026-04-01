@@ -3,7 +3,12 @@ import {
   CheqdDIDTestnetQualifier,
   CheqdDIDMainnetQualifier,
 } from '../constants';
-import { TypedEnum, withQualifier } from '../../../generic';
+import {
+  TypedEnum,
+  TypedTuple,
+  withFrom,
+  withQualifier,
+} from '../../../generic';
 import TypedUUID from '../../../generic/typed-uuid';
 
 /**
@@ -30,11 +35,31 @@ export class CheqdMainnetDidValue extends CheqdDidValue {
 }
 
 export class CheqdDid extends withQualifier(TypedEnum, true) {
-  static random() {
-    return new this(this.Class.random());
+  get Qualifier() {
+    return this.Class?.Qualifier;
+  }
+
+  static random(network) {
+    if (this.Class != null) {
+      return new this(this.Class.random());
+    } else if (network === 'testnet') {
+      // eslint-disable-next-line no-use-before-define
+      return CheqdTestnetDid.random();
+    } else if (network === 'mainnet') {
+      // eslint-disable-next-line no-use-before-define
+      return CheqdMainnetDid.random();
+    } else {
+      throw new Error(
+        `Unknown network provided: \`${network}\`, expected \`mainnet\` or \`testnet\``,
+      );
+    }
   }
 
   toJSON() {
+    return String(this);
+  }
+
+  toCheqdPayload() {
     return String(this);
   }
 }
@@ -51,3 +76,45 @@ export class CheqdMainnetDid extends CheqdDid {
 }
 
 CheqdDid.bindVariants(CheqdTestnetDid, CheqdMainnetDid);
+
+export class CheqdDLRRef extends withFrom(
+  TypedTuple,
+  function from(value, fromFn) {
+    if (typeof value === 'string') {
+      const resources = value.lastIndexOf('/resources/');
+
+      if (resources === -1) {
+        const lastColon = value.lastIndexOf(':');
+
+        return new this(value.slice(0, lastColon), value.slice(lastColon + 1));
+      }
+
+      return new this(
+        value.slice(0, resources),
+        value.slice(resources + '/resources/'.length),
+      );
+    } else {
+      return fromFn(value);
+    }
+  },
+) {
+  static Did = CheqdDid;
+
+  static Id = TypedUUID;
+
+  static get Classes() {
+    return [this.Did, this.Id];
+  }
+
+  toString() {
+    return `${this[0]}/resources/${this[1]}`;
+  }
+
+  toJSON() {
+    return String(this);
+  }
+
+  toCheqdPayload() {
+    return String(this);
+  }
+}

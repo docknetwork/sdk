@@ -1,16 +1,40 @@
-import { Any, TypedStruct, withProp } from '../generic';
-import { CheqdBlobId, DockBlobId } from './blob-id';
+import { TypedStruct, withProp } from '../generic';
+import {
+  BlobId,
+  CheqdBlobIdValue,
+  CheqdMainnetBlobIdValue,
+  CheqdTestnetBlobIdValue,
+  DockBlobIdValue,
+} from './id';
 import Blob from './blob';
 
-export * from './blob-id';
+export * from './id';
 export { default as Blob } from './blob';
 
 export class BlobWithId extends TypedStruct {
   static Classes = {
-    id: Any,
+    id: BlobId,
     blob: Blob,
   };
 }
 
-export class CheqdBlobWithId extends withProp(BlobWithId, 'id', CheqdBlobId) {}
-export class DockBlobWithId extends withProp(BlobWithId, 'id', DockBlobId) {}
+export class CheqdBlobWithId extends withProp(
+  BlobWithId,
+  'id',
+  CheqdBlobIdValue,
+) {}
+export class CheqdTestnetBlobWithId extends withProp(
+  CheqdBlobWithId,
+  'id',
+  CheqdTestnetBlobIdValue,
+) {}
+export class CheqdMainnetBlobWithId extends withProp(
+  CheqdBlobWithId,
+  'id',
+  CheqdMainnetBlobIdValue,
+) {}
+export class DockBlobWithId extends withProp(
+  BlobWithId,
+  'id',
+  DockBlobIdValue,
+) {}

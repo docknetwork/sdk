@@ -16,7 +16,7 @@ import {
   Bls12381PSDockVerKeyName,
   JsonWebSignature2020,
   Ed25519Signature2020,
-} from './custom_crypto';
+} from './crypto';
 import {
   Bls12381BBDT16DockVerKeyName,
   Bls12381BBDT16MacDockName,
@@ -24,6 +24,7 @@ import {
 } from './crypto/constants';
 import Bls12381BBDT16MACDock2024 from './crypto/Bls12381BBDT16MACDock2024';
 import { DidKeypair } from '../keypairs';
+import { possibleVerificationMethodRefs } from '../types/did/document/verification-method-ref';
 
 /**
  * @typedef {object} KeyDoc The Options to use in the function createUser.
@@ -77,9 +78,6 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
     case Ed255192020VerKeyName:
       Cls = Ed25519Signature2020;
       break;
-    /* case Sr25519VerKeyName:
-      Cls = Sr25519Signature2020;
-      break; */
     case Bls12381BBSDockVerKeyName:
       Cls = Bls12381BBSSignatureDock2022;
       break;
@@ -135,6 +133,17 @@ export function potentialToArray(a) {
   return a ? (Array.isArray(a) ? a : [a]) : [];
 }
 
+/**
+ * Compares a verification method reference with a key ID to determine if they are equivalent.
+ * The function checks if the reference might start with `did:dock:`, and converts it to a `did:cheqd:` format for comparison.
+ *
+ * @param {string} ref - The verification method reference to compare.
+ * @param {string} keyId - The key ID to compare against.
+ * @returns {boolean} - Returns `true` if the references are equivalent, `false` otherwise.
+ */
+export const verMethodRefsEqual = (ref, keyId) => ref === keyId
+  || possibleVerificationMethodRefs(ref).some((id) => id === keyId);
+
 export function getKeyFromDIDDocument(didDocument, didUrl) {
   // Ensure not already a key doc
   if (
@@ -151,7 +160,8 @@ export function getKeyFromDIDDocument(didDocument, didUrl) {
     ...potentialToArray(didDocument.keyAgreement),
     ...potentialToArray(didDocument.publicKey),
   ];
-  return possibleKeys.filter((key) => key.id === didUrl)[0];
+
+  return possibleKeys.find((key) => verMethodRefsEqual(didUrl, key.id));
 }
 
 /**

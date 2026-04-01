@@ -6,7 +6,8 @@
   },
   "env": {
     "browser": true,
-    "es6": true
+    "es6": true,
+    "es2020": true
   },
   "extends": [
     "plugin:sonarjs/recommended",
@@ -37,10 +38,12 @@
     ],
     "import/no-extraneous-dependencies": "off",
     "class-methods-use-this": "off",
+    "generator-star-spacing": ["error", { "before": true, "after": false }],
     "no-return-await": "off",
     "no-plusplus": "off",
     "no-void": "off",
     "max-len": "off",
+    "jest/no-standalone-expect": "off",
     "no-underscore-dangle": ["error", { "enforceInMethodNames": false }],
     "max-classes-per-file": "off",
     "import/prefer-default-export": "off",
@@ -48,6 +51,7 @@
     "no-useless-constructor": "off",
     "no-console": "off",
     "no-else-return": "off",
+    "import/extensions": "off",
     "no-restricted-syntax": [
       "error",
       {

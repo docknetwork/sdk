@@ -37,7 +37,7 @@ const blobStruct = {
   id: blobId,
   blob: blobHexOrArray, // Contents of your blob as a hex string or byte array
 };
-const result = await dock.blob.new(blobStruct, ownerDid, didKeypair);
+const result = await dock.blob.new(blobStruct, didKeypair);
 ```
 
 If everything worked properly `result` will indicate a successful transaction.
@@ -137,7 +137,7 @@ Writing a Schema to the Dock chain is similar to writing any other Blob. `1` is 
 
 ```javascript
 >  const formattedBlob = myNewSchema.toBlob(dockDID);
->  await myNewSchema.writeToChain(modules.blob, dockDID, keypair);
+>  await myNewSchema.writeToChain(modules.blob, keypair);
 ```
 
 ### Reading a Schema from the Dock chain
@@ -160,7 +160,7 @@ used when present. Basically, once you've created and stored your Schema on chai
 
 ```javascript
 >    const dockApi = new DockAPI();
->    const dockResolver = new DockResolver(dockApi);
+>    const CoreResolver = new CoreResolver(dockApi);
 >    let validCredential = new VerifiableCredential('https://example.com/credentials/123');
 >    validCredential.addContext('https://www.w3.org/2018/credentials/examples/v1');
 >    const ctx1 = {
@@ -178,7 +178,7 @@ used when present. Basically, once you've created and stored your Schema on chai
 >    validCredential.setSchema(blobHexIdToQualified(blobId), 'JsonSchemaValidator2018');
 >    await validCredential.sign(keyDoc);
 >    await validCredential.verify({
-       resolver: dockResolver,
+       resolver: CoreResolver,
        compactProof: true,
      });
 ```

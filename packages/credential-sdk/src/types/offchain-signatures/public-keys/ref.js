@@ -1,22 +1,56 @@
-import { TypedTuple, TypedNumber, TypedUUID } from '../../generic';
+import { TypedTuple, anyOf } from '../../generic';
 import {
   DockDidValue,
   DockDidOrDidMethodKey,
-  CheqdDid,
+  CheqdDLRRef,
+  CheqdTestnetDid,
+  CheqdMainnetDid,
+  NamespaceDid,
 } from '../../did/onchain/typed-did';
+import { CheqdParamsId, DockParamsId } from '../params/id';
 
 export class DockOffchainSignatureKeyRef extends TypedTuple {
-  static Classes = [DockDidValue, TypedNumber];
+  static Classes = [DockDidValue, DockParamsId];
 }
 
 export class DockOffchainSignatureParamsRef extends TypedTuple {
-  static Classes = [DockDidOrDidMethodKey, TypedNumber];
+  static Classes = [DockDidOrDidMethodKey, DockParamsId];
 }
 
-export class CheqdOffchainSignatureKeyRef extends TypedTuple {
-  static Classes = [CheqdDid, TypedUUID];
+export class CheqdOffchainSignatureKeyRef extends CheqdDLRRef {}
+
+export class CheqdTestnetOffchainSignatureKeyRef extends CheqdDLRRef {
+  static Did = CheqdTestnetDid;
 }
 
-export class CheqdOffchainSignatureParamsRef extends TypedTuple {
-  static Classes = [CheqdDid, TypedUUID];
+export class CheqdMainnetOffchainSignatureKeyRef extends CheqdDLRRef {
+  static Did = CheqdMainnetDid;
+}
+
+export class CheqdOffchainSignatureParamsRef extends CheqdDLRRef {}
+
+export class CheqdTestnetOffchainSignatureParamsRef extends CheqdDLRRef {
+  static Did = CheqdTestnetDid;
+
+  static Id = CheqdParamsId;
+}
+
+export class CheqdMainnetOffchainSignatureParamsRef extends CheqdDLRRef {
+  static Did = CheqdMainnetDid;
+
+  static Id = CheqdParamsId;
+}
+
+export class DockOrCheqdOffchainSignatureParamsRef extends TypedTuple {
+  constructor(...args) {
+    super(...args);
+
+    if (this[0].isCheqd) {
+      return CheqdOffchainSignatureParamsRef.from(this);
+    } else if (this[0].isDock && this[1] instanceof DockParamsId) {
+      return DockOffchainSignatureParamsRef.from(this);
+    }
+  }
+
+  static Classes = [NamespaceDid, anyOf(DockParamsId, CheqdParamsId)];
 }

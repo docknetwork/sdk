@@ -1,29 +1,28 @@
-import { CheqdDid } from '@docknetwork/credential-sdk/types/did/onchain/typed-did';
 import {
-  TypedUUID,
-  TypedStruct,
-} from '@docknetwork/credential-sdk/types/generic';
-import { DIDDocument } from '@docknetwork/credential-sdk/types/did/document';
+  DIDDocument,
+  CheqdDeactivateDidDocument,
+} from '@docknetwork/credential-sdk/types';
+import { TypedUUID } from '@docknetwork/credential-sdk/types/generic';
+import { DIDModule } from '@cheqd/sdk';
 import { createInternalCheqdModule } from '../common';
 
-const parseDocument = (document) => DIDDocument.from(document).toCheqd();
-
-class DeactivateDidDocument extends TypedStruct {
-  static Classes = {
-    id: CheqdDid,
-    versionId: TypedUUID,
-  };
+function createOrUpdateDidDocument(document) {
+  return DIDDocument.from(document).toCheqd(this.types.DidDocument);
+}
+function deactivateDidDocument(id) {
+  return new CheqdDeactivateDidDocument(
+    this.types.Did.from(id),
+    TypedUUID.random(),
+  );
 }
 
 const methods = {
-  createDidDocument: parseDocument,
-  updateDidDocument: parseDocument,
-  deactivateDidDocument: (id) => new DeactivateDidDocument(id, TypedUUID.random()),
+  createDidDocument: createOrUpdateDidDocument,
+  updateDidDocument: createOrUpdateDidDocument,
+  deactivateDidDocument,
 };
 
 export class CheqdDIDModuleInternal extends createInternalCheqdModule(methods) {
-  static Prop = 'did';
-
   static MsgNames = {
     createDidDocument: 'MsgCreateDidDoc',
     updateDidDocument: 'MsgUpdateDidDoc',
@@ -31,6 +30,16 @@ export class CheqdDIDModuleInternal extends createInternalCheqdModule(methods) {
   };
 
   async getDidDocumentWithMetadata(did) {
-    return await this.query.didDoc(String(CheqdDid.from(did)));
+    // TODO: use sdk.methods.queryDidDoc eventually, but that requires an SDK did doc refactor
+    // for now we can just gather the context through toSpecCompliantPayload
+    const result = await this.apiProvider.sdk.querier.did.didDoc(
+      String(this.types.Did.from(did)),
+    );
+
+    if (result?.didDoc && result?.didDoc?.context.length === 0) {
+      const compliantDoc = await DIDModule.toSpecCompliantPayload(result.didDoc);
+      result.didDoc.context = compliantDoc['@context'];
+    }
+    return result;
   }
 }

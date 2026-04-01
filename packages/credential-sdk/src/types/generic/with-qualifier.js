@@ -1,4 +1,3 @@
-import { ID_STR } from '@docknetwork/crypto-wasm-ts';
 import TypedBytes from './typed-bytes';
 import {
   withExtendedStaticProperties,
@@ -6,7 +5,7 @@ import {
 } from '../../utils/inheritance';
 import { maybeFrom } from '../../utils/interfaces';
 import withFrom from './with-from';
-import { fmtIter } from '../../utils';
+import { fmtIterable } from '../../utils';
 import TypedString from './typed-string';
 
 /**
@@ -30,6 +29,7 @@ export default function withQualifier(klass, wrapper = false) {
         static get Qualifiers() {
           return [].concat(
             this.Qualifier ??
+              this.Class?.Qualifiers ??
               this.Variants.flatMap((variant) =>
                 [].concat(
                   variant.Qualifier ?? variant !== this
@@ -59,7 +59,7 @@ export default function withQualifier(klass, wrapper = false) {
           }
 
           throw new Error(
-            `Unsupported qualified string: \`${value}\`, expected with either prefix: ${fmtIter(
+            `Unsupported qualified string: \`${value}\`, expected with either prefix: ${fmtIterable(
               this.Qualifiers
             )}`
           );
@@ -76,9 +76,13 @@ export default function withQualifier(klass, wrapper = false) {
         }
 
         static fromUnqualifiedString(str) {
-          throw new Error(
-            `Can't build an instance of \`${this.name}\` from unqualified string: ${ID_STR}`
-          );
+          if (this.Class == null) {
+            throw new Error(
+              `Can't build an instance of \`${this.name}\` from unqualified string: ${str}`
+            );
+          } else {
+            return new this(this.Class.fromUnqualifiedString(str));
+          }
         }
 
         /**
@@ -95,10 +99,14 @@ export default function withQualifier(klass, wrapper = false) {
         toString() {
           return this.value.toString();
         }
+
+        toCheqdPayload() {
+          return String(this);
+        }
       },
     };
 
-    return withFrom(classes[name], function (value, from) {
+    return withFrom(classes[name], function from(value, fromFn) {
       if (typeof value === "string" || value instanceof TypedString) {
         if (this.Class != null) {
           return new this(maybeFrom(this.Class, String(value)));
@@ -107,19 +115,21 @@ export default function withQualifier(klass, wrapper = false) {
         }
       } else if (
         value?.constructor?.Qualifier != null &&
-        !this.Qualifiers.find((qualifier) =>
-          value.constructor.Qualifier.startsWith(qualifier)
+        !this.Qualifiers.find(
+          (qualifier) =>
+            value.constructor.Qualifier.startsWith(qualifier) ||
+            qualifier.startsWith(value.constructor.Qualifier)
         )
       ) {
         throw new Error(
           `Value has a different qualifier: \`${
             value.constructor.Qualifier
-          }\` while expected one of \`${fmtIter(this.Qualifiers)}\` by \`${
+          }\` while expected one of \`${fmtIterable(this.Qualifiers)}\` by \`${
             this.name
           }\``
         );
       } else {
-        return from(value);
+        return fromFn(value);
       }
     });
   } else {
@@ -178,6 +188,10 @@ export default function withQualifier(klass, wrapper = false) {
         toString() {
           return this.toQualifiedEncodedString();
         }
+
+        toCheqdPayload() {
+          return String(this);
+        }
       },
     };
 
@@ -189,7 +203,7 @@ export default function withQualifier(klass, wrapper = false) {
           classes[name]
         )
       ),
-      function (value, from) {
+      function from(value, fromFn) {
         if (typeof value === "string" || value instanceof TypedString) {
           if (this.isQualifiedString(String(value))) {
             return this.fromQualifiedString(String(value));
@@ -198,13 +212,14 @@ export default function withQualifier(klass, wrapper = false) {
           }
         } else if (
           value?.constructor?.Qualifier != null &&
-          !value.constructor.Qualifier.startsWith(this.Qualifier)
+          !value.constructor.Qualifier.startsWith(this.Qualifier) &&
+          !this.Qualifier.startsWith(value.constructor.Qualifier)
         ) {
           throw new Error(
             `Value has a different qualifier: \`${value.constructor.Qualifier}\` while expected \`${this.Qualifier}\` by \`${this.name}\``
           );
         } else {
-          return from(value);
+          return fromFn(value);
         }
       }
     );

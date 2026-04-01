@@ -8,8 +8,8 @@ import {
   flattenObjectToKeyValuesList,
 } from '@docknetwork/crypto-wasm-ts';
 import b58 from 'bs58';
-import { normalizeOrConvertStringToU8a } from '../utils/bytes';
-import { ensureArray } from '../utils/type-helpers';
+import { normalizeOrConvertStringToU8a } from '../utils/types/bytes';
+import { ensureArray } from '../utils';
 
 import Bls12381BBSSignatureDock2022 from './crypto/Bls12381BBSSignatureDock2022';
 import { DOCK_ANON_CREDENTIAL_ID } from './crypto/common/DockCryptoSignatureProof';
@@ -27,7 +27,7 @@ import defaultDocumentLoader from './document-loader';
 import {
   Bls12381BBSSignatureDock2023,
   Bls12381PSSignatureDock2023,
-} from './custom_crypto';
+} from './crypto';
 import Bls12381BBDT16MACDock2024 from './crypto/Bls12381BBDT16MACDock2024';
 
 import { isCredVerGte060 } from './crypto/common/DockCryptoSignature';

@@ -1,4 +1,4 @@
-import { newEngine } from "@comunica/actor-init-sparql-rdfjs";
+import { QueryEngine } from "@comunica/query-sparql-rdfjs";
 import { parseRDFDocument, queryNextLookup } from "../src/rdf-and-cd";
 
 const rdfInputs = [
@@ -48,7 +48,7 @@ const claimgraph = [
 
 describe("RDF SPARQL", () => {
   test("Can query an RDF source (dbpedia)", async () => {
-    const engine = newEngine();
+    const engine = new QueryEngine();
     const query =
       "SELECT * { ?s ?p <http://dbpedia.org/resource/Belgium>. ?s ?p ?lookupNext } LIMIT 2";
     const newGraph = await queryNextLookup(dbpediaSource, query, engine);
@@ -56,7 +56,7 @@ describe("RDF SPARQL", () => {
   });
 
   test("Can query a claimgraph", async () => {
-    const engine = newEngine();
+    const engine = new QueryEngine();
     const query = `prefix dockalpha: <http://rdf.dock.io/alpha/2021#>
     select * {
       ?root dockalpha:mayClaim dockalpha:ANYCLAIM .

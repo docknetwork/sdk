@@ -1,7 +1,4 @@
-import {
-  BBDT16Credential,
-  BBDT16CredentialBuilder,
-} from '@docknetwork/crypto-wasm-ts/';
+import { BBDT16Credential, BBDT16CredentialBuilder } from '../../crypto';
 
 import { Bls12381BBDT16MacDockName } from './constants';
 
@@ -29,7 +26,7 @@ export default class Bls12381BBDT16MACDock2024 extends DockCryptoSignature {
       },
       Bls12381BBDT16MacDockName,
       Bls12381BBDT16KeyPairDock2024,
-      'https://ld.dock.io/security/bbdt16/v1',
+      'https://ld.truvera.io/security/bbdt16/v1',
     );
   }
 

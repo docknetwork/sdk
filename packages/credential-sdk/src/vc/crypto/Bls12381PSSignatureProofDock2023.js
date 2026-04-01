@@ -20,7 +20,7 @@ export default class Bls12381PSSignatureProofDock2022 extends DockCryptoSignatur
       options,
       Bls12381PSSigProofDockSigName,
       Bls12381PSKeyPairDock2023,
-      'https://ld.dock.io/security/ps/v1',
+      'https://ld.truvera.io/security/ps/v1',
     );
   }
 }

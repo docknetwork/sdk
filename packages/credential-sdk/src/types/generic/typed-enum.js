@@ -1,5 +1,5 @@
 /* eslint-disable  max-classes-per-file */
-import { fmtIter } from '../../utils/generic';
+import { fmtIterable } from '../../utils';
 import {
   isEqualToOrPrototypeOf,
   withExtendedStaticProperties,
@@ -8,12 +8,13 @@ import {
   maybeEq,
   maybeFrom,
   maybeNew,
-  maybeToJSON,
+  maybeToJSONString,
 } from '../../utils/interfaces';
 import withBase from './with-base';
 import Null from './typed-null';
 import withCatchNull from './with-catch-null';
 import withEq from './with-eq';
+import withFromJSONBytes from './with-from-json-bytes';
 
 /**
  * @template V
@@ -44,7 +45,6 @@ class TypedEnum extends withBase(class EnumBase {}) {
 
   /**
    * Associates enum parameters with the base enum class and vice versa.
-   * @template Class
    * @param {...this} classes
    */
   /* eslint-disable */
@@ -80,7 +80,9 @@ class TypedEnum extends withBase(class EnumBase {}) {
           if (this[isIdentifier]) {
             return this[Type];
           } else {
-            throw new Error(`Not a \`${Type}\``);
+            throw new Error(
+              `Not a \`${Type}\` by \`${this.constructor.name}\``
+            );
           }
         },
         enumerable: false,
@@ -177,18 +179,14 @@ class TypedEnum extends withBase(class EnumBase {}) {
     return this[this.type];
   }
 
-  /**
-   * Convert the instance to a JSON representation.
-   * @returns {Object} The JSON representation of the instance.
-   */
-  toJSON() {
+  apply(fn) {
     if (this.constructor.isNullish) {
-      return this.constructor.JsonType;
+      return fn(this.constructor.JsonType);
     } else {
       const { type, value } = this;
 
       return {
-        [type]: maybeToJSON(value),
+        [type]: fn(value),
       };
     }
   }
@@ -217,7 +215,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
         }
 
         throw new Error(
-          `Unexpected json in \`${this}\`: \`${json}\`, expected one of ${fmtIter(
+          `Unexpected json in \`${this}\`: \`${json}\`, expected one of ${fmtIterable(
             new Set([...this.Variants].flatMap((v) => [v.JsonType, v.Type])),
           )}`,
         );
@@ -227,7 +225,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
     const keys = Object.keys(json);
     if (keys.length !== 1) {
       throw new Error(
-        `Expected object with 1 key, received \`${json}\` with keys: ${fmtIter(
+        `Expected object with 1 key, received \`${json}\` with keys: ${fmtIterable(
           keys,
         )} by ${this.name}`,
       );
@@ -250,7 +248,7 @@ class TypedEnum extends withBase(class EnumBase {}) {
       }
 
       throw new Error(
-        `Invalid key \`${key}\`, expected one of ${fmtIter(
+        `Invalid key \`${key}\`, expected one of ${fmtIterable(
           new Set([...this.Variants].flatMap((v) => [v.JsonType, v.Type])),
         )} by \`${this.name}\``,
       );
@@ -275,9 +273,9 @@ class TypedEnum extends withBase(class EnumBase {}) {
     }
 
     throw new Error(
-      `Invalid object received: \`${maybeToJSON(
+      `Invalid object received: \`${maybeToJSONString(
         obj,
-      )}\`, expected to build an instance of ${fmtIter(
+      )}\`, expected to build an instance of ${fmtIterable(
         this.Variants.map((v) => v.Type),
       )} by \`${this.name}\``,
     );
@@ -332,6 +330,6 @@ class TypedEnum extends withBase(class EnumBase {}) {
   }
 }
 
-export default withEq(
-  withCatchNull(withExtendedStaticProperties(['Variants'], TypedEnum)),
+export default withFromJSONBytes(
+  withEq(withCatchNull(withExtendedStaticProperties(['Variants'], TypedEnum))),
 );

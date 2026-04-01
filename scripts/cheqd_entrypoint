@@ -73,4 +73,4 @@ cp /tmp/cheqd_config.toml $CHAIN_DIR/config/config.toml
 
 # Step 8: Starting the node
 echo "Starting cheqd node..."
-$COMMAND start --home $CHAIN_DIR --moniker $MONIKER --log_level info
+$COMMAND start --home $CHAIN_DIR --moniker $MONIKER --log_level info --pricefeeder.enable=false --pricefeeder.config_path $CHAIN_DIR/config/config.toml

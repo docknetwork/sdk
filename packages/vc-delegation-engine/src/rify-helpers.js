@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import { matchesType } from './jsonld-utils.js';
 import { extractMayClaims, collectSubjectClaimEntries } from './utils.js';
 
@@ -43,6 +42,67 @@ export function buildRifyRules(rootGraphId, authorizedGraphId) {
   ];
 }
 
+function pushRootMayClaimPremises(rootSubjectId, rootGraphId, rootCredential) {
+  const premises = [];
+  if (!rootSubjectId) {
+    return premises;
+  }
+  const rootMayClaims = extractMayClaims(rootCredential.credentialSubject ?? {});
+  rootMayClaims.forEach((claim) => {
+    premises.push([rootSubjectId, 'allows', claim, rootGraphId]);
+  });
+  return premises;
+}
+
+function pushDelegationVcPremises(vc, rootGraphId) {
+  const premises = [];
+  if (!matchesType(vc, 'DelegationCredential')) {
+    return premises;
+  }
+  const parent = vc.issuer;
+  const child = vc.credentialSubject?.id;
+  if (!parent || !child) {
+    return premises;
+  }
+  premises.push([parent, 'delegatesTo', child, rootGraphId]);
+  const listed = extractMayClaims(vc.credentialSubject ?? {});
+  listed.forEach((claim) => {
+    premises.push([child, 'listsClaim', claim, rootGraphId]);
+  });
+  return premises;
+}
+
+function valueForAttestationPremise(value) {
+  if (value && typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  return String(value);
+}
+
+function pushVcAttestationPremises(vc, rootId, rootGraphId) {
+  const premises = [];
+  const subjectId = vc.credentialSubject?.id;
+  const issuerId = vc.issuer;
+  if (!subjectId || !issuerId) {
+    return premises;
+  }
+  const claimEntries = collectSubjectClaimEntries(vc.credentialSubject ?? {});
+  claimEntries.forEach(([key, value]) => {
+    if (value === undefined || value === null) {
+      return;
+    }
+    const valueForPremise = valueForAttestationPremise(value);
+    premises.push([subjectId, key, valueForPremise, issuerId]);
+    if (vc.id === rootId) {
+      premises.push([issuerId, 'allows', key, rootGraphId]);
+    }
+  });
+  return premises;
+}
+
 export function buildRifyPremisesFromChain(chain, rootGraphId) {
   if (!Array.isArray(chain) || chain.length === 0) {
     throw new Error('buildRifyPremisesFromChain requires a non-empty chain');
@@ -50,69 +110,22 @@ export function buildRifyPremisesFromChain(chain, rootGraphId) {
   if (typeof rootGraphId !== 'string' || rootGraphId.length === 0) {
     throw new Error('Root credential must include an id for rify premises');
   }
-  const premises = [];
   const rootCredential = chain[0];
   const rootSubjectId = rootCredential.credentialSubject?.id;
 
-  if (rootSubjectId) {
-    const rootMayClaims = extractMayClaims(rootCredential.credentialSubject ?? {});
-    rootMayClaims.forEach((claim) => {
-      premises.push([rootSubjectId, 'allows', claim, rootGraphId]);
-    });
-  }
-
-  for (const vc of chain) {
-    if (!matchesType(vc, 'DelegationCredential')) {
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    const parent = vc.issuer;
-    const child = vc.credentialSubject?.id;
-    if (!parent || !child) {
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    premises.push([parent, 'delegatesTo', child, rootGraphId]);
-
-    const listed = extractMayClaims(vc.credentialSubject ?? {});
-    if (listed.length > 0) {
-      listed.forEach((claim) => {
-        premises.push([child, 'listsClaim', claim, rootGraphId]);
-      });
-    }
-  }
+  const premises = [
+    ...pushRootMayClaimPremises(rootSubjectId, rootGraphId, rootCredential),
+  ];
+  chain.forEach((vc) => {
+    premises.push(...pushDelegationVcPremises(vc, rootGraphId));
+  });
 
   const rootId = rootCredential.id;
   const attestations = (chain ?? []).filter(
     (vc) => vc.rootCredentialId === rootId || vc.id === rootId,
   );
-
   attestations.forEach((vc) => {
-    const subjectId = vc.credentialSubject?.id;
-    const issuerId = vc.issuer;
-    if (!subjectId || !issuerId) {
-      return;
-    }
-    const claimEntries = collectSubjectClaimEntries(vc.credentialSubject ?? {});
-    claimEntries.forEach(([key, value]) => {
-      if (value === undefined || value === null) {
-        return;
-      }
-      let valueForPremise;
-      if (value && typeof value === 'object') {
-        valueForPremise = JSON.stringify(value);
-      } else if (typeof value === 'string') {
-        valueForPremise = value;
-      } else {
-        valueForPremise = String(value);
-      }
-      premises.push([subjectId, key, valueForPremise, issuerId]);
-      if (vc.id === rootId) {
-        premises.push([issuerId, 'allows', key, rootGraphId]);
-      }
-    });
+    premises.push(...pushVcAttestationPremises(vc, rootId, rootGraphId));
   });
 
   const invalidPremises = premises.filter(

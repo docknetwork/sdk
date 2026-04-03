@@ -14,6 +14,12 @@ export const DELEGATION_NS = 'https://ld.truvera.io/credentials/delegation#';
 export const VC_TYPE_DELEGATION_CREDENTIAL = `${DELEGATION_NS}DelegationCredential`;
 export const VC_PREVIOUS_CREDENTIAL_ID = `${DELEGATION_NS}previousCredentialId`;
 export const VC_ROOT_CREDENTIAL_ID = `${DELEGATION_NS}rootCredentialId`;
+export const VC_DELEGATION_POLICY_ID = `${DELEGATION_NS}delegationPolicyId`;
+export const VC_DELEGATION_POLICY_DIGEST = `${DELEGATION_NS}delegationPolicyDigest`;
+export const VC_DELEGATION_ROLE_ID = `${DELEGATION_NS}delegationRoleId`;
+
+export const VC_ISSUANCE_DATE = `${VC_NS}issuanceDate`;
+export const VC_EXPIRATION_DATE = `${VC_NS}expirationDate`;
 
 export const ACTION_VERIFY = 'Verify';
 export const VERIFY_CHAIN_ID = 'Action:Verify';

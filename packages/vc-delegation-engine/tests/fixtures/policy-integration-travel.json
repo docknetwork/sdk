@@ -1,0 +1,155 @@
+{
+  "type": "DelegationPolicy",
+  "version": "1.0",
+  "id": "urn:test:delegation-policy:travel-example",
+  "ruleset": {
+    "createdAt": "2026-03-17",
+    "delegationTarget": "single-credential",
+    "overallConstraints": {
+      "maxDelegationDepth": 2
+    },
+    "capabilities": [
+      {
+        "name": "allowedRoutes",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      {
+        "name": "purchaseLimit",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      {
+        "name": "reserveFlights",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "reserveHotels",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ],
+    "roles": [
+      {
+        "roleId": "travel-agency",
+        "parentRoleId": null,
+        "label": "Travel Agency",
+        "capabilityGrants": [
+          {
+            "capability": "allowedRoutes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          {
+            "capability": "purchaseLimit",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            }
+          },
+          {
+            "capability": "reserveFlights",
+            "schema": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          {
+            "capability": "reserveHotels",
+            "schema": {
+              "type": "boolean",
+              "const": true
+            }
+          }
+        ]
+      },
+      {
+        "roleId": "regional-manager",
+        "parentRoleId": "travel-agency",
+        "label": "Regional Manager",
+        "capabilityGrants": [
+          {
+            "capability": "allowedRoutes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["US-NYC-LAX", "US-SFO-SEA", "US-ORD-MIA"]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          {
+            "capability": "purchaseLimit",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 5000
+            }
+          },
+          {
+            "capability": "reserveFlights",
+            "schema": {
+              "type": "boolean",
+              "const": true
+            }
+          }
+        ]
+      },
+      {
+        "roleId": "travel-agent",
+        "parentRoleId": "regional-manager",
+        "label": "Travel Agent",
+        "capabilityGrants": [
+          {
+            "capability": "allowedRoutes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["US-NYC-LAX", "US-SFO-SEA"]
+              },
+              "minItems": 1,
+              "uniqueItems": true,
+              "maxItems": 2
+            }
+          },
+          {
+            "capability": "purchaseLimit",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          },
+          {
+            "capability": "reserveFlights",
+            "schema": {
+              "type": "boolean",
+              "const": true
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -4,7 +4,7 @@ import {
   verifyPresentation,
   documentLoader as credentialDocumentLoader,
 } from '@docknetwork/credential-sdk/vc';
-import { MAY_CLAIM_IRI } from '@docknetwork/vc-delegation-engine';
+import { MAY_CLAIM_IRI, computePolicyDigestHex } from '@docknetwork/vc-delegation-engine';
 import * as cedar from '@cedar-policy/cedar-wasm/nodejs';
 
 const cedarPolicies = {
@@ -24,6 +24,7 @@ permit(
 const AUTHORITY_DID = 'did:example:authority';
 const DELEGATE_DID = 'did:example:delegator';
 const SUBJECT_DID = 'did:example:alice';
+const POLICY_ID = 'urn:uuid:4f4f0f7b-4c55-4c88-bc44-43f2e7eb2f10';
 const CHALLENGE = 'credit-score-demo';
 const DOMAIN = 'delegation.example';
 const W3CONTEXT = 'https://www.w3.org/2018/credentials/v1';
@@ -60,6 +61,53 @@ const CREDIT_SCORE_CONTEXT = [
     status: 'ex:status',
   },
 ];
+
+const delegationPolicy = {
+  id: POLICY_ID,
+  ruleset: {
+    capabilities: [
+      {
+        name: 'profile',
+        schema: {
+          type: 'object',
+        },
+      },
+      {
+        name: 'status',
+        schema: {
+          type: 'string',
+          enum: ['active', 'inactive'],
+        },
+      },
+    ],
+    roles: [
+      {
+        roleId: 'delegator',
+        parentRoleId: null,
+        attributes: ['*'],
+        capabilityGrants: [
+          {
+            capability: 'profile',
+            schema: {
+              type: 'object',
+            },
+          },
+          {
+            capability: 'status',
+            schema: {
+              type: 'string',
+              enum: ['active', 'inactive'],
+            },
+          },
+        ],
+      },
+    ],
+    overallConstraints: {
+      maxDelegationDepth: 1,
+    },
+  },
+};
+const delegationPolicyDigest = computePolicyDigestHex(delegationPolicy);
 
 const BASE_JWK_KEY = {
   type: 'JsonWebKey2020',
@@ -139,6 +187,9 @@ async function exampleDocumentLoader(url) {
   if (url === DELEGATE_KEY.id) {
     return { contextUrl: null, documentUrl: url, document: DELEGATE_KEY };
   }
+  if (url === POLICY_ID) {
+    return { contextUrl: null, documentUrl: url, document: delegationPolicy };
+  }
   return baseLoader(url);
 }
 
@@ -161,14 +212,25 @@ async function main() {
           },
         },
       },
-      [MAY_CLAIM_IRI]: ['$.scope.profile.financial.creditScore', 'status'],
+      [MAY_CLAIM_IRI]: [
+        '$.profile',
+        '$.profile.financial',
+        '$.profile.financial.creditScore',
+        'status',
+      ],
+      profile: {
+        financial: {
+          creditScore: 800,
+        },
+      },
+      status: 'active',
       body: 'Issuer of Credit Scores',
     },
     rootCredentialId: rootId,
     previousCredentialId: null,
-    delegationPolicyId: 'urn:uuid:4f4f0f7b-4c55-4c88-bc44-43f2e7eb2f10',
-    delegationPolicyDigest:
-      '3f2d2d6f2d7b6e0e9b0cfd5b6ac1e8f5f31d2d41e8d39d6b8d36b1d4c3a8d72a',
+    delegationPolicyId: POLICY_ID,
+    delegationPolicyDigest,
+    delegationRoleId: 'delegator',
   });
 
   const creditScoreCredential = await issueCredential(DELEGATE_KEY, {
@@ -181,13 +243,16 @@ async function main() {
       id: SUBJECT_DID,
       profile: {
         financial: {
-          creditScore: 760,
+          creditScore: 800,
         },
       },
       status: 'active',
     },
     rootCredentialId: rootId,
     previousCredentialId: rootId,
+    delegationPolicyId: POLICY_ID,
+    delegationPolicyDigest,
+    delegationRoleId: 'delegator',
   });
 
   const signedPresentation = await signPresentation(
@@ -217,9 +282,14 @@ async function main() {
   console.log('Credential verifications:', verification.credentialResults.map((r) => r.verified));
 
   if (verification.delegationResult) {
-    const { decision, summaries, authorizations } = verification.delegationResult;
+    const {
+      decision, summaries, authorizations, failures,
+    } = verification.delegationResult;
     console.log('Delegation decision:', decision);
     console.log('Authorized claims derived from chain:', summaries?.[0]?.authorizedClaims);
+    if (decision !== 'allow') {
+      console.log('Delegation failures:', failures);
+    }
     if (authorizations?.length) {
       console.log('Cedar authorization decisions:', authorizations);
     }

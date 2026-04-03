@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import {
   VC_TYPE,
   SECURITY_PROOF,
@@ -103,6 +102,57 @@ export function findExpandedTermId(node, term) {
   return undefined;
 }
 
+function mapJsonLdArrayElement(item) {
+  if (item && typeof item === 'object') {
+    if ('@value' in item) {
+      return item['@value'];
+    }
+    if ('@id' in item) {
+      return item['@id'];
+    }
+  }
+  return item;
+}
+
+function unwrapJsonLdScalar(value) {
+  if (value && typeof value === 'object') {
+    if ('@value' in value) {
+      return value['@value'];
+    }
+    if ('@id' in value) {
+      return value['@id'];
+    }
+  }
+  return value;
+}
+
+function normalizeSubjectFieldValue(key, value) {
+  if (Array.isArray(value)) {
+    const mapped = value.map(mapJsonLdArrayElement);
+    if (!MAY_CLAIM_ALIAS_KEYS.includes(key) && mapped.length === 1) {
+      return mapped[0];
+    }
+    return mapped;
+  }
+  return unwrapJsonLdScalar(value);
+}
+
+function withMayClaimAliasesFromNormalizedKeys(normalized) {
+  const mayClaims = MAY_CLAIM_ALIAS_KEYS.map((alias) => normalized[alias]).find(
+    (val) => val !== undefined,
+  );
+  if (mayClaims === undefined) {
+    return normalized;
+  }
+  const list = Array.isArray(mayClaims) ? mayClaims : [mayClaims];
+  const canonical = list.map((claim) => String(claim));
+  return {
+    ...normalized,
+    [MAY_CLAIM_IRI]: canonical,
+    mayClaim: canonical,
+  };
+}
+
 export function normalizeSubject(compactedSubject) {
   const subjectValue = Array.isArray(compactedSubject)
     ? compactedSubject[0]
@@ -112,42 +162,11 @@ export function normalizeSubject(compactedSubject) {
   }
 
   const normalized = { ...subjectValue };
-  Object.entries(normalized).forEach(([key, value]) => {
-    if (Array.isArray(value)) {
-      normalized[key] = value.map((item) => {
-        if (item && typeof item === 'object') {
-          if ('@value' in item) {
-            return item['@value'];
-          }
-          if ('@id' in item) {
-            return item['@id'];
-          }
-        }
-        return item;
-      });
-      if (!MAY_CLAIM_ALIAS_KEYS.includes(key) && normalized[key].length === 1) {
-        const [singleValue] = normalized[key];
-        normalized[key] = singleValue;
-      }
-    } else if (value && typeof value === 'object') {
-      if ('@value' in value) {
-        normalized[key] = value['@value'];
-      } else if ('@id' in value) {
-        normalized[key] = value['@id'];
-      }
-    }
+  Object.keys(normalized).forEach((key) => {
+    normalized[key] = normalizeSubjectFieldValue(key, normalized[key]);
   });
 
-  const mayClaims = MAY_CLAIM_ALIAS_KEYS.map((alias) => normalized[alias]).find(
-    (val) => val !== undefined,
-  );
-  if (mayClaims !== undefined) {
-    const list = Array.isArray(mayClaims) ? mayClaims : [mayClaims];
-    normalized[MAY_CLAIM_IRI] = list.map((claim) => String(claim));
-    normalized.mayClaim = normalized[MAY_CLAIM_IRI];
-  }
-
-  return normalized;
+  return withMayClaimAliasesFromNormalizedKeys(normalized);
 }
 
 export function matchesType(vc, typeName) {

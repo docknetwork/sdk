@@ -1,0 +1,29 @@
+name: Delegation Engine examples
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+
+      - run: yarn install --frozen-lockfile --ignore-scripts
+
+      - run: npm install -g turbo@2.0.5
+
+      - run: turbo telemetry disable
+
+      - name: Run example scripts (pharmacy, delegation, staff, ai-agent, …)
+        run: turbo run examples --filter @docknetwork/vc-delegation-engine

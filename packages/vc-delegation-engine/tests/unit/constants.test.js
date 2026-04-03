@@ -11,6 +11,11 @@ import {
   VC_TYPE_DELEGATION_CREDENTIAL,
   VC_PREVIOUS_CREDENTIAL_ID,
   VC_ROOT_CREDENTIAL_ID,
+  VC_DELEGATION_POLICY_ID,
+  VC_DELEGATION_POLICY_DIGEST,
+  VC_DELEGATION_ROLE_ID,
+  VC_ISSUANCE_DATE,
+  VC_EXPIRATION_DATE,
   ACTION_VERIFY,
   VERIFY_CHAIN_ID,
   UNKNOWN_IDENTIFIER,
@@ -36,6 +41,11 @@ describe('constants', () => {
     expect(VC_TYPE_DELEGATION_CREDENTIAL).toBe(`${DELEGATION_NS}DelegationCredential`);
     expect(VC_PREVIOUS_CREDENTIAL_ID).toBe(`${DELEGATION_NS}previousCredentialId`);
     expect(VC_ROOT_CREDENTIAL_ID).toBe(`${DELEGATION_NS}rootCredentialId`);
+    expect(VC_DELEGATION_POLICY_ID).toBe(`${DELEGATION_NS}delegationPolicyId`);
+    expect(VC_DELEGATION_POLICY_DIGEST).toBe(`${DELEGATION_NS}delegationPolicyDigest`);
+    expect(VC_DELEGATION_ROLE_ID).toBe(`${DELEGATION_NS}delegationRoleId`);
+    expect(VC_ISSUANCE_DATE).toBe(`${VC_NS}issuanceDate`);
+    expect(VC_EXPIRATION_DATE).toBe(`${VC_NS}expirationDate`);
   });
 
   it('defines shared action values', () => {

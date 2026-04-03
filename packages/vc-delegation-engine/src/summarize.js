@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import {
   matchesType,
   extractGraphId,
@@ -24,12 +23,7 @@ function normalizeTypeList(value) {
   return [];
 }
 
-// Derives delegation-chain facts (root/tail info, depth, mayClaim, etc.) from chain of expanded JSON-LD credentials
-export function summarizeDelegationChain(credentials) {
-  if (credentials.length === 0) {
-    throw new Error('Chain must include credentials to summarize');
-  }
-
+function buildCredentialMap(credentials) {
   const credentialMap = new Map();
   credentials.forEach((vc) => {
     const vcId = vc['@id'];
@@ -38,7 +32,10 @@ export function summarizeDelegationChain(credentials) {
     }
     credentialMap.set(vcId, vc);
   });
+  return credentialMap;
+}
 
+function collectReferencedPreviousIds(credentials) {
   const referencedPreviousIds = new Set();
   credentials.forEach((vc) => {
     const prevId = findExpandedTermId(vc, VC_PREVIOUS_CREDENTIAL_ID);
@@ -46,32 +43,34 @@ export function summarizeDelegationChain(credentials) {
       referencedPreviousIds.add(prevId);
     }
   });
+  return referencedPreviousIds;
+}
 
+function getUniqueTailCredential(credentials, referencedPreviousIds) {
   const tailCandidates = credentials.filter((vc) => !referencedPreviousIds.has(vc['@id']));
-
   if (tailCandidates.length === 0) {
     throw new Error('Unable to determine tail credential');
   }
   if (tailCandidates.length > 1) {
     throw new Error('Unable to determine unique tail credential');
   }
+  return tailCandidates[0];
+}
 
-  const tailCredential = tailCandidates[0];
-
+function assertTailHasPreviousAndIssuer(tailCredential) {
   if (typeof findExpandedTermId(tailCredential, VC_PREVIOUS_CREDENTIAL_ID) !== 'string') {
     throw new Error('Tail credential must include previousCredentialId');
   }
-
-  const resourceId = tailCredential['@id'];
   const tailIssuer = extractGraphId(tailCredential, VC_ISSUER);
   if (typeof tailIssuer !== 'string' || tailIssuer.length === 0) {
     throw new Error('Tail credential must include a string issuer');
   }
+}
 
+function walkChainFromTail(tailCredential, credentialMap) {
   const chain = [];
   const visited = new Set();
   let current = tailCredential;
-
   while (current) {
     if (visited.has(current['@id'])) {
       throw new Error('Credential chain contains a cycle');
@@ -88,7 +87,10 @@ export function summarizeDelegationChain(credentials) {
     }
     current = prev;
   }
+  return chain;
+}
 
+function validateIssuerDelegateBinding(chain) {
   for (let i = 1; i < chain.length; i += 1) {
     const parent = chain[i - 1];
     const child = chain[i];
@@ -103,8 +105,9 @@ export function summarizeDelegationChain(credentials) {
       );
     }
   }
+}
 
-  const rootCredential = chain[0];
+function validateRootIdsAlongChain(rootCredential, chainRest) {
   const expectedRootId = rootCredential['@id'];
   const rootDeclaredId = extractGraphId(rootCredential, VC_ROOT_CREDENTIAL_ID);
   if (rootDeclaredId && rootDeclaredId !== expectedRootId) {
@@ -112,8 +115,7 @@ export function summarizeDelegationChain(credentials) {
       `Root credential ${rootCredential['@id']} must declare rootCredentialId equal to its own id`,
     );
   }
-
-  chain.slice(1).forEach((vc) => {
+  chainRest.forEach((vc) => {
     const declaredRootId = findExpandedTermId(vc, VC_ROOT_CREDENTIAL_ID);
     if (typeof declaredRootId !== 'string' || declaredRootId.length === 0) {
       throw new Error(
@@ -126,24 +128,22 @@ export function summarizeDelegationChain(credentials) {
       );
     }
   });
+}
 
+function assertRootDelegationCredential(rootCredential) {
   if (!matchesType(rootCredential, VC_TYPE_DELEGATION_CREDENTIAL)) {
     throw new Error('Root credential must be a DelegationCredential');
   }
-
   const rootIssuerId = extractGraphId(rootCredential, VC_ISSUER);
   if (typeof rootIssuerId !== 'string' || rootIssuerId.length === 0) {
     throw new Error('Root credential must include a string issuer');
   }
+  return rootIssuerId;
+}
 
-  const rootTypes = normalizeTypeList(rootCredential['@type']);
-
-  const rootClaims = extractGraphObject(rootCredential, VC_SUBJECT) ?? {};
-
-  const depthByActor = new Map([[rootIssuerId, 0]]);
+function createDelegationRegistrar() {
   const delegations = [];
   const registeredDelegations = new Set();
-
   const registerDelegation = (principalId, depth) => {
     if (typeof principalId !== 'string' || principalId.length === 0) {
       throw new Error('Tried to register delegation with no principal ID');
@@ -154,33 +154,63 @@ export function summarizeDelegationChain(credentials) {
     registeredDelegations.add(principalId);
     delegations.push({ principalId, depth, actions: [ACTION_VERIFY] });
   };
+  return { delegations, registerDelegation };
+}
 
+function accumulateDelegationDepths(chain, rootIssuerId, rootClaims, registerDelegation) {
+  const depthByActor = new Map([[rootIssuerId, 0]]);
+  const delegationCredentialsInChain = [];
   const rootDelegateId = extractGraphId(rootClaims, VC_SUBJECT);
   if (typeof rootDelegateId === 'string' && rootDelegateId.length > 0) {
     registerDelegation(rootDelegateId, 1);
     depthByActor.set(rootDelegateId, 1);
   }
-
-  const delegationCredentialsInChain = [];
-
   chain.forEach((vc) => {
     if (!matchesType(vc, VC_TYPE_DELEGATION_CREDENTIAL)) {
       return;
     }
-
     delegationCredentialsInChain.push(vc);
-
     const delegator = extractGraphId(vc, VC_ISSUER);
     const delegate = extractGraphId(vc, VC_SUBJECT);
     if (typeof delegate !== 'string' || delegate.length === 0) {
       return;
     }
-
     const parentDepth = depthByActor.get(delegator) ?? 0;
     const depth = parentDepth + 1;
     depthByActor.set(delegate, depth);
     registerDelegation(delegate, depth);
   });
+  return { depthByActor, delegationCredentialsInChain };
+}
+
+// Derives delegation-chain facts (root/tail info, depth, mayClaim, etc.) from chain of expanded JSON-LD credentials
+export function summarizeDelegationChain(credentials) {
+  if (credentials.length === 0) {
+    throw new Error('Chain must include credentials to summarize');
+  }
+
+  const credentialMap = buildCredentialMap(credentials);
+  const referencedPreviousIds = collectReferencedPreviousIds(credentials);
+  const tailCredential = getUniqueTailCredential(credentials, referencedPreviousIds);
+  assertTailHasPreviousAndIssuer(tailCredential);
+
+  const resourceId = tailCredential['@id'];
+  const chain = walkChainFromTail(tailCredential, credentialMap);
+  validateIssuerDelegateBinding(chain);
+
+  const rootCredential = chain[0];
+  validateRootIdsAlongChain(rootCredential, chain.slice(1));
+  const rootIssuerId = assertRootDelegationCredential(rootCredential);
+  const rootTypes = normalizeTypeList(rootCredential['@type']);
+  const rootClaims = extractGraphObject(rootCredential, VC_SUBJECT) ?? {};
+
+  const { delegations, registerDelegation } = createDelegationRegistrar();
+  const { depthByActor, delegationCredentialsInChain } = accumulateDelegationDepths(
+    chain,
+    rootIssuerId,
+    rootClaims,
+    registerDelegation,
+  );
 
   const tailTypes = normalizeTypeList(tailCredential['@type']);
   const tailDelegateId = extractGraphId(tailCredential, VC_SUBJECT);

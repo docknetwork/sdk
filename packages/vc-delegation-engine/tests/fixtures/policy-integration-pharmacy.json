@@ -1,0 +1,203 @@
+{
+  "type": "DelegationPolicy",
+  "version": "1.0",
+  "createdAt": "2026-03-18",
+  "id": "urn:test:delegation-policy:pharmacy-example",
+  "ruleset": {
+    "rulesetVersion": "2026-03-pharmacy-v1",
+    "delegationTarget": "single-credential",
+    "overallConstraints": {
+      "maxDelegationDepth": 3
+    },
+    "capabilities": [
+      {
+        "name": "allowedClaims",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["PickUp", "Pay", "Cancel"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      {
+        "name": "prescriptionResourceIds",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^urn:rx:[A-Za-z0-9._:-]+$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      {
+        "name": "canPickUp",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "canPay",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "canCancel",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    ],
+    "roles": [
+      {
+        "roleId": "doctor",
+        "parentRoleId": null,
+        "label": "Prescribing Doctor",
+        "capabilityGrants": [
+          {
+            "capability": "allowedClaims",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["PickUp", "Pay", "Cancel"]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          {
+            "capability": "prescriptionResourceIds",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^urn:rx:[A-Za-z0-9._:-]+$"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          {
+            "capability": "canPickUp",
+            "schema": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          {
+            "capability": "canPay",
+            "schema": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          {
+            "capability": "canCancel",
+            "schema": {
+              "type": "boolean",
+              "const": true
+            }
+          }
+        ]
+      },
+      {
+        "roleId": "pharmacy",
+        "parentRoleId": "doctor",
+        "label": "Pharmacy",
+        "cannotDelegateToSameRole": true,
+        "capabilityGrants": [
+          {
+            "capability": "allowedClaims",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["PickUp", "Pay"]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          {
+            "capability": "prescriptionResourceIds",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^urn:rx:[A-Za-z0-9._:-]+$"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          {
+            "capability": "canPickUp",
+            "schema": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          {
+            "capability": "canPay",
+            "schema": {
+              "type": "boolean",
+              "const": true
+            }
+          }
+        ]
+      },
+      {
+        "roleId": "patient",
+        "parentRoleId": "pharmacy",
+        "label": "Patient",
+        "capabilityGrants": [
+          {
+            "capability": "allowedClaims",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["PickUp"]
+              },
+              "minItems": 1,
+              "maxItems": 1,
+              "uniqueItems": true
+            }
+          },
+          {
+            "capability": "prescriptionResourceIds",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^urn:rx:[A-Za-z0-9._:-]+$"
+              },
+              "minItems": 1,
+              "maxItems": 1,
+              "uniqueItems": true
+            }
+          },
+          {
+            "capability": "canPickUp",
+            "schema": {
+              "type": "boolean",
+              "const": true
+            }
+          }
+        ]
+      },
+      {
+        "roleId": "guardian",
+        "parentRoleId": "patient",
+        "label": "Guardian",
+        "capabilityGrants": []
+      }
+    ]
+  }
+}

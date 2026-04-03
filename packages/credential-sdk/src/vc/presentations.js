@@ -112,6 +112,7 @@ async function optionalDelegationValidation(
       failOnUnauthorizedClaims: delegationOptions.failOnUnauthorizedClaims ?? true,
       cedar: cedarOptions.cedar,
       policies,
+      delegationPolicy: delegationOptions.delegationPolicy,
     });
 
     const delegationVerified = delegationResult.decision === 'allow';
@@ -235,10 +236,11 @@ export async function verifyPresentationCredentials(
  * @property {Boolean} [unsignedPresentation] - Whether to verify the proof or not
  * @property {Boolean} [compactProof] - Whether to compact the JSON-LD or not.
  * @property {object} [presentationPurpose] - A purpose other than the default AuthenticationProofPurpose
- * @property {object} [documentLoader] - A document loader, can be null and use the default
+ * @property {object} [documentLoader] - A document loader, can be null and use the default (built from `resolver` when omitted). Must resolve each `delegationPolicyId` to the policy JSON when credentials reference a delegation policy.
  * @property {boolean} [failOnUnauthorizedClaims] - When true, delegation chains that emit unauthorized claims cause verification to fail
  * @property {object} [policies] - Optional delegation policy bundle forwarded to @docknetwork/vc-delegation-engine
  * @property {object} [cedarAuth] - Optional cedar authorization configuration forwarded to @docknetwork/vc-delegation-engine
+ * @property {object} [delegationPolicy] - Optional: set `enabled: false` to skip delegation policy digest/schema/chain checks even when credentials carry `delegationPolicyId` / `delegationPolicyDigest`.
  */
 
 /**
@@ -281,6 +283,7 @@ export async function verifyPresentation(presentation, options = {}) {
   const delegationOptions = {
     failOnUnauthorizedClaims: options.failOnUnauthorizedClaims,
     cedar: options.cedarAuth,
+    delegationPolicy: options.delegationPolicy,
   };
 
   // Build verification options

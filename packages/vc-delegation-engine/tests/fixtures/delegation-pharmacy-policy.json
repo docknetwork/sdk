@@ -111,6 +111,7 @@
         "roleId": "pharmacy",
         "parentRoleId": "doctor",
         "label": "Pharmacy",
+        "cannotDelegateToSameRole": true,
         "attributes": ["*"],
         "capabilityGrants": [
           {

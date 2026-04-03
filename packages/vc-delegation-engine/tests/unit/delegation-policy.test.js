@@ -13,6 +13,7 @@ import {
   durationToMilliseconds,
   fetchDelegationPolicyJson,
   isRoleAncestorOrEqual,
+  isRoleStrictSubRole,
   resolveAndVerifyDelegationPolicy,
 } from '../../src/delegation-policy-chain.js';
 import { DelegationError, DelegationErrorCodes } from '../../src/errors.js';
@@ -24,7 +25,7 @@ const mockPrescriptionResourceId = 'urn:rx:789';
 describe('delegation policy digest', () => {
   it('computes stable SHA-256 for pharmacy fixture', () => {
     expect(computePolicyDigestHex(pharmacyPolicy)).toBe(
-      'c1eec4edab98e8c71446016d870d0b4520516d937d16717d6458f2a6a0b2b44d',
+      'e63a871e132696b8a50fb29515ddfc4d88fd01f35cee9df8b230cf472c409e3f',
     );
   });
 
@@ -59,6 +60,22 @@ describe('delegation policy validation', () => {
     expect(() => validateDelegationPolicy(bad)).toThrow(/unique capability names/);
   });
 
+  it('rejects cannotDelegateToSameRole when role has no sub-role in the policy', () => {
+    const bad = structuredClone(pharmacyPolicy);
+    const guardian = bad.ruleset.roles.find((r) => r.roleId === 'guardian');
+    guardian.cannotDelegateToSameRole = true;
+    expect(() => validateDelegationPolicy(bad)).toThrow(DelegationError);
+    expect(() => validateDelegationPolicy(bad)).toThrow(/no sub-role/);
+  });
+
+  it('rejects cannotDelegateToSameRole when not a boolean', () => {
+    const bad = structuredClone(pharmacyPolicy);
+    const pharmacyRole = bad.ruleset.roles.find((r) => r.roleId === 'pharmacy');
+    pharmacyRole.cannotDelegateToSameRole = 'yes';
+    expect(() => validateDelegationPolicy(bad)).toThrow(DelegationError);
+    expect(() => validateDelegationPolicy(bad)).toThrow(/cannotDelegateToSameRole must be a boolean/);
+  });
+
   it('treats empty child attributes as narrower than wildcard parent', () => {
     expect(attributesAreNarrowerOrEqual([], ['*'])).toBe(true);
   });
@@ -71,6 +88,13 @@ describe('delegation policy role graph', () => {
     expect(isRoleAncestorOrEqual('doctor', 'pharmacy', roleById)).toBe(true);
     expect(isRoleAncestorOrEqual('pharmacy', 'patient', roleById)).toBe(true);
     expect(isRoleAncestorOrEqual('patient', 'doctor', roleById)).toBe(false);
+  });
+
+  it('isRoleStrictSubRole is false for same role and true for proper descendants', () => {
+    const roleById = new Map(pharmacyPolicy.ruleset.roles.map((r) => [r.roleId, r]));
+    expect(isRoleStrictSubRole('pharmacy', 'pharmacy', roleById)).toBe(false);
+    expect(isRoleStrictSubRole('pharmacy', 'patient', roleById)).toBe(true);
+    expect(isRoleStrictSubRole('doctor', 'pharmacy', roleById)).toBe(true);
   });
 });
 
@@ -102,6 +126,92 @@ describe('delegation policy chain resolution', () => {
         documentUrl: pharmacyPolicy.id,
         document: structuredClone(pharmacyPolicy),
       }),
+    });
+    expect(out.id).toBe(pharmacyPolicy.id);
+  });
+
+  it('rejects two delegation steps with the same role when policy sets cannotDelegateToSameRole', async () => {
+    const digest = computePolicyDigestHex(pharmacyPolicy);
+    const pharmacySubject = {
+      allowedClaims: ['PickUp', 'Pay'],
+      prescriptionResourceIds: [mockPrescriptionResourceId],
+      canPickUp: true,
+      canPay: true,
+    };
+    const chain = [
+      {
+        id: 'urn:root',
+        delegationPolicyId: pharmacyPolicy.id,
+        delegationPolicyDigest: digest,
+        delegationRoleId: 'pharmacy',
+        issuanceDate: mockChainIssuanceDate,
+        expirationDate: mockChainRootExpirationDate,
+        credentialSubject: { ...pharmacySubject },
+        type: ['DelegationCredential'],
+      },
+      {
+        id: 'urn:second',
+        delegationPolicyId: pharmacyPolicy.id,
+        delegationPolicyDigest: digest,
+        delegationRoleId: 'pharmacy',
+        issuanceDate: mockChainIssuanceDate,
+        expirationDate: mockChainRootExpirationDate,
+        credentialSubject: { ...pharmacySubject },
+        type: ['DelegationCredential'],
+      },
+    ];
+    await expect(
+      resolveAndVerifyDelegationPolicy({
+        chain,
+        rootPolicyId: pharmacyPolicy.id,
+        rootPolicyDigest: digest,
+        documentLoader: async () => ({ document: structuredClone(pharmacyPolicy) }),
+      }),
+    ).rejects.toMatchObject({ code: DelegationErrorCodes.POLICY_ROLE_INVALID });
+  });
+
+  it('accepts pharmacy then patient when pharmacy cannotDelegateToSameRole', async () => {
+    const digest = computePolicyDigestHex(pharmacyPolicy);
+    const chain = [
+      {
+        id: 'urn:root',
+        delegationPolicyId: pharmacyPolicy.id,
+        delegationPolicyDigest: digest,
+        delegationRoleId: 'pharmacy',
+        issuanceDate: mockChainIssuanceDate,
+        expirationDate: mockChainRootExpirationDate,
+        credentialSubject: {
+          allowedClaims: ['PickUp', 'Pay'],
+          prescriptionResourceIds: [mockPrescriptionResourceId],
+          canPickUp: true,
+          canPay: true,
+          PickUp: true,
+          Pay: true,
+        },
+        type: ['DelegationCredential'],
+      },
+      {
+        id: 'urn:patient',
+        delegationPolicyId: pharmacyPolicy.id,
+        delegationPolicyDigest: digest,
+        delegationRoleId: 'patient',
+        issuanceDate: mockChainIssuanceDate,
+        expirationDate: '2026-06-10T12:00:00Z',
+        credentialSubject: {
+          allowedClaims: ['PickUp'],
+          prescriptionResourceIds: [mockPrescriptionResourceId],
+          canPickUp: true,
+          PickUp: true,
+          Pay: true,
+        },
+        type: ['DelegationCredential'],
+      },
+    ];
+    const out = await resolveAndVerifyDelegationPolicy({
+      chain,
+      rootPolicyId: pharmacyPolicy.id,
+      rootPolicyDigest: digest,
+      documentLoader: async () => ({ document: structuredClone(pharmacyPolicy) }),
     });
     expect(out.id).toBe(pharmacyPolicy.id);
   });

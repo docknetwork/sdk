@@ -402,7 +402,7 @@ describe('policy example integration (pharmacy ruleset)', () => {
 
   it('stable digest for bundled pharmacy example policy', () => {
     expect(PHARMACY_INTEGRATION_DIGEST).toBe(
-      'd33d97497d4c599260d34006e14c1359261690ce0b99552b52b5fa79f368e2c0',
+      'f9be6bd54c970faf8068517f53323ffb9f3237942b6b4720ffe2ee73b062db73',
     );
   });
 });

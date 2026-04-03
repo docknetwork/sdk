@@ -18,6 +18,20 @@ export function isRoleAncestorOrEqual(ancestorRoleId, descendantRoleId, roleById
 }
 
 /**
+ * True when `descendantRoleId` is strictly below `ancestorRoleId` in the role graph (a sub-role, not the same node).
+ * @param {string} ancestorRoleId
+ * @param {string} descendantRoleId
+ * @param {Map<string, object>} roleById
+ * @returns {boolean}
+ */
+export function isRoleStrictSubRole(ancestorRoleId, descendantRoleId, roleById) {
+  if (descendantRoleId === ancestorRoleId) {
+    return false;
+  }
+  return isRoleAncestorOrEqual(ancestorRoleId, descendantRoleId, roleById);
+}
+
+/**
  * @param {object} parentVc
  * @param {object} childVc
  */
@@ -67,6 +81,14 @@ export function assertDelegationChainRoles(delegationCreds, roleById) {
         throw new DelegationError(
           DelegationErrorCodes.POLICY_ROLE_INVALID,
           `Credential ${vc.id} delegationRoleId "${roleId}" must be the same role as or a descendant of the previous delegation step role "${prevRoleId}" per the policy role graph`,
+        );
+      }
+      const prevRoleDef = roleById.get(prevRoleId);
+      if (prevRoleDef?.cannotDelegateToSameRole === true
+        && !isRoleStrictSubRole(prevRoleId, roleId, roleById)) {
+        throw new DelegationError(
+          DelegationErrorCodes.POLICY_ROLE_INVALID,
+          `Credential ${vc.id} delegationRoleId "${roleId}" must be a strict sub-role of "${prevRoleId}"; policy disallows delegating from "${prevRoleId}" to the same role`,
         );
       }
     }

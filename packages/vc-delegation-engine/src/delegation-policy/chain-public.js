@@ -12,6 +12,7 @@ export {
 export { assertMaxDelegationDepth } from './chain-depth.js';
 export {
   isRoleAncestorOrEqual,
+  isRoleStrictSubRole,
   assertChildCredentialExpiresBeforeOrEqualParent,
 } from './chain-roles-lifetime.js';
 export { subjectFieldDisclosureAllowedByRole } from './chain-subject-role.js';

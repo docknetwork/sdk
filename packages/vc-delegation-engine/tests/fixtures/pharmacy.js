@@ -4,7 +4,7 @@ export { pharmacyDelegationPolicyDoc };
 
 /** SHA-256 hex of json-canonicalize(policy document) */
 export const PHARMACY_DELEGATION_POLICY_DIGEST =
-  'c1eec4edab98e8c71446016d870d0b4520516d937d16717d6458f2a6a0b2b44d';
+  'e63a871e132696b8a50fb29515ddfc4d88fd01f35cee9df8b230cf472c409e3f';
 
 export const PHARMACY_DELEGATION_POLICY_ID = pharmacyDelegationPolicyDoc.id;
 

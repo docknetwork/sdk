@@ -110,6 +110,7 @@
         "roleId": "pharmacy",
         "parentRoleId": "doctor",
         "label": "Pharmacy",
+        "cannotDelegateToSameRole": true,
         "capabilityGrants": [
           {
             "capability": "allowedClaims",

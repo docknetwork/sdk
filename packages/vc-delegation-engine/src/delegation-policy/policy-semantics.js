@@ -80,6 +80,32 @@ function validateSingleRoleVersusParent(role, parent) {
   }
 }
 
+/**
+ * When `cannotDelegateToSameRole` is true, the role must have at least one child role in the graph
+ * so a delegator can move to a strict sub-role.
+ * @param {object[]} roles
+ */
+function validateCannotDelegateToSameRoleOnRoles(roles) {
+  for (const role of roles) {
+    const flag = role.cannotDelegateToSameRole;
+    if (flag !== undefined && typeof flag !== 'boolean') {
+      throw new DelegationError(
+        DelegationErrorCodes.POLICY_SEMANTIC_INVALID,
+        `Role "${role.roleId}" cannotDelegateToSameRole must be a boolean when present`,
+      );
+    }
+    if (flag === true) {
+      const hasSubRole = roles.some((r) => r.parentRoleId === role.roleId);
+      if (!hasSubRole) {
+        throw new DelegationError(
+          DelegationErrorCodes.POLICY_SEMANTIC_INVALID,
+          `Role "${role.roleId}" sets cannotDelegateToSameRole but the policy defines no sub-role of that role`,
+        );
+      }
+    }
+  }
+}
+
 function assertRoleHierarchyAcyclic(roles, roleById) {
   const visited = new Set();
   const stack = new Set();
@@ -118,6 +144,7 @@ export function validateDelegationPolicySemantics(policyJson) {
   const { roleById, roleIds } = buildRoleMaps(roles);
 
   validateRoleParentsExist(roles, roleIds);
+  validateCannotDelegateToSameRoleOnRoles(roles);
   validateRolesGrantsAgainstCapabilities(roles, capabilities, capabilityNames);
   validateRolesNarrowingVersusParents(roles, roleById);
   assertRoleHierarchyAcyclic(roles, roleById);
@@ -170,7 +197,7 @@ function buildRoleMaps(roles) {
 }
 
 /**
- * Semantic checks only (role graph, grant narrowing, capability registry). No JSON Schema for the policy document.
+ * Semantic checks only (role graph, grant narrowing, capability registry, cannotDelegateToSameRole shape). No JSON Schema for the policy document.
  * @param {unknown} policyJson
  */
 export function validateDelegationPolicy(policyJson) {

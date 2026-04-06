@@ -1,5 +1,11 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 4.2.1
+
+### Patch Changes
+
+- Pass fee multiplier in signAndSend
+
 ## 4.2.0
 
 ### Minor Changes

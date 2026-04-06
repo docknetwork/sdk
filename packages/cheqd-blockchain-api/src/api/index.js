@@ -379,13 +379,13 @@ export class CheqdAPI extends AbstractApiProvider {
    * @returns {Promise<*>}
    */
   async signAndSend(tx, {
-    from, fee, memo, gas, payment,
+    from, fee, feeMultiplier, memo, gas, payment,
   } = {}) {
     const sender = from ?? (await this.address());
     const txJSON = this.constructor.txToJSON(tx);
 
     const estimatedGas = gas ?? (await this.estimateGas(tx, sender));
-    const finalFee = fee ?? (await this.calculateFee(tx, sender, estimatedGas));
+    const finalFee = fee ?? (await this.calculateFee(tx, sender, estimatedGas, feeMultiplier));
     const paymentObj = payment || {
       amount: [].concat(finalFee),
       gas: estimatedGas,

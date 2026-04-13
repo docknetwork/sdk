@@ -9,6 +9,7 @@ import {
   WildcardResolverRouter,
   createResolver,
   DIDResolver,
+  DIDKeyResolver,
 } from "../src/resolver";
 import {
   CheqdTestnetDIDDocument,
@@ -16,7 +17,15 @@ import {
   DIDDocument,
   DidKey,
 } from "../src/types";
-import { decodeFromBase58 } from "../src/utils";
+import { decodeFromBase58, encodeAsBase58, encodeAsBase58btc } from "../src/utils";
+import {
+  DidMethodKeyBytePrefixBBS23,
+  DidMethodKeyBytePrefixBBSPlus,
+} from "../src/types/did/onchain/constants";
+import {
+  Bls12381BBS23DockVerKeyName,
+  Bls12381BBSDockVerKeyName,
+} from "../src/vc/crypto";
 
 class APrefixBMethodResolver extends Resolver {
   prefix = "a";
@@ -304,5 +313,75 @@ describe("Resolvers", () => {
     expect(await multiResolver.resolve("abc:cde:1")).toBe(1);
     expect(multiResolver.supports("abc:cde:1")).toBe(true);
     expect(multiResolver.supports("abc:de:1")).toBe(false);
+  });
+
+  it("checks `DIDKeyResolver` custom fallback for BBS/BBS+", async () => {
+    const resolver = new DIDKeyResolver();
+    const standardDid = "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8";
+    const standardDocument = await resolver.resolve(standardDid);
+    expect(standardDocument.id).toBe(standardDid);
+    expect(Array.isArray(standardDocument.verificationMethod)).toBe(true);
+    expect(standardDocument.verificationMethod.length).toBeGreaterThan(0);
+
+    const bbsBytes = Uint8Array.from({ length: 96 }, (_, idx) => idx);
+    const customBbsDid = `did:key:${encodeAsBase58btc(
+      DidMethodKeyBytePrefixBBS23,
+      bbsBytes
+    )}`;
+    const bbsDocument = await resolver.resolve(customBbsDid);
+    const bbsMethodId = `${customBbsDid}#${customBbsDid.split(":")[2]}`;
+    expect(bbsDocument).toEqual({
+      "@context": "https://www.w3.org/ns/did/v1",
+      id: customBbsDid,
+      verificationMethod: [
+        {
+          id: bbsMethodId,
+          type: Bls12381BBS23DockVerKeyName,
+          controller: customBbsDid,
+          publicKeyBase58: encodeAsBase58(bbsBytes),
+        },
+      ],
+      authentication: [bbsMethodId],
+      assertionMethod: [bbsMethodId],
+      capabilityInvocation: [bbsMethodId],
+      capabilityDelegation: [bbsMethodId],
+    });
+
+    const bbsPlusBytes = Uint8Array.from({ length: 96 }, (_, idx) => 255 - idx);
+    const customBbsPlusDid = `did:key:${encodeAsBase58btc(
+      DidMethodKeyBytePrefixBBSPlus,
+      bbsPlusBytes
+    )}`;
+    const bbsPlusDocument = await resolver.resolve(customBbsPlusDid);
+    expect(bbsPlusDocument.verificationMethod[0].type).toBe(
+      Bls12381BBSDockVerKeyName
+    );
+  });
+
+  it("checks `DIDKeyResolver` fallback with DID URL fragment", async () => {
+    const resolver = new DIDKeyResolver();
+    const bbsBytes = Uint8Array.from({ length: 96 }, (_, idx) => idx);
+    const customBbsDid = `did:key:${encodeAsBase58btc(
+      DidMethodKeyBytePrefixBBS23,
+      bbsBytes
+    )}`;
+    const didUrl = `${customBbsDid}#custom-fragment`;
+    const didDoc = await resolver.resolve(didUrl);
+
+    expect(didDoc.id).toBe(customBbsDid);
+    expect(didDoc.verificationMethod[0].controller).toBe(customBbsDid);
+    expect(didDoc.verificationMethod[0].id).toBe(
+      `${customBbsDid}#${customBbsDid.split(":")[2]}`
+    );
+  });
+
+  it("checks `DIDKeyResolver` does not fallback for unknown custom headers", async () => {
+    const resolver = new DIDKeyResolver();
+    const unknownHeaderDid = `did:key:${encodeAsBase58btc(
+      new Uint8Array([0xf7, 0x01]),
+      Uint8Array.from({ length: 96 }, (_, idx) => idx)
+    )}`;
+
+    await expect(resolver.resolve(unknownHeaderDid)).rejects.toThrow();
   });
 });

@@ -1,18 +1,34 @@
-import { TypedEnum, TypedStruct, withQualifier } from '../../../../generic';
+import { base58btc } from 'multiformats/bases/base58';
+import varint from 'varint';
+import {
+  TypedBytes,
+  TypedEnum,
+  TypedStruct,
+  sized,
+  withQualifier,
+} from '../../../../generic';
 import {
   PublicKeyEd25519Value,
   PublicKeySecp256k1Value,
 } from '../../../../public-keys';
 import {
+  DidMethodKeyBBS23ByteSize,
+  DidMethodKeyBBSPlusByteSize,
+  DidMethodKeyBytePrefixBBS23,
+  DidMethodKeyBytePrefixBBSPlus,
   DidMethodKeyBytePrefixEd25519,
   DidMethodKeyBytePrefixSecp256k1,
   DidMethodKeyQualifier,
-  Ed25519PublicKeyPrefix,
-  Secp256k1PublicKeyPrefix,
 } from '../../constants';
 import DidOrDidMethodKeySignature from '../signature';
 import { DidMethodKeySignatureValue } from './did-method-key-signature';
-import { decodeFromBase58btc, encodeAsBase58btc } from '../../../../../utils';
+import {
+  encodeAsBase58btc,
+  normalizeToU8a,
+} from '../../../../../utils';
+
+const Bls12381BBS23DockVerKeyName = 'Bls12381BBSVerificationKeyDock2023';
+const Bls12381BBSDockVerKeyName = 'Bls12381G2VerificationKeyDock2022';
 
 export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
   static Qualifier = DidMethodKeyQualifier;
@@ -25,15 +41,28 @@ export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
    * @returns {DidMethodKey}
    */
   static fromUnqualifiedString(id) {
-    const bytes = decodeFromBase58btc(id);
+    const decoded = base58btc.decode(id);
+    varint.decode(decoded);
+    const prefix = decoded.slice(0, varint.decode.bytes);
+    const bytes = decoded.slice(varint.decode.bytes);
+    const hasPrefix = (candidate) => (
+      prefix.length === candidate.length
+      && prefix.every((byte, idx) => byte === candidate[idx])
+    );
 
     let PublicKey;
-    if (id.startsWith(Secp256k1PublicKeyPrefix)) {
+    if (hasPrefix(DidMethodKeyBytePrefixSecp256k1)) {
       // eslint-disable-next-line no-use-before-define
       PublicKey = DidMethodKeyPublicKeySecp256k1;
-    } else if (id.startsWith(Ed25519PublicKeyPrefix)) {
+    } else if (hasPrefix(DidMethodKeyBytePrefixEd25519)) {
       // eslint-disable-next-line no-use-before-define
       PublicKey = DidMethodKeyPublicKeyEd25519;
+    } else if (hasPrefix(DidMethodKeyBytePrefixBBS23)) {
+      // eslint-disable-next-line no-use-before-define
+      PublicKey = DidMethodKeyPublicKeyBBS;
+    } else if (hasPrefix(DidMethodKeyBytePrefixBBSPlus)) {
+      // eslint-disable-next-line no-use-before-define
+      PublicKey = DidMethodKeyPublicKeyBBSPlus;
     } else {
       throw new Error(`Unsupported \`did:key:*\`: \`${id}\``);
     }
@@ -58,6 +87,16 @@ export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
    * @returns {DidMethodKey}
    */
   static fromKeypair(keypair) {
+    if (keypair?.type === Bls12381BBS23DockVerKeyName) {
+      // eslint-disable-next-line no-use-before-define
+      return new DidMethodKeyPublicKeyBBS(normalizeToU8a(keypair.publicKeyBuffer));
+    } else if (keypair?.type === Bls12381BBSDockVerKeyName) {
+      // eslint-disable-next-line no-use-before-define
+      return new DidMethodKeyPublicKeyBBSPlus(
+        normalizeToU8a(keypair.publicKeyBuffer),
+      );
+    }
+
     return this.from(keypair.publicKey().value);
   }
 
@@ -103,7 +142,41 @@ export class DidMethodKeyPublicKeySecp256k1 extends DidMethodKeyPublicKey {
   static Prefix = DidMethodKeyBytePrefixSecp256k1;
 }
 
+class PublicKeyBBSValue extends sized(TypedBytes) {
+  static Type = 'bbs';
+
+  static Size = DidMethodKeyBBS23ByteSize;
+
+  static VerKeyType = Bls12381BBS23DockVerKeyName;
+}
+
+class PublicKeyBBSPlusValue extends sized(TypedBytes) {
+  static Type = 'bbsPlus';
+
+  static Size = DidMethodKeyBBSPlusByteSize;
+
+  static VerKeyType = Bls12381BBSDockVerKeyName;
+}
+
+export class DidMethodKeyPublicKeyBBS extends DidMethodKeyPublicKey {
+  static Class = PublicKeyBBSValue;
+
+  static Type = PublicKeyBBSValue.Type;
+
+  static Prefix = DidMethodKeyBytePrefixBBS23;
+}
+
+export class DidMethodKeyPublicKeyBBSPlus extends DidMethodKeyPublicKey {
+  static Class = PublicKeyBBSPlusValue;
+
+  static Type = PublicKeyBBSPlusValue.Type;
+
+  static Prefix = DidMethodKeyBytePrefixBBSPlus;
+}
+
 DidMethodKeyPublicKey.bindVariants(
   DidMethodKeyPublicKeyEd25519,
   DidMethodKeyPublicKeySecp256k1,
+  DidMethodKeyPublicKeyBBS,
+  DidMethodKeyPublicKeyBBSPlus,
 );

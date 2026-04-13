@@ -1,5 +1,7 @@
+import base64url from 'base64url';
 import { DidKeypair, Ed25519Keypair } from '../../keypairs';
 import { DIDResolver } from '../../resolver';
+import { valueBytes } from '../../utils';
 import {
   DIDDocument,
   BBSPublicKeyValue,
@@ -9,6 +11,8 @@ import {
   VerificationMethodRef,
   createServiceEndpoint,
 } from '../../types';
+import { possibleVerificationMethodRefs } from '../../types/did/document/verification-method-ref';
+import { possibleDids } from '../../types/did/onchain/typed-did';
 import { TypedBytes } from '../../types/generic';
 import { NoDIDError } from '../abstract/did/errors';
 import { testIf } from './common';
@@ -33,6 +37,65 @@ export default function generateDIDModuleTests(
       await module.createDocument(document, didKeypair);
 
       expect((await module.getDocument(did)).eq(document)).toBe(true);
+    });
+
+    test('Creates and resolves `DIDDocument` with `JsonWebKey2020` controller key', async () => {
+      const did = Did.random();
+
+      const keyPair = Ed25519Keypair.random();
+      const didKeypair = new DidKeypair([did, 1], keyPair);
+      const keyId = `${did}#keys-1`;
+      const publicKeyJwk = {
+        crv: 'Ed25519',
+        kty: 'OKP',
+        x: base64url.encode(Buffer.from(valueBytes(keyPair.publicKey()))),
+      };
+
+      const document = DIDDocument.from({
+        '@context': [
+          'https://www.w3.org/ns/did/v1',
+          'https://w3id.org/security/suites/jws-2020/v1',
+        ],
+        id: String(did),
+        controller: [String(did)],
+        verificationMethod: [
+          {
+            id: keyId,
+            type: 'JsonWebKey2020',
+            controller: String(did),
+            publicKeyJwk,
+          },
+        ],
+        authentication: [keyId],
+        assertionMethod: [keyId],
+        keyAgreement: [],
+        capabilityInvocation: [keyId],
+        capabilityDelegation: [],
+        service: [],
+      });
+
+      await module.createDocument(document, didKeypair);
+      const storedDocument = await module.getDocument(did);
+      const storedJSON = storedDocument.toJSON();
+      const possibleDidIds = new Set(possibleDids(did));
+      const possibleMethodIds = new Set(possibleVerificationMethodRefs(keyId));
+      const storedMethod = storedJSON.verificationMethod.find(
+        (method) => possibleMethodIds.has(method.id),
+      );
+
+      expect(possibleDidIds.has(storedJSON.id)).toBe(true);
+      expect(storedMethod).toMatchObject({
+        type: 'JsonWebKey2020',
+      });
+      expect(possibleDidIds.has(storedMethod.controller)).toBe(true);
+      expect(storedMethod.publicKeyJwk).toEqual(publicKeyJwk);
+      expect(storedJSON.authentication.some((methodId) => possibleMethodIds.has(methodId))).toBe(true);
+      expect(storedJSON.assertionMethod.some((methodId) => possibleMethodIds.has(methodId))).toBe(true);
+
+      const resolver = new DIDResolver(module);
+      expect(
+        DIDDocument.from(await resolver.resolve(String(did))).eq(storedDocument),
+      ).toBe(true);
     });
 
     test('Creates `DIDDocument` containing BBS/BBSPlus/PS keys', async () => {

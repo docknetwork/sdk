@@ -478,8 +478,13 @@ describe("DID document workflow", () => {
     expect(thirdPartyJSON).toMatchObject(CHEQD_TESTNET_JSONWEBKEY_DOC);
 
     const cheqdDocument = DIDDocument.from(thirdPartyDocument.toJSON()).toCheqd(CheqdTestnetDIDDocument);
-    // TODO: test material when we support JsonWebKey controllers
-    expect(cheqdDocument).toBeDefined();
+    expect(cheqdDocument.verificationMethod[0].verificationMaterial.toString().startsWith("z")).toEqual(true);
+    expect(cheqdDocument.verificationMethod[0].verificationMaterial.length).toEqual(79);
+
+    const roundTrippedMethod = cheqdDocument.verificationMethod[0].toVerificationMethod().toJSON();
+    expect(roundTrippedMethod.publicKeyJwk).toEqual(
+      CHEQD_TESTNET_JSONWEBKEY_DOC.verificationMethod[0].publicKeyJwk,
+    );
   });
 
   test(`\`CheqdTestnetDIDDocument\``, () => {

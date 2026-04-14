@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.17
+
+### Patch Changes
+
+- Custom did:key anoncreds support
+
 ## 0.54.16
 
 ### Patch Changes

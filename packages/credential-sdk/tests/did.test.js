@@ -1,6 +1,14 @@
-import { randomAsHex, encodeAsSS58 } from "../src/utils";
+import { randomAsHex, encodeAsSS58, encodeAsBase58btc } from "../src/utils";
 
 import { DockDidOrDidMethodKey, DockDid, DidMethodKey } from "../src/types/did";
+import {
+  DidMethodKeyBytePrefixBBS23,
+  DidMethodKeyBytePrefixBBSPlus,
+} from "../src/types/did/onchain/constants";
+import {
+  Bls12381BBS23DockVerKeyName,
+  Bls12381BBSDockVerKeyName,
+} from "../src/vc/crypto";
 
 const hexDid = (did) => DockDid.from(did).toHex();
 
@@ -81,6 +89,64 @@ describe("`DockDidOrDidMethodKey.from`", () => {
         "did:key:z6MktvqCyLxTsXUH1tUZncNdVeEZ7hNh7npPRbUU27GTrYb8"
       );
     }
+  });
+
+  test("`DidMethodKey.from` works for custom did:key bbs", () => {
+    const bytes = Uint8Array.from({ length: 96 }, (_, idx) => idx);
+    const did = `did:key:${encodeAsBase58btc(DidMethodKeyBytePrefixBBS23, bytes)}`;
+    const result = DidMethodKey.from(did);
+    expect(result.didMethodKey.bbs.value).toEqual(result.didMethodKey.value.value);
+    expect(result.didMethodKey.bbs.bytes).toEqual(bytes);
+    expect(result.toString()).toEqual(did);
+  });
+
+  test("`DidMethodKey.from` works for custom did:key bbsPlus", () => {
+    const bytes = Uint8Array.from({ length: 96 }, (_, idx) => 255 - idx);
+    const did = `did:key:${encodeAsBase58btc(DidMethodKeyBytePrefixBBSPlus, bytes)}`;
+    const result = DidMethodKey.from(did);
+    expect(result.didMethodKey.bbsPlus.value).toEqual(result.didMethodKey.value.value);
+    expect(result.didMethodKey.bbsPlus.bytes).toEqual(bytes);
+    expect(result.toString()).toEqual(did);
+  });
+
+  test("`DidMethodKey.from` rejects custom bbs did:key with invalid key size", () => {
+    const bytes = Uint8Array.from({ length: 95 }, (_, idx) => idx);
+    const did = `did:key:${encodeAsBase58btc(DidMethodKeyBytePrefixBBS23, bytes)}`;
+
+    expect(() => DidMethodKey.from(did)).toThrow(
+      /expected `96` by `PublicKeyBBSValue`/
+    );
+  });
+
+  test("`DidMethodKey.fromKeypair` routes custom BBS keypair type", () => {
+    const publicKeyBuffer = Uint8Array.from({ length: 96 }, (_, idx) => idx);
+    const did = DidMethodKey.fromKeypair({
+      type: Bls12381BBS23DockVerKeyName,
+      publicKeyBuffer,
+    });
+
+    expect(did.didMethodKey.isBbs).toBe(true);
+    expect(did.didMethodKey.bbs.bytes).toEqual(publicKeyBuffer);
+    expect(did.toString()).toBe(
+      `did:key:${encodeAsBase58btc(DidMethodKeyBytePrefixBBS23, publicKeyBuffer)}`
+    );
+  });
+
+  test("`DidMethodKey.fromKeypair` routes custom BBS+ keypair type", () => {
+    const publicKeyBuffer = Uint8Array.from({ length: 96 }, (_, idx) => 255 - idx);
+    const did = DidMethodKey.fromKeypair({
+      type: Bls12381BBSDockVerKeyName,
+      publicKeyBuffer,
+    });
+
+    expect(did.didMethodKey.isBbsPlus).toBe(true);
+    expect(did.didMethodKey.bbsPlus.bytes).toEqual(publicKeyBuffer);
+    expect(did.toString()).toBe(
+      `did:key:${encodeAsBase58btc(
+        DidMethodKeyBytePrefixBBSPlus,
+        publicKeyBuffer
+      )}`
+    );
   });
 });
 

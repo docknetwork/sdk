@@ -65,6 +65,7 @@ import {
   encodeAsBase58,
   u8aToString,
   normalizeToU8a,
+  stringToU8a,
 } from '../../../utils';
 import { isMultibaseBytes } from '../../../utils/encoding/multibase';
 
@@ -104,9 +105,12 @@ export class TypedJsonWebKey extends withFrom(
     x: option(TypedString),
   };
 
-  // TODO: implement to support cheqd DID controlling with JsonWebKey
   get bytes() {
-    return [0, 0, 0, 0];
+    return this.toJSONStringBytes();
+  }
+
+  static fromBytes(bytes) {
+    return this.fromJSON(JSON.parse(u8aToString(bytes)));
   }
 }
 
@@ -253,7 +257,7 @@ export class VerificationMethod extends withFrom(
   static fromDidKey(keyRef, didKey) {
     const ref = VerificationMethodRef.from(keyRef);
 
-    const isJsonWebKey = false; // TODO: implement to support cheqd DID controlling with JsonWebKey
+    const isJsonWebKey = didKey.publicKey.constructor.VerKeyType === JsonWebKey2020Method.Type;
     const pkBytes = valueBytes(didKey.publicKey);
     const isMultibaseKey = !isJsonWebKey && isMultibaseBytes(pkBytes);
 
@@ -264,7 +268,7 @@ export class VerificationMethod extends withFrom(
       (!isMultibaseKey && !isJsonWebKey) ? pkBytes : void 0,
       void 0,
       isMultibaseKey ? pkBytes : void 0,
-      isJsonWebKey ? this.verificationMaterial : void 0,
+      isJsonWebKey ? TypedJsonWebKey.fromBytes(pkBytes) : void 0,
       void 0,
       didKey.isOffchain() ? didKey.publicKey.value : null,
     );
@@ -297,6 +301,17 @@ export class VerificationMethod extends withFrom(
 export class CheqdVerificationMethod extends withFrom(
   TypedStruct,
   function from(value, fromFn) {
+    if (
+      !(value instanceof VerificationMethod)
+      && value?.verificationMethodType === JsonWebKey2020Method.Type
+      && typeof value?.verificationMaterial === 'string'
+    ) {
+      return fromFn({
+        ...value,
+        verificationMaterial: stringToU8a(value.verificationMaterial),
+      });
+    }
+
     return fromFn(
       value instanceof VerificationMethod ? value.toCheqd(this) : value,
     );
@@ -314,12 +329,13 @@ export class CheqdVerificationMethod extends withFrom(
     return !(
       this.verificationMethodType instanceof Ed25519Verification2018Method
       || this.verificationMethodType instanceof Ed25519Verification2020Method
+      || this.verificationMethodType instanceof JsonWebKey2020Method
     );
   }
 
   toVerificationMethod(VerMethod = VerificationMethod) {
     // Convert the Cheqd-specific ID to a generic VerificationMethodRef
-    const isJsonWebKey = false; // TODO: implement to support cheqd DID controlling with JsonWebKey
+    const isJsonWebKey = this.verificationMethodType instanceof JsonWebKey2020Method;
     const genericId = VerificationMethodRef.from(this.id.toJSON());
     const isMultibaseKey = !isJsonWebKey && isMultibaseBytes(this.verificationMaterial);
     return new (ensureEqualToOrPrototypeOf(VerificationMethod, VerMethod))(
@@ -329,7 +345,7 @@ export class CheqdVerificationMethod extends withFrom(
       (!isMultibaseKey && !isJsonWebKey) ? this.verificationMaterial : void 0,
       void 0,
       isMultibaseKey ? this.verificationMaterial : void 0,
-      isJsonWebKey ? this.verificationMaterial : void 0,
+      isJsonWebKey ? TypedJsonWebKey.fromBytes(this.verificationMaterial) : void 0,
       void 0,
       this.metadata,
     );
@@ -341,10 +357,16 @@ export class CheqdVerificationMethod extends withFrom(
 
   // eslint-disable-next-line sonarjs/no-identical-functions
   toCheqdPayload() {
-    return filterObj(
+    const payload = filterObj(
       this.apply(maybeToCheqdPayloadOrJSON),
       (_, value) => value != null,
     );
+
+    if (this.verificationMethodType instanceof JsonWebKey2020Method) {
+      payload.verificationMaterial = u8aToString(this.verificationMaterial);
+    }
+
+    return payload;
   }
 }
 

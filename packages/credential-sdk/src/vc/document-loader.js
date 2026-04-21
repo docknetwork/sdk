@@ -54,8 +54,8 @@ function documentLoader(resolver = null) {
     if (uriString.startsWith('data:')) {
       document = parseEmbeddedDataURI(uriString);
     } else if (resolver?.supports(uriString)) {
-      // Try to resolve a DID and throw if cannot resolve
-      document = await resolver.resolve(uriString);
+      // Try to resolve using resolver; if not found, return null and let upstream loaders continue.
+      document = (await resolver.resolve(uriString)) ?? null;
     } else {
       // Strip ending slash from uri to determine cache key
       const cacheKey = uriString.endsWith('/')

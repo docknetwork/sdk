@@ -1,6 +1,8 @@
 import { Ed25519Keypair } from "../src/keypairs";
 import { AbstractDIDModule } from "../src/modules";
 import AbstractApiProvider from "../src/modules/abstract/common/abstract-api-provider";
+import AbstractStatusListCredentialModule from "../src/modules/abstract/status-list-credential/module";
+import { createCredential, createList } from "@digitalcredentials/vc-status-list";
 import {
   Resolver,
   ResolverRouter,
@@ -10,6 +12,7 @@ import {
   createResolver,
   DIDResolver,
   DIDKeyResolver,
+  StatusList2021Resolver,
 } from "../src/resolver";
 import {
   CheqdTestnetDIDDocument,
@@ -102,6 +105,27 @@ class WildcardPrefixAndMethodResolver extends Resolver {
   }
 }
 
+class TestStatusListCredentialModule extends AbstractStatusListCredentialModule {
+  constructor(getStatusListCredentialImpl) {
+    super();
+    this.getStatusListCredentialImpl = getStatusListCredentialImpl;
+  }
+
+  methods() {
+    return ["dock"];
+  }
+
+  async getStatusListCredential(id) {
+    return await this.getStatusListCredentialImpl(id);
+  }
+
+  async createStatusListCredentialTx() {}
+
+  async updateStatusListCredentialTx() {}
+
+  async removeStatusListCredentialTx() {}
+}
+
 describe("Resolvers", () => {
   it("checks `DIDResolverWithDIDReplacement`", async () => {
     const did = "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5";
@@ -162,6 +186,65 @@ describe("Resolvers", () => {
     expect(
       await new DIDResolver(dummyApi).resolve(String(did))
     ).toMatchSnapshot();
+  });
+
+  it("checks `StatusList2021Resolver` supports `http(s)` and dock identifiers", async () => {
+    const statusListModule = new TestStatusListCredentialModule(async (id) => ({
+      toJSON: () => ({ id, source: "module" }),
+    }));
+    const resolver = new StatusList2021Resolver(statusListModule);
+    const statusListId = "status-list2021:dock:0x123";
+    const httpsStatusListId = "https://example.com/status-list/1";
+    const httpStatusListId = "http://example.com/status-list/1";
+    const statusList = await createList({ length: 16 });
+    const httpStatusListCredential = await createCredential({
+      id: httpsStatusListId,
+      list: statusList,
+      statusPurpose: "revocation",
+    });
+    const fetchMock = jest.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => httpStatusListCredential,
+    });
+
+    expect(resolver.supports(statusListId)).toBe(true);
+    expect(resolver.supports(httpsStatusListId)).toBe(true);
+    expect(resolver.supports(httpStatusListId)).toBe(true);
+    expect(await resolver.resolve(statusListId)).toEqual({
+      id: statusListId,
+      source: "module",
+    });
+    expect(await resolver.resolve(httpsStatusListId)).toMatchObject({
+      id: httpsStatusListId,
+      credentialSubject: {
+        type: "StatusList2021",
+        statusPurpose: "revocation",
+      },
+    });
+    expect(fetchMock).toHaveBeenCalledWith(httpsStatusListId, undefined);
+
+    fetchMock.mockRestore();
+  });
+
+  it("checks `StatusList2021Resolver` skips non-status-list JSON over `http(s)`", async () => {
+    const statusListModule = new TestStatusListCredentialModule(async (id) => ({
+      toJSON: () => ({ id, source: "module" }),
+    }));
+    const resolver = new StatusList2021Resolver(statusListModule);
+    const httpsStatusListId = "https://example.com/not-a-status-list";
+    const fetchMock = jest.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        "@context": ["https://www.w3.org/2018/credentials/v1"],
+        id: httpsStatusListId,
+        type: ["VerifiableCredential"],
+      }),
+    });
+
+    expect(await resolver.resolve(httpsStatusListId)).toBeNull();
+    expect(fetchMock).toHaveBeenCalledWith(httpsStatusListId, undefined);
+
+    fetchMock.mockRestore();
   });
 
   it("checks `ResolverRouter`", async () => {

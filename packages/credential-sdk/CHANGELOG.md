@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.54.18
+
+### Patch Changes
+
+- Allow to resolve status list from http/https too
+
 ## 0.54.17
 
 ### Patch Changes

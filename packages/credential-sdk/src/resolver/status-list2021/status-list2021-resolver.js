@@ -2,12 +2,28 @@ import { ensureInstanceOf, ensureString } from '../../utils';
 import AbstractStatusListCredentialModule from '../../modules/abstract/status-list-credential/module';
 import { Resolver } from '../generic';
 import jsonFetch from '../../utils/json-fetch';
-import { StatusList2021Credential } from '../../vc';
 
 const HTTP_PREFIXES = ['http://', 'https://'];
+const STATUS_LIST_2021_TYPE = 'StatusList2021';
+const STATUS_PURPOSES = new Set(['revocation', 'suspension']);
 
 function isHttpUrl(id) {
   return HTTP_PREFIXES.some((prefix) => id.startsWith(prefix));
+}
+
+function isStatusList2021CredentialLike(doc) {
+  if (doc == null || typeof doc !== 'object') return false;
+
+  const { credentialSubject } = doc;
+  if (credentialSubject == null || typeof credentialSubject !== 'object') {
+    return false;
+  }
+
+  return (
+    credentialSubject.type === STATUS_LIST_2021_TYPE
+    && typeof credentialSubject.encodedList === 'string'
+    && STATUS_PURPOSES.has(credentialSubject.statusPurpose)
+  );
 }
 
 class StatusListResolver extends Resolver {
@@ -44,11 +60,7 @@ class StatusListResolver extends Resolver {
     if (isHttpUrl(identifier)) {
       const doc = await jsonFetch(identifier);
 
-      try {
-        return StatusList2021Credential.fromJSON(doc).toJSON();
-      } catch {
-        return null;
-      }
+      return isStatusList2021CredentialLike(doc) ? doc : null;
     }
 
     const cred = await this.statusListCredentialModule.getStatusListCredential(identifier);

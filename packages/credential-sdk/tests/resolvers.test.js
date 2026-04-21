@@ -105,6 +105,27 @@ class WildcardPrefixAndMethodResolver extends Resolver {
   }
 }
 
+class TestStatusListCredentialModule extends AbstractStatusListCredentialModule {
+  constructor(getStatusListCredentialImpl) {
+    super();
+    this.getStatusListCredentialImpl = getStatusListCredentialImpl;
+  }
+
+  methods() {
+    return ["dock"];
+  }
+
+  async getStatusListCredential(id) {
+    return await this.getStatusListCredentialImpl(id);
+  }
+
+  async createStatusListCredentialTx() {}
+
+  async updateStatusListCredentialTx() {}
+
+  async removeStatusListCredentialTx() {}
+}
+
 describe("Resolvers", () => {
   it("checks `DIDResolverWithDIDReplacement`", async () => {
     const did = "did:dock:5EbpmcZhMPPLCyP4mDwo4bNtwZBi3dZuKzz65PGk2Amnvek5";
@@ -168,17 +189,9 @@ describe("Resolvers", () => {
   });
 
   it("checks `StatusList2021Resolver` supports `http(s)` and dock identifiers", async () => {
-    const statusListModule = new (class Module extends AbstractStatusListCredentialModule {
-      methods() {
-        return ["dock"];
-      }
-
-      async getStatusListCredential(id) {
-        return {
-          toJSON: () => ({ id, source: "module" }),
-        };
-      }
-    })();
+    const statusListModule = new TestStatusListCredentialModule(async (id) => ({
+      toJSON: () => ({ id, source: "module" }),
+    }));
     const resolver = new StatusList2021Resolver(statusListModule);
     const statusListId = "status-list2021:dock:0x123";
     const httpsStatusListId = "https://example.com/status-list/1";
@@ -214,17 +227,9 @@ describe("Resolvers", () => {
   });
 
   it("checks `StatusList2021Resolver` skips non-status-list JSON over `http(s)`", async () => {
-    const statusListModule = new (class Module extends AbstractStatusListCredentialModule {
-      methods() {
-        return ["dock"];
-      }
-
-      async getStatusListCredential(id) {
-        return {
-          toJSON: () => ({ id, source: "module" }),
-        };
-      }
-    })();
+    const statusListModule = new TestStatusListCredentialModule(async (id) => ({
+      toJSON: () => ({ id, source: "module" }),
+    }));
     const resolver = new StatusList2021Resolver(statusListModule);
     const httpsStatusListId = "https://example.com/not-a-status-list";
     const fetchMock = jest.spyOn(global, "fetch").mockResolvedValue({

@@ -36,6 +36,54 @@ Detailed documentation and API reference are provided at the [Dock Network Docum
 
 Contributions to the @docknetwork/credential-sdk are welcome. Please feel free to open issues or submit pull requests to improve the SDK or add new features.
 
+## Release process
+
+Use this workflow when publishing a new package version from this monorepo.
+
+### 1) Add a changeset in your initial PR
+
+From the repository root:
+
+```bash
+yarn changeset
+```
+
+- Select packages in the prompt.
+- Choose the correct bump type (`patch`, `minor`, or `major`).
+- Write a short, user-facing summary.
+- Commit the generated file in `.changeset/` in the same PR as your code changes.
+
+Open a PR and merge it to `master` once CI is green.
+
+### 2) Version packages with Changesets
+
+After a PR that already includes its `.changeset` file is merged, run this from the latest `master` branch:
+
+```bash
+yarn changeset version
+```
+
+This command updates package versions and changelogs (including `packages/credential-sdk/CHANGELOG.md` and `packages/credential-sdk/package.json`).
+
+Commit those version/changelog updates to `master` (directly or via a small release PR, based on your team workflow).
+
+### 3) Publish via GitHub Release
+
+Publishing is triggered by the GitHub Actions workflow `.github/workflows/npm-publish.yml`, which runs on `release.published`.
+
+1. Go to [GitHub Releases](https://github.com/docknetwork/sdk/releases) and create a new release from `master`.
+2. Create/use the tag for the version being published (for example `v0.54.19`).
+3. Publish the release.
+
+When the release is published:
+
+- `npm-publish.yml` runs `yarn changeset publish` and publishes to npm using `NPM_TOKEN`.
+
+### 4) Verify publication
+
+- Confirm the GitHub Action completed successfully.
+- Verify the new versions on npm, for example: [@docknetwork/credential-sdk](https://www.npmjs.com/package/@docknetwork/credential-sdk).
+
 ## Types Overview
 
 The Credential SDK provides a flexible and extensible set of typed structures that facilitate working with complex data types. These types are designed to provide enhanced type safety, ensure consistent data handling, and simplify JSON and API integration. This includes support for versatile data representations such as Enums, Tuples, Strings, and Arrays, all of which come with utility methods for manipulation and comparison.

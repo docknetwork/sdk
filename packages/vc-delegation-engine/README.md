@@ -40,6 +40,30 @@ yarn add @docknetwork/vc-delegation-engine
 
 - **Errors, Summaries, and Constants**: `DelegationError`/`DelegationErrorCodes` offer structured failures, while `summarize.js` and `constants.js` capture reusable IRIs, action IDs, and summary builders for every delegation evaluation.
 
+## Delegation Architecture Notes
+
+The engine behavior includes several decisions that are important for integrators but easy to miss when reading only API signatures:
+
+- **Fail-closed verification**: any structural, policy, digest, or inference failure yields a `deny` decision with typed failure codes.
+- **Tail-first chain reconstruction**: chains are built from each tail credential by following `previousCredentialId`, and they reject cycles and missing links.
+- **Strict root anchoring**: delegation credentials must carry `rootCredentialId`; the root must be present in the same presentation bundle.
+- **Policy integrity binding**: when policy checks are enabled and a root references `delegationPolicyId`/`delegationPolicyDigest`, a `documentLoader` must fetch the policy and the digest must match.
+- **Monotonic narrowing model**: child credentials are validated as same-or-narrower than parent grants (roles, capabilities, and expiration windows).
+- **Signer-as-principal model**: the VP proof signer is surfaced as principal/context input for Cedar decisions.
+- **Dual-path VC-JWT ingestion**: JSON-LD VC-JWTs are expanded and evaluated as chains; VC-JWTs without JSON-LD context are intentionally skipped from chain logic but exposed as `skippedCredentials` for policy use.
+
+For a fuller record, see the consolidated delegation reference: [`DELEGATION_REFERENCE.md`](./DELEGATION_REFERENCE.md).
+
+## Working Material (Non-normative)
+
+Some delegation material is intentionally preserved as working references rather than normative docs:
+
+- scenario-heavy examples that encode practical policy patterns
+- test fixtures that capture edge cases and expected failures
+- policy JSON fixtures that act as reference schemas for role/capability narrowing
+
+See [`DELEGATION_REFERENCE.md`](./DELEGATION_REFERENCE.md) for the curated index and contributor checklist.
+
 ## License
 
 This SDK is licensed under the MIT License. See the [LICENSE.md](../../LICENSE.md) file for more details.

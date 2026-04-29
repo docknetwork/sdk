@@ -6,6 +6,7 @@ export default {
     "^@cheqd/sdk(.*)$": "<rootDir>/../../node_modules/@cheqd/sdk/build/cjs/$1",
     "^uint8arrays$": "<rootDir>/../../node_modules/uint8arrays/dist/src",
     "^file-type$": "<rootDir>/../../node_modules/file-type/index.js",
+    "^uuid$": "<rootDir>/../../node_modules/uuid-cjs",
     "^multiformats/(.*)$":
       "<rootDir>/../../node_modules/multiformats/dist/src/$1",
   },

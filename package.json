@@ -9,6 +9,29 @@
     "scripts/bench"
   ],
   "dependencies": {},
+  "overrides": {
+    "axios": "^1.15.2",
+    "bn.js": "^5.2.3",
+    "brace-expansion": "^2.0.3",
+    "file-type": "^22.0.1",
+    "lodash": "^4.18.1",
+    "minimatch": "^9.0.7",
+    "picomatch": "^4.0.4",
+    "protobufjs": "^8.0.1",
+    "undici": "^6.24.0",
+    "uuid": "^14.0.0",
+    "@stablelib/ed25519": "^1.0.2",
+    "@stablelib/ed25519-cjs": "npm:@stablelib/ed25519@^1.0.2",
+    "uuid-cjs": "npm:uuid@^14.0.0",
+    "file-type-cjs": "npm:file-type@^21.3.2",
+    "@digitalbazaar/http-client": "^3.4.1",
+    "@cheqd/ts-proto": {
+      "protobufjs": "^8.0.1"
+    },
+    "@cheqd/ts-proto-cjs": {
+      "protobufjs": "^8.0.1"
+    }
+  },
   "devDependencies": {
     "@babel/cli": "^7.24.1",
     "@babel/core": "^7.24.3",
@@ -19,6 +42,25 @@
     "turbo": "2.0.5"
   },
   "packageManager": "yarn@1.22.22",
+  "resolutions": {
+    "axios": "^1.15.2",
+    "bn.js": "^5.2.3",
+    "brace-expansion": "^2.0.3",
+    "file-type": "^22.0.1",
+    "lodash": "^4.18.1",
+    "minimatch": "^9.0.7",
+    "picomatch": "^4.0.4",
+    "protobufjs": "^8.0.1",
+    "undici": "^6.24.0",
+    "uuid": "^14.0.0",
+    "@stablelib/ed25519": "^1.0.2",
+    "@stablelib/ed25519-cjs": "npm:@stablelib/ed25519@^1.0.2",
+    "uuid-cjs": "npm:uuid@^14.0.0",
+    "file-type-cjs": "npm:file-type@^21.3.2",
+    "@digitalbazaar/http-client": "^3.4.1",
+    "@cheqd/ts-proto/protobufjs": "^8.0.1",
+    "@cheqd/ts-proto-cjs/protobufjs": "^8.0.1"
+  },
   "scripts": {
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",
     "publish-packages": "changeset version && changeset publish"

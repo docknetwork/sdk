@@ -43,7 +43,7 @@
     "@juanelas/base64": "^1.1.5",
     "@sphereon/pex": "^5.0.0-unstable.28",
     "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.26.0",
-    "@stablelib/ed25519": "^1.0.0",
+    "@stablelib/ed25519": "^2.1.0",
     "@transmute/json-web-signature": "^0.7.0-unstable.82",
     "blake2b": "2.1.4",
     "blakejs": "^1.2.1",
@@ -62,7 +62,7 @@
     "n3": "^1.17.4",
     "rify": "^0.7.1",
     "semver": "^7.6.0",
-    "uuid": "^10.0.0",
+    "uuid": "^14.0.0",
     "uuidv4": "^6.2.13",
     "varint": "^6.0.0"
   },

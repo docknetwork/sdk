@@ -20,10 +20,11 @@
     "protobufjs": "^8.0.1",
     "undici": "^6.24.0",
     "uuid": "^14.0.0",
-    "@stablelib/ed25519": "^2.1.0",
-    "@stablelib/ed25519-cjs": "npm:@stablelib/ed25519@^2.1.0",
+    "@stablelib/ed25519": "^1.0.2",
+    "@stablelib/ed25519-cjs": "npm:@stablelib/ed25519@^1.0.2",
     "uuid-cjs": "npm:uuid@^14.0.0",
     "file-type-cjs": "npm:file-type@^21.3.2",
+    "@digitalbazaar/http-client": "^3.4.1",
     "@cheqd/ts-proto": {
       "protobufjs": "^8.0.1"
     },
@@ -52,10 +53,11 @@
     "protobufjs": "^8.0.1",
     "undici": "^6.24.0",
     "uuid": "^14.0.0",
-    "@stablelib/ed25519": "^2.1.0",
-    "@stablelib/ed25519-cjs": "npm:@stablelib/ed25519@^2.1.0",
+    "@stablelib/ed25519": "^1.0.2",
+    "@stablelib/ed25519-cjs": "npm:@stablelib/ed25519@^1.0.2",
     "uuid-cjs": "npm:uuid@^14.0.0",
     "file-type-cjs": "npm:file-type@^21.3.2",
+    "@digitalbazaar/http-client": "^3.4.1",
     "@cheqd/ts-proto/protobufjs": "^8.0.1",
     "@cheqd/ts-proto-cjs/protobufjs": "^8.0.1"
   },

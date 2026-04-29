@@ -51,7 +51,11 @@ class EtherResolver extends Resolver {
   async resolve(did) {
     const parsed = parseDIDUrl(did);
     try {
-      return this.ethres(did, parsed);
+      // ethr-did-resolver v11 expects DID Resolution options as the 4th arg.
+      // Passing an explicit accept value avoids undefined option access.
+      return this.ethres(did, parsed, undefined, {
+        accept: 'application/did+ld+json',
+      });
     } catch (e) {
       throw new NoDIDError(did);
     }

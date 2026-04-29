@@ -24,7 +24,15 @@ export default class CustomLinkedDataSignature extends jsigs.suites
    * @param {object} config - Configuration options
    */
   constructor(config) {
-    super(config);
+    super({
+      ...config,
+      // Keep pre-upgrade behavior: allow relative JSON-LD terms/types during
+      // canonization unless a caller explicitly opts into safe mode.
+      canonizeOptions: {
+        safe: false,
+        ...(config.canonizeOptions || {}),
+      },
+    });
     this.alg = config.alg;
     this.useProofValue = config.useProofValue || false;
   }

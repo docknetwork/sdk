@@ -16,12 +16,21 @@
     "brace-expansion": "^2.0.3",
     "file-type": "^22.0.1",
     "lodash": "^4.18.1",
-    "minimatch": "^9.0.7",
+    "minimatch": "^10.2.5",
     "picomatch": "^4.0.4",
-    "protobufjs": "^7.5.5",
+    "protobufjs": "^8.0.1",
     "undici": "^6.24.0",
     "uuid": "^14.0.0",
-    "@stablelib/ed25519": "^2.1.0"
+    "@stablelib/ed25519": "^2.1.0",
+    "@stablelib/ed25519-cjs": "npm:@stablelib/ed25519@^2.1.0",
+    "uuid-cjs": "npm:uuid@^14.0.0",
+    "file-type-cjs": "npm:file-type@^21.3.2",
+    "@cheqd/ts-proto": {
+      "protobufjs": "^8.0.1"
+    },
+    "@cheqd/ts-proto-cjs": {
+      "protobufjs": "^8.0.1"
+    }
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",
@@ -40,12 +49,17 @@
     "brace-expansion": "^2.0.3",
     "file-type": "^22.0.1",
     "lodash": "^4.18.1",
-    "minimatch": "^9.0.7",
+    "minimatch": "^10.2.5",
     "picomatch": "^4.0.4",
-    "protobufjs": "^7.5.5",
+    "protobufjs": "^8.0.1",
     "undici": "^6.24.0",
     "uuid": "^14.0.0",
-    "@stablelib/ed25519": "^2.1.0"
+    "@stablelib/ed25519": "^2.1.0",
+    "@stablelib/ed25519-cjs": "npm:@stablelib/ed25519@^2.1.0",
+    "uuid-cjs": "npm:uuid@^14.0.0",
+    "file-type-cjs": "npm:file-type@^21.3.2",
+    "@cheqd/ts-proto/protobufjs": "^8.0.1",
+    "@cheqd/ts-proto-cjs/protobufjs": "^8.0.1"
   },
   "scripts": {
     "mdbook": "mdbook build tutorials --dest-dir ../out/tutorials",

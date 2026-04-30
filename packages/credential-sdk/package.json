@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/credential-sdk",
-  "version": "0.54.18",
+  "version": "0.54.19",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -39,7 +39,7 @@
     "@astronautlabs/jsonpath": "^1.1.2",
     "@digitalcredentials/vc-status-list": "^9.0.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0",
-    "@docknetwork/vc-delegation-engine": "1.0.3",
+    "@docknetwork/vc-delegation-engine": "1.0.4",
     "@juanelas/base64": "^1.1.5",
     "@sphereon/pex": "^5.0.0-unstable.28",
     "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.26.0",

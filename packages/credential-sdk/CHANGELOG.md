@@ -1,5 +1,13 @@
 # @docknetwork/credential-sdk
 
+## 0.54.19
+
+### Patch Changes
+
+- Upgrade packages
+- Updated dependencies
+  - @docknetwork/vc-delegation-engine@1.0.4
+
 ## 0.54.18
 
 ### Patch Changes

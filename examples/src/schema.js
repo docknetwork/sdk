@@ -11,6 +11,7 @@ import { CheqdCoreModules } from '@docknetwork/cheqd-blockchain-modules';
 import {
   VerifiableCredential,
   getKeyDoc,
+  getSuiteFromKeyDoc,
 } from '@docknetwork/credential-sdk/vc';
 import {
   Ed25519Keypair,
@@ -119,11 +120,13 @@ async function main() {
     emailAddress: 'abc@example.com',
   });
   await vc.sign(keyDoc);
+  const signingSuite = await getSuiteFromKeyDoc(keyDoc);
 
   console.log('Verifying the credential:', vc);
   const { verified, error } = await vc.verify({
     resolver,
     compactProof: false,
+    suite: [signingSuite],
   });
   if (!verified) {
     throw error || new Error('Verification failed');
@@ -139,6 +142,7 @@ async function main() {
     await vc.verify({
       resolver,
       compactProof: false,
+      suite: [signingSuite],
     });
     throw new Error(
       "Verification succeeded, but it shouldn't have. This is a bug.",

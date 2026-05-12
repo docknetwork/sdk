@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/vc-delegation-engine",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",

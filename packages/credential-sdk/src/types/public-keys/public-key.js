@@ -2,6 +2,7 @@ import { TypedEnum } from '../generic';
 import PublicKeyX25519Value from './public-key-x25519-value';
 import PublicKeyEd25519Value from './public-key-ed25519-value';
 import PublicKeySecp256k1Value from './public-key-secp256k1-value';
+import PublicKeySecp256r1Value from './public-key-secp256r1-value';
 import PublicKeySr25519Value from './public-key-sr25519-value';
 
 /**
@@ -31,6 +32,14 @@ export class PublicKeySecp256k1 extends PublicKey {
   static Class = PublicKeySecp256k1Value;
 }
 /**
+ * Class representing Secp256r1 PublicKey
+ * @class
+ * @extends {PublicKey}
+ */
+export class PublicKeySecp256r1 extends PublicKey {
+  static Class = PublicKeySecp256r1Value;
+}
+/**
  * Class representing Sr25519 PublicKey
  * @class
  * @extends {PublicKey}
@@ -50,6 +59,7 @@ export class PublicKeyX25519 extends PublicKey {
 PublicKey.bindVariants(
   PublicKeyEd25519,
   PublicKeySecp256k1,
+  PublicKeySecp256r1,
   PublicKeySr25519,
   PublicKeyX25519,
 );

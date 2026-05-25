@@ -10,6 +10,7 @@ import {
 import {
   PublicKeyEd25519Value,
   PublicKeySecp256k1Value,
+  PublicKeySecp256r1Value,
 } from '../../../../public-keys';
 import {
   DidMethodKeyBBS23ByteSize,
@@ -18,6 +19,7 @@ import {
   DidMethodKeyBytePrefixBBSPlus,
   DidMethodKeyBytePrefixEd25519,
   DidMethodKeyBytePrefixSecp256k1,
+  DidMethodKeyBytePrefixSecp256r1,
   DidMethodKeyQualifier,
 } from '../../constants';
 import DidOrDidMethodKeySignature from '../signature';
@@ -54,6 +56,9 @@ export class DidMethodKeyPublicKey extends withQualifier(TypedEnum) {
     if (hasPrefix(DidMethodKeyBytePrefixSecp256k1)) {
       // eslint-disable-next-line no-use-before-define
       PublicKey = DidMethodKeyPublicKeySecp256k1;
+    } else if (hasPrefix(DidMethodKeyBytePrefixSecp256r1)) {
+      // eslint-disable-next-line no-use-before-define
+      PublicKey = DidMethodKeyPublicKeySecp256r1;
     } else if (hasPrefix(DidMethodKeyBytePrefixEd25519)) {
       // eslint-disable-next-line no-use-before-define
       PublicKey = DidMethodKeyPublicKeyEd25519;
@@ -142,6 +147,14 @@ export class DidMethodKeyPublicKeySecp256k1 extends DidMethodKeyPublicKey {
   static Prefix = DidMethodKeyBytePrefixSecp256k1;
 }
 
+export class DidMethodKeyPublicKeySecp256r1 extends DidMethodKeyPublicKey {
+  static Class = PublicKeySecp256r1Value;
+
+  static Type = PublicKeySecp256r1Value.Type;
+
+  static Prefix = DidMethodKeyBytePrefixSecp256r1;
+}
+
 class PublicKeyBBSValue extends sized(TypedBytes) {
   static Type = 'bbs';
 
@@ -177,6 +190,7 @@ export class DidMethodKeyPublicKeyBBSPlus extends DidMethodKeyPublicKey {
 DidMethodKeyPublicKey.bindVariants(
   DidMethodKeyPublicKeyEd25519,
   DidMethodKeyPublicKeySecp256k1,
+  DidMethodKeyPublicKeySecp256r1,
   DidMethodKeyPublicKeyBBS,
   DidMethodKeyPublicKeyBBSPlus,
 );

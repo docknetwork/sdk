@@ -4,8 +4,10 @@ import { MemoizedPromiseMap, retry, timeout } from "../src/utils/async";
 import {
   PublicKeyEd25519,
   PublicKeySecp256k1,
+  PublicKeySecp256r1,
   SignatureEd25519,
   SignatureSecp256k1,
+  SignatureSecp256r1,
 } from "../src/types";
 import { isHexWithGivenByteSize } from "../src/utils/types/bytes";
 import { expandJSONLD } from "../src/vc";
@@ -13,7 +15,7 @@ import {
   getCredentialStatus,
   isAccumulatorRevocationStatus,
 } from "../src/vc/revocation";
-import { Ed25519Keypair, Secp256k1Keypair } from "../src/keypairs";
+import { Ed25519Keypair, Secp256k1Keypair, Secp256r1Keypair } from "../src/keypairs";
 import { chunks } from "../src/utils";
 
 describe("`chunks`", () => {
@@ -288,6 +290,12 @@ describe("Testing public key and signature instantiation from keyring", () => {
     expect(pk instanceof PublicKeySecp256k1).toBe(true);
   });
 
+  test("Pair's publicKey returns correct public key from secp256r1 pair", () => {
+    const pair = Secp256r1Keypair.random();
+    const pk = pair.publicKey();
+    expect(pk instanceof PublicKeySecp256r1).toBe(true);
+  });
+
   test("Pair's sign method returns correct signature from ed25519 pair", () => {
     const pair = Ed25519Keypair.random();
     const sig = pair.sign([1, 2]);
@@ -298,6 +306,12 @@ describe("Testing public key and signature instantiation from keyring", () => {
     const pair = Secp256k1Keypair.random();
     const sig = pair.sign([1, 2]);
     expect(sig instanceof SignatureSecp256k1).toBe(true);
+  });
+
+  test("Pair's sign method returns correct signature from secp256r1 pair", () => {
+    const pair = Secp256r1Keypair.random();
+    const sig = pair.sign([1, 2]);
+    expect(sig instanceof SignatureSecp256r1).toBe(true);
   });
 });
 
@@ -335,6 +349,45 @@ describe("Testing Ecdsa with secp256k1", () => {
       pair.keyPair.sign(Secp256k1Keypair.hash(msg2)).toDER()
     );
     expect(Secp256k1Keypair.verify(msg2, sig2, pk)).toBe(true);
+    expect(msg2 !== msg1).toBe(true);
+    expect(sig2 !== sig1).toBe(true);
+  });
+});
+
+describe("Testing Ecdsa with secp256r1", () => {
+  test("Signing and verification works", () => {
+    const msg = [
+      1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1,
+      2, 3, 4, 5, 6, 7, 8,
+    ];
+    const entropy =
+      "0x4c94485e0c21ae6c41ce1dfe7b6bfaceea5ab68e40a2476f50208e526f506080";
+    const pair = new Secp256r1Keypair(entropy);
+    const pk = pair.publicKey();
+    const sig = new Uint8Array(
+      pair.keyPair.sign(Secp256r1Keypair.hash(msg)).toDER()
+    );
+    expect(Secp256r1Keypair.verify(msg, sig, pk)).toBe(true);
+
+    const msg1 = [
+      1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1,
+      2, 3, 4, 5, 6, 7, 8, 9,
+    ];
+    const sig1 = new Uint8Array(
+      pair.keyPair.sign(Secp256r1Keypair.hash(msg1)).toDER()
+    );
+    expect(Secp256r1Keypair.verify(msg1, sig1, pk)).toBe(true);
+    expect(msg !== msg1).toBe(true);
+    expect(sig !== sig1).toBe(true);
+
+    const msg2 = [
+      1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1,
+      2, 3, 4, 5, 6, 7,
+    ];
+    const sig2 = new Uint8Array(
+      pair.keyPair.sign(Secp256r1Keypair.hash(msg2)).toDER()
+    );
+    expect(Secp256r1Keypair.verify(msg2, sig2, pk)).toBe(true);
     expect(msg2 !== msg1).toBe(true);
     expect(sig2 !== sig1).toBe(true);
   });

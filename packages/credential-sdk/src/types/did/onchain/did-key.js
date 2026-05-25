@@ -4,6 +4,7 @@ import {
 import {
   PublicKeyEd25519Value,
   PublicKeySecp256k1Value,
+  PublicKeySecp256r1Value,
   PublicKeySr25519Value,
   PublicKeyX25519Value,
 } from '../../public-keys';
@@ -51,6 +52,11 @@ export class DidKeySecp256k1PublicKey extends DidKeyValue {
 
   static Class = PublicKeySecp256k1Value;
 }
+export class DidKeySecp256r1PublicKey extends DidKeyValue {
+  static Type = 'secp256r1';
+
+  static Class = PublicKeySecp256r1Value;
+}
 /**
  * Class representing Sr25519 PublicKey
  * @class
@@ -96,6 +102,7 @@ export class DidKeyPSPublicKey extends DidKeyValue {
 DidKeyValue.bindVariants(
   DidKeyEd25519PublicKey,
   DidKeySecp256k1PublicKey,
+  DidKeySecp256r1PublicKey,
   DidKeySr25519PublicKey,
   DidKeyX25519PublicKey,
   DidKeyBBSPublicKey,
@@ -107,6 +114,7 @@ const Signing = [
   DidKeyEd25519PublicKey,
   DidKeySr25519PublicKey,
   DidKeySecp256k1PublicKey,
+  DidKeySecp256r1PublicKey,
 ];
 
 const Assertion = [

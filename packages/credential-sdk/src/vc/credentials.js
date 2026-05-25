@@ -39,6 +39,7 @@ import { ensureValidDatetime } from '../utils';
 
 import {
   EcdsaSecp256k1Signature2019,
+  EcdsaSecp256r1Signature2019,
   Ed25519Signature2018,
   Ed25519Signature2020,
   //   Sr25519Signature2020,
@@ -379,6 +380,7 @@ export async function verifyCredential(
     new Ed25519Signature2018(),
     new Ed25519Signature2020(),
     new EcdsaSecp256k1Signature2019(),
+    new EcdsaSecp256r1Signature2019(),
     // new Sr25519Signature2020(),
     new JsonWebSignature2020(),
     new Bls12381BBSSignatureDock2022(anoncredsParams),
@@ -616,6 +618,7 @@ export async function verifyPrivateStatus(
   const fullSuite = [
     new Ed25519Signature2018(),
     new EcdsaSecp256k1Signature2019(),
+    new EcdsaSecp256r1Signature2019(),
     // new Sr25519Signature2020(),
     new JsonWebSignature2020(),
     ...suite,

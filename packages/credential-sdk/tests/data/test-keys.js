@@ -1,4 +1,4 @@
-import { Secp256k1Keypair } from "../../src/keypairs";
+import { Secp256k1Keypair, Secp256r1Keypair } from "../../src/keypairs";
 import {
   Bls12381BBSKeyPairDock2023,
   Bls12381G2KeyPairDock2022,
@@ -9,6 +9,9 @@ import {
 } from "../../src/vc/crypto";
 
 const keypairEcdsaSecp256k1 = new Secp256k1Keypair(
+  "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+);
+const keypairEcdsaSecp256r1 = new Secp256r1Keypair(
   "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 );
 const bbsPublicKeyBase58 = "24wuq4w44W7dpvtz6RCRzrmrAm3mfzwkJApR7N2spya85BkhmxzmkT3KfTQnYrZp3dUF3nAaF8EcPgM4wwAEMjMjU8h5w3t3u6JX7wdT8KZGnEsdo8UWv6SdADKDf3RtqbYC";
@@ -56,6 +59,16 @@ export default [
       type: "EcdsaSecp256k1VerificationKey2019",
       keypair: keypairEcdsaSecp256k1,
       publicKey: keypairEcdsaSecp256k1.publicKey(),
+    },
+  },
+  {
+    sigType: "EcdsaSecp256r1Signature2019",
+    keyDocument: {
+      id: "urn:EcdsaSecp256r1VerificationKey2019#keys-1",
+      controller: "urn:EcdsaSecp256r1VerificationKey2019",
+      type: "EcdsaSecp256r1VerificationKey2019",
+      keypair: keypairEcdsaSecp256r1,
+      publicKey: keypairEcdsaSecp256r1.publicKey(),
     },
   },
   {

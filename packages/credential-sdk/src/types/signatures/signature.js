@@ -1,6 +1,7 @@
 import { TypedEnum } from '../generic';
 import SignatureEd25519Value from './signature-ed25519-value';
 import SignatureSecp256k1Value from './signature-secp256k1-value';
+import SignatureSecp256r1Value from './signature-secp256r1-value';
 import SignatureSr25519Value from './signature-sr25519-value';
 
 /**
@@ -34,6 +35,14 @@ export class SignatureSecp256k1 extends Signature {
   static Class = SignatureSecp256k1Value;
 }
 /**
+ * Class representing Secp256r1 Signature
+ * @class
+ * @extends {Signature}
+ */
+export class SignatureSecp256r1 extends Signature {
+  static Class = SignatureSecp256r1Value;
+}
+/**
  * Class representing Sr25519 Signature
  * @class
  * @extends {SignatureEd25519OrSignatureSecp256k1OrSignatureSr25519}
@@ -42,4 +51,9 @@ export class SignatureSr25519 extends Signature {
   static Class = SignatureSr25519Value;
 }
 
-Signature.bindVariants(SignatureEd25519, SignatureSecp256k1, SignatureSr25519);
+Signature.bindVariants(
+  SignatureEd25519,
+  SignatureSecp256k1,
+  SignatureSecp256r1,
+  SignatureSr25519,
+);

@@ -23,12 +23,19 @@ import {
   modifyDocument,
 } from './utils/cached-document-loader';
 
-import { Secp256k1Keypair } from '../src/keypairs';
+import { Secp256k1Keypair, Secp256r1Keypair } from '../src/keypairs';
 import { newDid } from './utils/did-helpers';
 
-describe('Composite claim soundness checker', () => {
+let activeKeypairClass = Secp256k1Keypair;
+
+describe.each([Secp256k1Keypair, Secp256r1Keypair])(
+  'Composite claim soundness checker (%s)',
+  (KeypairClass) => {
+    beforeAll(() => {
+      activeKeypairClass = KeypairClass;
+    });
   test('control: issue and verify', async () => {
-    const { did: issuer, suite: kp } = await newDid();
+    const { did: issuer, suite: kp } = await newDid(activeKeypairClass);
 
     const cred = {
       '@context': [
@@ -53,8 +60,8 @@ describe('Composite claim soundness checker', () => {
   });
 
   test('assumption: credential with false issuer will fail', async () => {
-    const { did: issuera, suite: kpa } = await newDid();
-    const { did: issuerb, suite: kpb } = await newDid();
+    const { did: issuera, suite: kpa } = await newDid(activeKeypairClass);
+    const { did: issuerb, suite: kpb } = await newDid(activeKeypairClass);
 
     // fyi signing a cred does modify the cred by adding a proof
     const cred = () => ({
@@ -233,8 +240,8 @@ describe('Composite claim soundness checker', () => {
   });
 
   test('bddap is named Gorgadon because joe is a pig that can fly', async () => {
-    const { did: pigchecker, suite: pigchecker_kp } = await newDid();
-    const { did: faa, suite: faa_kp } = await newDid();
+    const { did: pigchecker, suite: pigchecker_kp } = await newDid(activeKeypairClass);
+    const { did: faa, suite: faa_kp } = await newDid(activeKeypairClass);
 
     // if pigs can fly, then bddap is Gorgadon
     const gorg = {
@@ -445,7 +452,8 @@ describe('Composite claim soundness checker', () => {
       compositeClaim,
     );
   }, 30000);
-});
+  },
+);
 
 // takes a verifiable presentation and rules, returns all claims which are known to be true under
 // the given set of rules
@@ -479,7 +487,7 @@ function getSampleKey(randomDID, keypair) {
   return {
     id: `${randomDID}#keys-1`,
     controller: randomDID,
-    type: 'EcdsaSecp256k1VerificationKey2019',
+    type: keypair.constructor.VerKeyType,
     keypair,
     thisisstring: 'yes',
     publicKey: keypair.publicKey(),
@@ -489,7 +497,7 @@ function getSampleKey(randomDID, keypair) {
 // newDid imported from tests/utils/did-helpers.js
 
 async function validCredential() {
-  const { did: issuer, suite: kp } = await newDid();
+  const { did: issuer, suite: kp } = await newDid(activeKeypairClass);
   const cred = {
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
@@ -512,7 +520,7 @@ async function validCredential() {
 /// makes an unsigned presentation
 async function validPresentation() {
   const creds = [await validCredential()];
-  const { did: holder } = await newDid();
+  const { did: holder } = await newDid(activeKeypairClass);
   const presentation = createPresentation(
     creds,
     `urn:${randomAsHex(16)}`,

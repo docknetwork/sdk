@@ -4,6 +4,7 @@ import { DockDidOrDidMethodKey, DockDid, DidMethodKey } from "../src/types/did";
 import {
   DidMethodKeyBytePrefixBBS23,
   DidMethodKeyBytePrefixBBSPlus,
+  DidMethodKeyBytePrefixSecp256r1,
 } from "../src/types/did/onchain/constants";
 import {
   Bls12381BBS23DockVerKeyName,
@@ -46,6 +47,17 @@ describe("`DockDidOrDidMethodKey.from`", () => {
     ).toThrowErrorMatchingSnapshot();
   });
 
+  test("`DidMethodKey.from` work for a raw did:key secp256r1", () => {
+    const bytes =
+      "0x03874c15c7fda20e539c6e5ba573c139884c351188799f5458b4b41f7924f235cd";
+    const did = encodeAsBase58btc(DidMethodKeyBytePrefixSecp256r1, bytes);
+    const result = DidMethodKey.from(did);
+    expect(result.didMethodKey.secp256r1.value).toEqual(bytes);
+    expect(result.toString()).toEqual(`did:key:${did}`);
+
+    expect(() => DockDidOrDidMethodKey.from(did)).toThrowErrorMatchingSnapshot();
+  });
+
   test("`DockDidOrDidMethodKey.from`/`DockDid.from` work for did:dock", () => {
     const classes = [DockDidOrDidMethodKey, DockDid];
 
@@ -72,6 +84,22 @@ describe("`DockDidOrDidMethodKey.from`", () => {
       expect(result.toString()).toEqual(
         "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme"
       );
+    }
+  });
+
+  test("`DockDidOrDidMethodKey.from`/`DidMethodKey.from` works for did:key secp256r1", () => {
+    const classes = [DockDidOrDidMethodKey, DidMethodKey];
+    const bytes =
+      "0x03874c15c7fda20e539c6e5ba573c139884c351188799f5458b4b41f7924f235cd";
+    const did = `did:key:${encodeAsBase58btc(
+      DidMethodKeyBytePrefixSecp256r1,
+      bytes
+    )}`;
+
+    for (const Did of classes) {
+      const result = Did.from(did);
+      expect(result.didMethodKey.secp256r1.value).toEqual(bytes);
+      expect(result.toString()).toEqual(did);
     }
   });
 

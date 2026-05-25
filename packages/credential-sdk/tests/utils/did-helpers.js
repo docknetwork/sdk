@@ -1,6 +1,6 @@
 import b58 from 'bs58';
 import { randomAsHex } from '../../src/utils';
-import { Secp256k1Keypair } from '../../src/keypairs';
+import { Secp256k1Keypair, Secp256r1Keypair } from '../../src/keypairs';
 import { verifyCredential, verifyPresentation } from '../../src/vc';
 import { documentLoader, addDocument, registered } from './cached-document-loader';
 
@@ -53,15 +53,19 @@ export function getSampleKey(randomDID, keypair) {
   return {
     id: `${randomDID}#keys-1`,
     controller: randomDID,
-    type: 'EcdsaSecp256k1VerificationKey2019',
+    type: keypair.constructor.VerKeyType,
     keypair,
     thisisstring: 'yes',
     publicKey: keypair.publicKey(),
   };
 }
 
-export async function newDid() {
-  const kp = Secp256k1Keypair.random();
+export async function newDid(KeypairClass = Secp256k1Keypair) {
+  if (![Secp256k1Keypair, Secp256r1Keypair].includes(KeypairClass)) {
+    throw new Error(`Unsupported keypair class \`${KeypairClass?.name}\``);
+  }
+
+  const kp = KeypairClass.random();
   const randomDID = genPlaceholderDID();
   const keypair = getSampleKey(randomDID, kp);
   registerDid(randomDID, keypair);

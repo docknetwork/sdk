@@ -15,6 +15,8 @@ export { default as Bls12381PSSignatureDock2023 } from './Bls12381PSSignatureDoc
 export { default as Bls12381PSSignatureProofDock2023 } from './Bls12381PSSignatureProofDock2023';
 export { default as EcdsaSecp256k1Signature2019 } from './EcdsaSecp256k1Signature2019';
 export { default as EcdsaSecp256k1VerificationKey2019 } from './EcdsaSecp256k1VerificationKey2019';
+export { default as EcdsaSecp256r1Signature2019 } from './EcdsaSecp256r1Signature2019';
+export { default as EcdsaSecp256r1VerificationKey2019 } from './EcdsaSecp256r1VerificationKey2019';
 export { default as Ed25519Signature2018 } from './Ed25519Signature2018';
 export { default as Ed25519Signature2020 } from './Ed25519Signature2020';
 export { default as Ed25519VerificationKey2018 } from './Ed25519VerificationKey2018';

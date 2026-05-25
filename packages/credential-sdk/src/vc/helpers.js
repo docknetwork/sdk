@@ -4,8 +4,10 @@ import defaultDocumentLoader from './document-loader';
 
 import {
   EcdsaSecp256k1VerKeyName,
+  EcdsaSecp256r1VerKeyName,
   Ed25519VerKeyName,
   EcdsaSecp256k1Signature2019,
+  EcdsaSecp256r1Signature2019,
   Ed25519Signature2018,
   // Sr25519Signature2020,
   Bls12381BBSSignatureDock2022,
@@ -71,6 +73,9 @@ export async function getSuiteFromKeyDoc(keyDoc, useProofValue, options) {
   switch (keyDoc.type) {
     case EcdsaSecp256k1VerKeyName:
       Cls = EcdsaSecp256k1Signature2019;
+      break;
+    case EcdsaSecp256r1VerKeyName:
+      Cls = EcdsaSecp256r1Signature2019;
       break;
     case Ed25519VerKeyName:
       Cls = Ed25519Signature2018;

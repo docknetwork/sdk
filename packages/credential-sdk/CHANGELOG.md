@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.55.0
+
+### Minor Changes
+
+- secp256r1 key support
+
 ## 0.54.19
 
 ### Patch Changes

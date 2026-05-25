@@ -1,5 +1,14 @@
 # @docknetwork/benchmarks
 
+## 0.4.24
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/credential-sdk@0.55.0
+  - @docknetwork/cheqd-blockchain-api@5.0.0
+  - @docknetwork/cheqd-blockchain-modules@5.0.0
+
 ## 0.4.23
 
 ### Patch Changes

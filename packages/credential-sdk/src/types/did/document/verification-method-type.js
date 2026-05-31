@@ -1,6 +1,7 @@
 import { TypedEnum, Null } from '../../generic';
 import {
   EcdsaSecp256k1VerKeyName,
+  EcdsaSecp256r1VerKeyName,
   Ed255192020VerKeyName,
   Ed25519VerKeyName,
   Sr25519VerKeyName,
@@ -37,6 +38,11 @@ export class EcdsaSecp256k1VerificationKey2019 extends VerificationMethodType {
 
   static Type = EcdsaSecp256k1VerKeyName;
 }
+export class EcdsaSecp256r1VerificationKey2019 extends VerificationMethodType {
+  static Class = Null;
+
+  static Type = EcdsaSecp256r1VerKeyName;
+}
 export class X25519KeyAgreementKey2019 extends VerificationMethodType {
   static Class = Null;
 
@@ -67,6 +73,7 @@ VerificationMethodType.bindVariants(
   Ed25519Verification2020Method,
   Sr25519Verification2020Method,
   EcdsaSecp256k1VerificationKey2019,
+  EcdsaSecp256r1VerificationKey2019,
   X25519KeyAgreementKey2019,
   Bls12381G2VerificationKeyDock2022,
   Bls12381BBSVerificationKeyDock2023,

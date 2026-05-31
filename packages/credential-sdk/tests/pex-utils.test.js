@@ -41,6 +41,7 @@ const samplePresentationDefinition = {
       proof_type: [
         "JsonWebSignature2020",
         "EcdsaSecp256k1Signature2019",
+        "EcdsaSecp256r1Signature2019",
         "Ed25519Signature2018",
         "Bls12381BBS+SignatureDock2022",
       ],

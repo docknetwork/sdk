@@ -1,7 +1,7 @@
-import { Ed25519Keypair, Secp256k1Keypair } from "../src/keypairs";
+import { Ed25519Keypair, Secp256k1Keypair, Secp256r1Keypair } from "../src/keypairs";
 import { randomAsHex } from "../src/utils";
 
-describe.each([Ed25519Keypair, Secp256k1Keypair])("Keypairs", (Keypair) => {
+describe.each([Ed25519Keypair, Secp256k1Keypair, Secp256r1Keypair])("Keypairs", (Keypair) => {
   const createKp = (source) =>
     Keypair === Ed25519Keypair
       ? Keypair.fromSeed(source)

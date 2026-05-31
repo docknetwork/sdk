@@ -118,6 +118,19 @@ export default {
     assertionMethod: ["urn:EcdsaSecp256k1VerificationKey2019#keys-1"],
     authentication: ["urn:EcdsaSecp256k1VerificationKey2019#keys-1"],
   },
+  "urn:EcdsaSecp256r1VerificationKey2019#keys-1": {
+    id: "urn:EcdsaSecp256r1VerificationKey2019#keys-1",
+    type: "EcdsaSecp256r1VerificationKey2019",
+    publicKeyBase58: "xPFeecydprLrZ8N9WsSfbcRzp8UifrhBkMWuJofAsvpH",
+    "@context": "https://w3id.org/security/v2",
+    controller: "urn:EcdsaSecp256r1VerificationKey2019",
+  },
+  "urn:EcdsaSecp256r1VerificationKey2019": {
+    "@context": "https://w3id.org/security/v2",
+    id: "urn:EcdsaSecp256r1VerificationKey2019",
+    assertionMethod: ["urn:EcdsaSecp256r1VerificationKey2019#keys-1"],
+    authentication: ["urn:EcdsaSecp256r1VerificationKey2019#keys-1"],
+  },
 
   "urn:JsonWebKey2020": {
     "@context": "https://w3id.org/security/v2",

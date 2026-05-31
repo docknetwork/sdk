@@ -27,10 +27,12 @@ import {
 import {
   PublicKeyEd25519,
   PublicKeySecp256k1,
+  PublicKeySecp256r1,
   PublicKeySr25519,
 } from '../../public-keys';
 import {
   EcdsaSecp256k1VerKeyName,
+  EcdsaSecp256r1VerKeyName,
   Ed255192020VerKeyName,
   Ed25519VerKeyName,
   Sr25519VerKeyName,
@@ -233,6 +235,8 @@ export class VerificationMethod extends withFrom(
         return PublicKeyEd25519;
       case EcdsaSecp256k1VerKeyName:
         return PublicKeySecp256k1;
+      case EcdsaSecp256r1VerKeyName:
+        return PublicKeySecp256r1;
       case Bls12381BBSDockVerKeyName:
         return BBSPlusPublicKey;
       case Bls12381BBS23DockVerKeyName:

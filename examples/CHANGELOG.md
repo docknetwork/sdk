@@ -1,5 +1,16 @@
 # @docknetwork/sdk-examples
 
+## 0.22.6
+
+### Minor Changes
+
+- Upgrade Cheqd SDK
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-api@5.1.0
+
 ## 0.22.5
 
 ### Patch Changes

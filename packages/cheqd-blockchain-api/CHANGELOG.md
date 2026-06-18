@@ -1,5 +1,12 @@
 # @docknetwork/cheqd-blockchain-api
 
+## 5.1.0
+
+### Minor Changes
+
+- Upgrade Cheqd SDK
+
+
 ## 5.0.0
 
 ### Patch Changes

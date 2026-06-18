@@ -1294,10 +1294,10 @@
     human-id "^4.1.1"
     prettier "^2.7.1"
 
-"@cheqd/sdk@5.5.0":
-  version "5.5.0"
-  resolved "https://registry.npmjs.org/@cheqd/sdk/-/sdk-5.5.0.tgz"
-  integrity sha512-vtmu8GsGSvR0w08kRX1CXI+lwU5K+qJg+zxh3rQiSsid36DiakmrQAJF2bNsGhyDYDT0GjObsKohHxoiBXX0pw==
+"@cheqd/sdk@5.5.1":
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/@cheqd/sdk/-/sdk-5.5.1.tgz#241340a57d219c9a6fac6112a2b0f86d3acab0ed"
+  integrity sha512-azd+xG0poZxayF6iGfwXs/HPSaxREabLPxauXAfNhuSBA8BIqoE12giNBjGM+Lhq+dvg02PSy+riS2YU9jXk0A==
   dependencies:
     "@cheqd/ts-proto" "^4.2.0"
     "@cheqd/ts-proto-cjs" "npm:@cheqd/ts-proto@~2.6.0"

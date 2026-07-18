@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/credential-sdk",
-  "version": "0.55.0",
+  "version": "0.56.0",
   "license": "MIT",
   "type": "module",
   "files": [
@@ -43,7 +43,7 @@
   "dependencies": {
     "@astronautlabs/jsonpath": "^1.1.2",
     "@digitalcredentials/vc-status-list": "^9.0.0",
-    "@docknetwork/crypto-utils": "0.1.0",
+    "@docknetwork/crypto-utils": "0.2.0",
     "@docknetwork/crypto-wasm-ts": "^0.63.0",
     "@docknetwork/vc-delegation-engine": "1.0.4",
     "@juanelas/base64": "^1.1.5",

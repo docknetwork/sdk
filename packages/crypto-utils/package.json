@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/crypto-utils",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Lightweight Dock keypairs, crypto value types, byte utilities, and JWS helpers",
   "license": "MIT",
   "type": "module",

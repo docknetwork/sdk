@@ -1,5 +1,16 @@
 # @docknetwork/credential-sdk
 
+## 0.56.0
+
+### Minor Changes
+
+- Create crypto-utils package
+
+### Patch Changes
+
+- Updated dependencies
+  - @docknetwork/crypto-utils@0.2.0
+
 ## 0.55.0
 
 ### Minor Changes

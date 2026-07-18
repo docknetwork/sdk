@@ -1,7 +1,13 @@
-export * from './public-key';
-
-export { default as PublicKeySr25519Value } from './public-key-sr25519-value';
-export { default as PublicKeyEd25519Value } from './public-key-ed25519-value';
-export { default as PublicKeySecp256k1Value } from './public-key-secp256k1-value';
-export { default as PublicKeySecp256r1Value } from './public-key-secp256r1-value';
-export { default as PublicKeyX25519Value } from './public-key-x25519-value';
+export {
+  PublicKey,
+  PublicKeyEd25519,
+  PublicKeyEd25519Value,
+  PublicKeySecp256k1,
+  PublicKeySecp256k1Value,
+  PublicKeySecp256r1,
+  PublicKeySecp256r1Value,
+  PublicKeySr25519,
+  PublicKeySr25519Value,
+  PublicKeyX25519,
+  PublicKeyX25519Value,
+} from '@docknetwork/crypto-utils/types';

@@ -1,5 +1,7 @@
-export { default as DockKeypair } from './dock-keypair';
-export { default as Ed25519Keypair } from './keypair-ed25519';
-export { default as Secp256k1Keypair } from './keypair-secp256k1';
-export { default as Secp256r1Keypair } from './keypair-secp256r1';
+export {
+  DockKeypair,
+  Ed25519Keypair,
+  Secp256k1Keypair,
+  Secp256r1Keypair,
+} from '@docknetwork/crypto-utils/keypairs';
 export { default as DidKeypair } from './did-keypair';

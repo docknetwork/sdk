@@ -157,6 +157,49 @@ function decodeJsonPart(encoded, name) {
   }
 }
 
+function compactJwtParts(jwt, label) {
+  if (typeof jwt !== 'string') {
+    throw new TypeError(`${label} must be a compact JWT`);
+  }
+  const parts = jwt.split('.');
+  if (parts.length !== 3 || parts.some((part) => part.length === 0)) {
+    throw new Error(`${label} must be a compact JWT`);
+  }
+  return parts;
+}
+
+/**
+ * Decodes a compact JWT payload without verifying its signature.
+ *
+ * @param {string} jwt
+ * @param {string} label
+ * @returns {object}
+ */
+export function decodeJwtPayload(jwt, label = 'JWT') {
+  const [, encodedPayload] = compactJwtParts(jwt, label);
+  try {
+    return JSON.parse(base64url.decode(encodedPayload));
+  } catch (cause) {
+    throw new Error(`${label} payload is not valid JSON`, { cause });
+  }
+}
+
+/**
+ * Decodes a compact JWT protected header without verifying its signature.
+ *
+ * @param {string} jwt
+ * @param {string} label
+ * @returns {object}
+ */
+export function decodeJwtProtectedHeader(jwt, label = 'JWT') {
+  const [encodedHeader] = compactJwtParts(jwt, label);
+  try {
+    return JSON.parse(base64url.decode(encodedHeader));
+  } catch (cause) {
+    throw new Error(`${label} protected header is not valid JSON`, { cause });
+  }
+}
+
 /**
  * Verifies and decodes a compact JWT using a supported Dock public key.
  *
@@ -174,16 +217,11 @@ export function verifyJWT(
   { algorithms = supportedJWTAlgorithms } = {},
 ) {
   try {
-    if (typeof jwt !== 'string') {
-      throw new TypeError('JWT must be a string');
-    }
-
-    const parts = jwt.split('.');
-    if (parts.length !== 3 || parts.some((part) => part.length === 0)) {
-      throw new Error('Malformed JWT: expected 3 non-empty parts');
-    }
-
-    const [encodedHeader, encodedPayload, encodedSignature] = parts;
+    const [
+      encodedHeader,
+      encodedPayload,
+      encodedSignature,
+    ] = compactJwtParts(jwt, 'JWT');
     const protectedHeader = decodeJsonPart(encodedHeader, 'protected header');
     const payload = decodeJsonPart(encodedPayload, 'payload');
 

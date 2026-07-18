@@ -1,0 +1,55 @@
+{
+  "name": "@docknetwork/ap2",
+  "version": "0.2.0",
+  "description": "Basic AP2 support",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.js"
+    },
+    "./src/*": {
+      "import": "./dist/esm/*",
+      "require": "./dist/cjs/*",
+      "default": "./dist/esm/*"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docknetwork/sdk"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.25.9",
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.3.1",
+    "babel-jest": "^29.7.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.7.0",
+    "rollup": "^4.28.0",
+    "rollup-plugin-multi-input": "^1.4.1"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "test": "jest --runInBand",
+    "lint": "eslint \"src/**/*.js\"",
+    "prepublishOnly": "yarn build"
+  }
+}

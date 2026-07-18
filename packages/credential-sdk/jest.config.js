@@ -1,6 +1,9 @@
 export default {
   bail: true,
-  moduleNameMapper: {},
+  moduleNameMapper: {
+    "^@docknetwork/crypto-utils$": "<rootDir>/../crypto-utils/src/index.js",
+    "^@docknetwork/crypto-utils/(.*)$": "<rootDir>/../crypto-utils/src/$1",
+  },
   clearMocks: true,
   testTimeout: 30000,
   testEnvironment: "./tests/test-environment",

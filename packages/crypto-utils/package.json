@@ -1,0 +1,78 @@
+{
+  "name": "@docknetwork/crypto-utils",
+  "version": "0.2.0",
+  "description": "Lightweight Dock keypairs, crypto value types, byte utilities, and JWS helpers",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/index.js"
+    },
+    "./keypairs": {
+      "import": "./dist/esm/keypairs/index.js",
+      "require": "./dist/cjs/keypairs/index.cjs",
+      "default": "./dist/esm/keypairs/index.js"
+    },
+    "./types": {
+      "import": "./dist/esm/types/index.js",
+      "require": "./dist/cjs/types/index.cjs",
+      "default": "./dist/esm/types/index.js"
+    },
+    "./utils": {
+      "import": "./dist/esm/utils/index.js",
+      "require": "./dist/cjs/utils/index.cjs",
+      "default": "./dist/esm/utils/index.js"
+    },
+    "./vc": {
+      "import": "./dist/esm/vc/index.js",
+      "require": "./dist/cjs/vc/index.cjs",
+      "default": "./dist/esm/vc/index.js"
+    },
+    "./src/*": {
+      "import": "./dist/esm/*",
+      "require": "./dist/cjs/*",
+      "default": "./dist/esm/*"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docknetwork/sdk"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@stablelib/ed25519": "^1.0.0",
+    "base64url": "^3.0.1",
+    "elliptic": "6.6.1",
+    "js-sha256": "^0.11.0"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.25.9",
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.3.1",
+    "babel-jest": "^29.7.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.7.0",
+    "rollup": "^4.28.0",
+    "rollup-plugin-multi-input": "^1.4.1"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "test": "jest --runInBand",
+    "lint": "eslint \"src/**/*.js\"",
+    "prepublishOnly": "yarn build"
+  }
+}

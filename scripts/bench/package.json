@@ -2,14 +2,14 @@
   "name": "@docknetwork/benchmarks",
   "private": true,
   "type": "module",
-  "version": "0.4.26",
+  "version": "0.4.27",
   "scripts": {
     "bench": "babel-node src/main.js"
   },
   "dependencies": {
-    "@docknetwork/cheqd-blockchain-api": "6.0.0",
-    "@docknetwork/cheqd-blockchain-modules": "6.0.0",
-    "@docknetwork/credential-sdk": "0.56.0",
+    "@docknetwork/cheqd-blockchain-api": "6.0.1",
+    "@docknetwork/cheqd-blockchain-modules": "6.0.1",
+    "@docknetwork/credential-sdk": "0.56.1",
     "@docknetwork/crypto-wasm-ts": "^0.63.0"
   },
   "devDependencies": {

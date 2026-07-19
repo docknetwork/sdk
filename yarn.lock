@@ -7096,6 +7096,21 @@
   resolved "https://registry.npmjs.org/@scure/base/-/base-1.2.6.tgz"
   integrity sha512-g/nm5FgUa//MCj1gV09zTJTaM6KBAHqLN907YVQqf7zC49+DcO4B1so4ZX07Ef10Twr6nuqYEH9GEggFXA4Fmg==
 
+"@sd-jwt/core@0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/core/-/core-0.9.2.tgz#89092457660b45cdd0d9da2b30f2f8ecf19c7ba5"
+  integrity sha512-AbvID/VIogRtPtCWGmfUlCZczHaBSRFmTwOAiUeuPRjDJTGUQu3gMRKwsfSGRHlfPo0pSaRQ7lqN3N+a5i+SDA==
+  dependencies:
+    "@sd-jwt/decode" "0.9.2"
+    "@sd-jwt/present" "0.9.2"
+    "@sd-jwt/types" "0.9.2"
+    "@sd-jwt/utils" "0.9.2"
+
+"@sd-jwt/crypto-nodejs@^0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/crypto-nodejs/-/crypto-nodejs-0.9.2.tgz#23ad818b909a6b339d63cb38c1d230bf481ce0a1"
+  integrity sha512-OL5drLhrsDok60XfLoovAK+DT/6mA1myZe1tkA8JflV8tcx4OZTLi/UMVcW/hc+7nBugYICutVSoIejTYsgbEw==
+
 "@sd-jwt/decode@0.7.2", "@sd-jwt/decode@^0.7.2":
   version "0.7.2"
   resolved "https://registry.npmjs.org/@sd-jwt/decode/-/decode-0.7.2.tgz"
@@ -7103,6 +7118,32 @@
   dependencies:
     "@sd-jwt/types" "0.7.2"
     "@sd-jwt/utils" "0.7.2"
+
+"@sd-jwt/decode@0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/decode/-/decode-0.9.2.tgz#3f2df7b22bfce1ff4640f46b1e51d513c9c1446d"
+  integrity sha512-jHY7hqk7EMkp6E2cB13QmXvRZN7njvAveVh+zKKy0kxpAM7DmcR4TqcDA4mc5y4lP8zWFUgbk7oGLCx2wiBq+w==
+  dependencies:
+    "@sd-jwt/types" "0.9.2"
+    "@sd-jwt/utils" "0.9.2"
+
+"@sd-jwt/jwt-status-list@0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/jwt-status-list/-/jwt-status-list-0.9.2.tgz#9af484cad38c137831fd2d836be3789822b3d45b"
+  integrity sha512-59bPkgSnwvibJgUNVKmSE3SFMQwvDnh3Xr21aUi0bgII7yoHTQ+vqnryVOF8qcjpyICyi/clIlkTw3VWSyAV+g==
+  dependencies:
+    "@sd-jwt/types" "0.9.2"
+    base64url "^3.0.1"
+    pako "^2.1.0"
+
+"@sd-jwt/present@0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/present/-/present-0.9.2.tgz#476af63defbe8459cb033a88b0263c78d4251572"
+  integrity sha512-ozBDYfQxUCwu0N+gbyk6zJDraMslFFuNLW+GxITybdDfVJek65tBtbROB8ZBvkAlEl0PDRKebq+xKOCRmplmWA==
+  dependencies:
+    "@sd-jwt/decode" "0.9.2"
+    "@sd-jwt/types" "0.9.2"
+    "@sd-jwt/utils" "0.9.2"
 
 "@sd-jwt/present@^0.7.2":
   version "0.7.2"
@@ -7113,10 +7154,26 @@
     "@sd-jwt/types" "0.7.2"
     "@sd-jwt/utils" "0.7.2"
 
+"@sd-jwt/sd-jwt-vc@^0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/sd-jwt-vc/-/sd-jwt-vc-0.9.2.tgz#bbb3ea645bd6426866bdcbc024604ee12cd49dd4"
+  integrity sha512-UOx5ULWyztJv2FbIjVJ0XCDixXwpgFxRCFykhLeRJI0T9+48hi2ucvOdqZqD2X7LkXkjCZNR0kQlJs+/n8gLEg==
+  dependencies:
+    "@sd-jwt/core" "0.9.2"
+    "@sd-jwt/jwt-status-list" "0.9.2"
+    "@sd-jwt/utils" "0.9.2"
+    ajv "^8.17.1"
+    ajv-formats "^3.0.1"
+
 "@sd-jwt/types@0.7.2", "@sd-jwt/types@^0.7.2":
   version "0.7.2"
   resolved "https://registry.npmjs.org/@sd-jwt/types/-/types-0.7.2.tgz"
   integrity sha512-1NRKowiW0ZiB9SGLApLPBH4Xk8gDQJ+nA9NdZ+uy6MmJKLEwjuJxO7yTvRIv/jX/0/Ebh339S7Kq4RD2AiFuRg==
+
+"@sd-jwt/types@0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/types/-/types-0.9.2.tgz#17a9d62e36d9863b2c20a127be22a3e77005a6a8"
+  integrity sha512-eV/MY80ekeTrqaohzPpkrgwPki6Igx69D6RniduV1Ehv6o/zaJQ2F0hY/RqBAkJhQtBQoOzouwKYHme40k1Dlw==
 
 "@sd-jwt/utils@0.7.2":
   version "0.7.2"
@@ -7124,6 +7181,14 @@
   integrity sha512-aMPY7uHRMgyI5PlDvEiIc+eBFGC1EM8OCQRiEjJ8HGN0pajWMYj0qwSw7pS90A49/DsYU1a5Zpvb7nyjgGH0Yg==
   dependencies:
     "@sd-jwt/types" "0.7.2"
+    js-base64 "^3.7.6"
+
+"@sd-jwt/utils@0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/utils/-/utils-0.9.2.tgz#7e15091a5b7c636379932014f1fedb1713dc4217"
+  integrity sha512-GpTD0isav2f+JyMyzeyf6wV3nYcD5e3oL+sVVr/61Y3oaIBGMWLtGGGhBRMCimSnd8kbb0P9jLxvp7ioASk6vw==
+  dependencies:
+    "@sd-jwt/types" "0.9.2"
     js-base64 "^3.7.6"
 
 "@sinclair/typebox@^0.27.8":
@@ -12979,6 +13044,11 @@ pako@^2.0.4:
   version "2.1.0"
   resolved "https://registry.npmjs.org/pako/-/pako-2.1.0.tgz"
   integrity sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==
+
+pako@^2.1.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/pako/-/pako-2.2.0.tgz#246b9d4c841a8d308e484c0d03786651b143e63a"
+  integrity sha512-zJq6RP/5q+TO2OpFV3FHzlPnFjmkb7Nc99a5SNjJE+uu/PkpChs+NIZSSzbBoD+6kjiISXjfYdwj1ZRQ81dz/w==
 
 parent-module@^1.0.0:
   version "1.0.1"

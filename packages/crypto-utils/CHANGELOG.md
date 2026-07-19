@@ -1,5 +1,11 @@
 # @docknetwork/crypto-utils
 
+## 0.2.2
+
+### Patch Changes
+
+- SD-JWT verification
+
 ## 0.2.1
 
 ### Patch Changes

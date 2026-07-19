@@ -1,5 +1,4 @@
-import { createHash } from 'node:crypto';
-
+import { sha256, sha384, sha512 } from '@noble/hashes/sha2.js';
 import { digest, generateSalt, ES256 } from '@sd-jwt/crypto-nodejs';
 import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import base64url from 'base64url';
@@ -20,9 +19,9 @@ import {
 } from './jws';
 
 const SD_HASH_ALGORITHMS = {
-  'sha-256': 'sha256',
-  'sha-384': 'sha384',
-  'sha-512': 'sha512',
+  'sha-256': sha256,
+  'sha-384': sha384,
+  'sha-512': sha512,
 };
 
 function createSdJwtInstance(options = {}) {
@@ -329,15 +328,15 @@ export function computeSdHash({ issuerJwt, disclosures = [] }) {
   const sdAlgorithm = String(
     Reflect.get(issuerPayload, '_sd_alg') ?? 'sha-256',
   ).toLowerCase();
-  const hashAlgorithm = SD_HASH_ALGORITHMS[sdAlgorithm];
-  if (!hashAlgorithm) {
+  const hash = SD_HASH_ALGORITHMS[sdAlgorithm];
+  if (!hash) {
     throw new Error(`Unsupported SD-JWT hash algorithm: ${sdAlgorithm}`);
   }
 
   const encodedPresentation = `${[issuerJwt, ...disclosures].join('~')}~`;
-  return createHash(hashAlgorithm)
-    .update(Buffer.from(encodedPresentation, 'ascii'))
-    .digest('base64url');
+  return Buffer.from(hash(Buffer.from(encodedPresentation, 'ascii'))).toString(
+    'base64url',
+  );
 }
 
 /**

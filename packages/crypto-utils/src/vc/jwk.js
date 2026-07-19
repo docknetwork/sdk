@@ -1,11 +1,9 @@
-import { ECDH } from 'node:crypto';
-
 import elliptic from 'elliptic';
 
 import { valueBytes } from '../utils';
 
-const P256_CURVE = 'prime256v1';
 const EC = elliptic.ec;
+const secp256r1Curve = new EC('p256');
 const secp256k1Curve = new EC('secp256k1');
 
 /**
@@ -15,12 +13,8 @@ const secp256k1Curve = new EC('secp256k1');
  * @returns {{kty: 'EC', crv: 'P-256', x: string, y: string}}
  */
 export function secp256r1PublicKeyToJwk(publicKey) {
-  const uncompressed = ECDH.convertKey(
-    Buffer.from(valueBytes(publicKey)),
-    P256_CURVE,
-    undefined,
-    undefined,
-    'uncompressed',
+  const uncompressed = Buffer.from(
+    secp256r1Curve.keyFromPublic(valueBytes(publicKey)).getPublic(false, 'array'),
   );
 
   return {
@@ -55,13 +49,10 @@ export function jwkToSecp256r1PublicKey(jwk) {
     throw new Error('P-256 JWK coordinates must be 32 bytes');
   }
 
-  return new Uint8Array(ECDH.convertKey(
+  const point = secp256r1Curve.keyFromPublic(
     Buffer.concat([Buffer.from([4]), x, y]),
-    P256_CURVE,
-    undefined,
-    undefined,
-    'compressed',
-  ));
+  );
+  return new Uint8Array(point.getPublic(true, 'array'));
 }
 
 /**

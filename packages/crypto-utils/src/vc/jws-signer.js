@@ -19,13 +19,13 @@ export function createRawSigner(keypair) {
  * Adapts a Dock or DID keypair to the signer contract used by JWS helpers.
  * Dock ECDSA signatures include a recovery byte; JOSE uses only r || s.
  *
- * @param {{sign: function(Uint8Array): *}} keypair
- * @returns {{sign: function({data: Uint8Array}): Uint8Array}}
+ * @param {{sign: function(Uint8Array): *|Promise<*>}} keypair
+ * @returns {{sign: function({data: Uint8Array}): Promise<Uint8Array>}}
  */
 export function createJwsSigner(keypair) {
   return {
-    sign({ data }) {
-      const signature = valueBytes(keypair.sign(data));
+    async sign({ data }) {
+      const signature = valueBytes(await keypair.sign(data));
       return signature.length === 65 ? signature.slice(0, 64) : signature;
     },
   };

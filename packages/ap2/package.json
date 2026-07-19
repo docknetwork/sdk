@@ -1,11 +1,12 @@
 {
-  "name": "@docknetwork/crypto-utils",
+  "name": "@docknetwork/ap2",
   "version": "0.2.1",
-  "description": "Lightweight Dock keypairs, crypto value types, byte utilities, and JWS helpers",
+  "description": "Basic AP2 support",
   "license": "MIT",
   "type": "module",
   "files": [
     "dist",
+    "examples",
     "CHANGELOG.md",
     "README.md",
     "LICENSE"
@@ -15,26 +16,6 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.cjs",
       "default": "./dist/esm/index.js"
-    },
-    "./keypairs": {
-      "import": "./dist/esm/keypairs/index.js",
-      "require": "./dist/cjs/keypairs/index.cjs",
-      "default": "./dist/esm/keypairs/index.js"
-    },
-    "./types": {
-      "import": "./dist/esm/types/index.js",
-      "require": "./dist/cjs/types/index.cjs",
-      "default": "./dist/esm/types/index.js"
-    },
-    "./utils": {
-      "import": "./dist/esm/utils/index.js",
-      "require": "./dist/cjs/utils/index.cjs",
-      "default": "./dist/esm/utils/index.js"
-    },
-    "./vc": {
-      "import": "./dist/esm/vc/index.js",
-      "require": "./dist/cjs/vc/index.cjs",
-      "default": "./dist/esm/vc/index.js"
     },
     "./src/*": {
       "import": "./dist/esm/*",
@@ -53,12 +34,11 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@stablelib/ed25519": "^1.0.0",
-    "base64url": "^3.0.1",
-    "elliptic": "6.6.1",
-    "js-sha256": "^0.11.0"
+    "@docknetwork/crypto-utils": "0.2.1",
+    "ajv": "^8.20.0"
   },
   "devDependencies": {
+    "@ar-agents/ap2": "^0.3.1",
     "@babel/eslint-parser": "^7.25.9",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-json": "^6.1.0",
@@ -67,10 +47,12 @@
     "eslint": "^8.0.0",
     "jest": "^29.7.0",
     "rollup": "^4.28.0",
-    "rollup-plugin-multi-input": "^1.4.1"
+    "rollup-plugin-multi-input": "^1.4.1",
+    "zod": "^4.4.3"
   },
   "scripts": {
     "build": "rollup -c",
+    "example:receipt": "yarn build && node examples/issue-and-verify-receipt.mjs",
     "test": "jest --runInBand",
     "lint": "eslint \"src/**/*.js\"",
     "prepublishOnly": "yarn build"

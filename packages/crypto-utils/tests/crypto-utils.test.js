@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 import base64url from 'base64url';
 
 import {
@@ -7,11 +9,19 @@ import {
   SignatureEd25519Value,
   Secp256k1Keypair,
   Secp256r1Keypair,
+  computeSdHash,
   createJws,
   createJwsSigner,
   createRawSigner,
+  decodeJwtPayload,
   joseSignatureToDER,
+  jwkToSecp256r1PublicKey,
+  parseFinalSdJwtPresentation,
+  parseSdJwtPresentation,
+  secp256r1PublicKeyToJwk,
+  signJWT,
   signJWS,
+  verifyJWT,
 } from '../src';
 import CredentialEd25519Keypair from '../../credential-sdk/src/keypairs/keypair-ed25519';
 import CredentialSecp256k1Keypair from '../../credential-sdk/src/keypairs/keypair-secp256k1';
@@ -151,6 +161,217 @@ describe('JWS helpers', () => {
     const result = createJws({ encodedHeader: 'header', verifyData });
 
     expect(Buffer.from(result)).toEqual(Buffer.from('header.\u0001\u0002\u0003'));
+  });
+
+  test('decodes JWT payloads and computes SD-JWT presentation hashes', () => {
+    const issuerPayload = { _sd_alg: 'sha-256', vct: 'mandate.payment.1' };
+    const issuerJwt = [
+      base64url.encode(JSON.stringify({ alg: 'ES256' })),
+      base64url.encode(JSON.stringify(issuerPayload)),
+      'signature',
+    ].join('.');
+    const disclosure = base64url.encode(JSON.stringify([
+      'salt',
+      'payment_id',
+      'PAY-001',
+    ]));
+    const expected = createHash('sha256')
+      .update(Buffer.from(`${issuerJwt}~${disclosure}~`, 'ascii'))
+      .digest('base64url');
+    const kbJwt = [
+      base64url.encode(JSON.stringify({ alg: 'ES256', typ: 'kb+jwt' })),
+      base64url.encode(JSON.stringify({ sd_hash: expected })),
+      'kb-signature',
+    ].join('.');
+    const presentation = `${issuerJwt}~${disclosure}~${kbJwt}`;
+
+    expect(decodeJwtPayload(issuerJwt)).toEqual(issuerPayload);
+    expect(parseSdJwtPresentation(presentation)).toEqual({
+      issuerJwt,
+      disclosures: [disclosure],
+      kbJwt,
+    });
+    expect(parseFinalSdJwtPresentation(
+      `${issuerJwt}~~~${presentation}`,
+    )).toEqual({
+      issuerJwt,
+      disclosures: [disclosure],
+      kbJwt,
+    });
+    expect(computeSdHash({
+      issuerJwt,
+      disclosures: [disclosure],
+    })).toBe(expected);
+  });
+
+  test('converts P-256 public keys to and from JWK', () => {
+    const keypair = Secp256r1Keypair.random();
+    const publicKey = keypair.publicKey();
+    const jwk = secp256r1PublicKeyToJwk(publicKey);
+
+    expect(jwk).toMatchObject({ kty: 'EC', crv: 'P-256' });
+    expect(jwkToSecp256r1PublicKey(jwk)).toEqual(
+      cryptoBytes.valueBytes(publicKey),
+    );
+    expect(() => jwkToSecp256r1PublicKey({
+      ...jwk,
+      crv: 'secp256k1',
+    })).toThrow('Expected a public P-256 EC JWK');
+  });
+
+  test.each([
+    {
+      algorithm: 'EdDSA',
+      Keypair: Ed25519Keypair,
+      sourceType: 'seed',
+    },
+    {
+      algorithm: 'ES256K',
+      Keypair: Secp256k1Keypair,
+      sourceType: 'entropy',
+    },
+    {
+      algorithm: 'ES256',
+      Keypair: Secp256r1Keypair,
+      sourceType: 'entropy',
+    },
+  ])('signs and verifies a $algorithm JWT', async ({
+    algorithm,
+    Keypair,
+    sourceType,
+  }) => {
+    const source = Uint8Array.from(
+      { length: Keypair.SeedSize },
+      (_, index) => index + 1,
+    );
+    const jwtKeypair = sourceType === 'seed'
+      ? Keypair.fromSeed(source)
+      : Keypair.fromEntropy(source);
+    const payload = { algorithm };
+    const jwt = await signJWT(jwtKeypair, payload);
+
+    expect(verifyJWT(jwt, jwtKeypair.publicKey())).toEqual({
+      verified: true,
+      payload,
+      protectedHeader: {
+        alg: algorithm,
+        typ: 'JWT',
+      },
+    });
+  });
+
+  test('signs and verifies an ES256 JWT', async () => {
+    const es256Keypair = Secp256r1Keypair.fromEntropy(Uint8Array.from(
+      { length: Secp256r1Keypair.SeedSize },
+      (_, index) => index + 1,
+    ));
+    const payload = { iss: 'mpp.acme', payment_id: 'PAY-001' };
+    const jwt = await signJWT(es256Keypair, payload, {
+      header: { kid: 'mpp-key-1' },
+    });
+
+    expect(verifyJWT(jwt, es256Keypair.publicKey())).toEqual({
+      verified: true,
+      payload,
+      protectedHeader: {
+        alg: 'ES256',
+        typ: 'JWT',
+        kid: 'mpp-key-1',
+      },
+    });
+  });
+
+  test('enforces algorithm allowlists', async () => {
+    const jwtKeypair = Ed25519Keypair.random();
+    const jwt = await signJWT(jwtKeypair, { status: 'Success' });
+    const result = verifyJWT(jwt, jwtKeypair.publicKey(), {
+      algorithms: ['ES256'],
+    });
+
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toBe('Unsupported JWT algorithm: EdDSA');
+  });
+
+  test('rejects signing algorithm and key type mismatches', () => {
+    expect(() => signJWT(
+      Ed25519Keypair.random(),
+      { status: 'Success' },
+      { algorithm: 'ES256' },
+    )).toThrow('JWT algorithm ES256 does not match signing key type');
+  });
+
+  test('supports untyped signer adapters with an explicit algorithm', async () => {
+    const keypair = Ed25519Keypair.random();
+    const signer = { sign: (data) => keypair.sign(data) };
+    const jwt = await signJWT(
+      signer,
+      { status: 'Success' },
+      { algorithm: 'EdDSA' },
+    );
+
+    expect(verifyJWT(jwt, keypair.publicKey()).verified).toBe(true);
+  });
+
+  test('supports asynchronous signer adapters', async () => {
+    const keypair = Secp256r1Keypair.random();
+    const signer = {
+      async sign(data) {
+        await Promise.resolve();
+        return keypair.sign(data);
+      },
+    };
+    const jwt = await signJWT(
+      signer,
+      { status: 'Success' },
+      { algorithm: 'ES256' },
+    );
+
+    expect(verifyJWT(jwt, keypair.publicKey()).verified).toBe(true);
+  });
+
+  test('infers the algorithm from wrapped DID keypairs', async () => {
+    const keyPair = Secp256k1Keypair.random();
+    const didKeypair = {
+      keyPair,
+      sign: (data) => keyPair.sign(data),
+    };
+    const jwt = await signJWT(didKeypair, { status: 'Success' });
+
+    expect(verifyJWT(jwt, keyPair.publicKey())).toMatchObject({
+      verified: true,
+      protectedHeader: { alg: 'ES256K' },
+    });
+  });
+
+  test('rejects protected header algorithm overrides', () => {
+    expect(() => signJWT(
+      Ed25519Keypair.random(),
+      { status: 'Success' },
+      { header: { alg: 'ES256' } },
+    )).toThrow(
+      'JWT header algorithm ES256 does not match signing algorithm EdDSA',
+    );
+  });
+
+  test('rejects verification algorithm and key type mismatches', async () => {
+    const signer = Ed25519Keypair.random();
+    const jwt = await signJWT(signer, { status: 'Success' });
+    const result = verifyJWT(jwt, Secp256r1Keypair.random().publicKey());
+
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toBe(
+      'JWT algorithm EdDSA does not match public key type',
+    );
+  });
+
+  test('returns a failed result for an invalid JWT signature', async () => {
+    const signer = Secp256r1Keypair.random();
+    const verifier = Secp256r1Keypair.random();
+    const jwt = await signJWT(signer, { status: 'Success' });
+    const result = verifyJWT(jwt, verifier.publicKey());
+
+    expect(result.verified).toBe(false);
+    expect(result.error).toBeInstanceOf(Error);
   });
 });
 

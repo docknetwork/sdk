@@ -1,5 +1,15 @@
 # @docknetwork/sdk-examples
 
+## 0.22.8
+
+### Patch Changes
+
+- AP2 package
+- Updated dependencies
+  - @docknetwork/cheqd-blockchain-modules@6.0.1
+  - @docknetwork/cheqd-blockchain-api@6.0.1
+  - @docknetwork/credential-sdk@0.56.1
+
 ## 0.22.7
 
 ### Patch Changes

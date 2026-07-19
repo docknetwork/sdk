@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schema.truvera.io/CheckoutReceipt-V1-1784315529607.json",
+  "title": "Checkout Receipt",
+  "name": "Checkout Receipt",
+  "description": "Receipt that supplies information about the final state of a checkout.",
+  "type": "object",
+  "properties": {
+    "status": {
+      "description": "The status of the checkout.",
+      "$ref": "#/$defs/receipt_status"
+    },
+    "iss": {
+      "type": "string",
+      "description": "The issuer of the receipt."
+    },
+    "iat": {
+      "type": "integer",
+      "description": "The creation timestamp as a Unix epoch."
+    },
+    "reference": {
+      "type": "string",
+      "description": "The hash of the closed Mandate that this receipt is binding to."
+    },
+    "error": {
+      "type": "string",
+      "description": "A unique error code. Present if and only if status is Error."
+    },
+    "error_description": {
+      "type": "string",
+      "description": "A human-readable error description. Present if and only if status is Error."
+    },
+    "order_id": {
+      "type": "string",
+      "description": "A reference to the order for the checkout. Present if and only if status is Success."
+    }
+  },
+  "required": [
+    "status",
+    "iss",
+    "iat",
+    "reference"
+  ],
+  "oneOf": [
+    {
+      "title": "Checkout Receipt Success",
+      "properties": {
+        "status": {
+          "const": "Success"
+        }
+      },
+      "required": [
+        "order_id"
+      ],
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "error"
+            ]
+          },
+          {
+            "required": [
+              "error_description"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Checkout Receipt Error",
+      "properties": {
+        "status": {
+          "const": "Error"
+        }
+      },
+      "required": [
+        "error",
+        "error_description"
+      ],
+      "not": {
+        "required": [
+          "order_id"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "receipt_status": {
+      "title": "Receipt Status",
+      "description": "The status of a receipt.",
+      "type": "string",
+      "enum": [
+        "Success",
+        "Error"
+      ]
+    }
+  },
+  "$metadata": {
+    "version": 1,
+    "uris": {
+      "jsonSchema": "https://schema.truvera.io/CheckoutReceipt-V1-1784315529607.json",
+      "jsonLdContext": "https://schema.truvera.io/CheckoutReceipt-V1784315529607.json-ld"
+    }
+  },
+  "additionalProperties": true
+}

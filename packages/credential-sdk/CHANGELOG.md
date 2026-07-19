@@ -1,5 +1,13 @@
 # @docknetwork/credential-sdk
 
+## 0.56.1
+
+### Patch Changes
+
+- AP2 package
+- Updated dependencies
+  - @docknetwork/crypto-utils@0.2.1
+
 ## 0.56.0
 
 ### Minor Changes

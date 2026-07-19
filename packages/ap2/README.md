@@ -1,8 +1,12 @@
 # @docknetwork/ap2
 
-AP2 receipt issuance and verification using the lightweight Dock crypto
-utilities. Receipts are compact ES256 JWTs compatible with the AP2 receipt
-format.
+[AP2](https://ap2-protocol.org/) receipt issuance and verification using the
+lightweight Dock crypto utilities. Receipts are compact ES256 JWTs compatible
+with the AP2 receipt format.
+
+See the [AP2 documentation](https://ap2-protocol.org/) and
+[specification](https://ap2-protocol.org/ap2/specification/) for protocol
+details.
 
 ```js
 import {

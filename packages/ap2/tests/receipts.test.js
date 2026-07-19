@@ -414,4 +414,78 @@ describe('AP2 receipts', () => {
       }),
     });
   });
+
+  test('composes mandate verification results and callbacks into receipt checks', async () => {
+    const keypair = Secp256r1Keypair.random();
+    const issuer = unsignedJwt({ _sd_alg: 'sha-256' });
+    const presentation = `${issuer}~${encodeDisclosure([
+      'salt',
+      'claim',
+      'approved',
+    ])}~`;
+    const reference = computeMandateReference(presentation);
+    const jwt = await issuePaymentReceipt(keypair, {
+      ...paymentReceipt,
+      reference,
+    });
+    const options = {
+      publicKey: keypair.publicKey(),
+      expectedIssuer: paymentReceipt.iss,
+      currentDate: receiptDate,
+      mandatePresentation: presentation,
+    };
+
+    expect(verifyPaymentReceipt(jwt, {
+      ...options,
+      mandateVerification: { verified: true },
+    })).toMatchObject({
+      verified: true,
+      referenceVerified: true,
+      mandateVerified: true,
+    });
+    expect(verifyPaymentReceipt(jwt, {
+      ...options,
+      mandateVerification: { ok: true },
+    })).toMatchObject({
+      verified: true,
+      mandateVerified: true,
+    });
+    expect(verifyPaymentReceipt(jwt, {
+      ...options,
+      mandateVerification: (mandatePresentation) => {
+        expect(mandatePresentation).toBe(presentation);
+        return { verified: true };
+      },
+    })).toMatchObject({
+      verified: true,
+      mandateVerified: true,
+    });
+
+    const mandateError = new Error('invalid audience');
+    expect(verifyPaymentReceipt(jwt, {
+      ...options,
+      mandateVerification: { verified: false, error: mandateError },
+    })).toMatchObject({
+      verified: false,
+      error: mandateError,
+    });
+    expect(verifyPaymentReceipt(jwt, {
+      ...options,
+      mandateVerification: { ok: false, reason: 'delegation expired' },
+    })).toMatchObject({
+      verified: false,
+      error: expect.objectContaining({
+        message: 'delegation expired',
+      }),
+    });
+    expect(verifyPaymentReceipt(jwt, {
+      ...options,
+      mandateVerification: () => Promise.resolve({ verified: true }),
+    })).toMatchObject({
+      verified: false,
+      error: expect.objectContaining({
+        message: expect.stringContaining('must be synchronous'),
+      }),
+    });
+  });
 });

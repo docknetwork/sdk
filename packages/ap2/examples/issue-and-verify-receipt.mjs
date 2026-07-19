@@ -41,10 +41,15 @@ const receiptJwt = await signReceipt(receipt, {
   kid: `${issuer}#receipt-key-1`,
 });
 
+// In production, await a real mandate verifier (signatures, delegation, etc.)
+// and pass its result here. This stub shows the composition point.
+const mandateVerification = { verified: true };
+
 const verification = verifyPaymentReceipt(receiptJwt, {
   publicKey: processorKeypair.publicKey(),
   expectedIssuer: issuer,
   mandatePresentation: closedMandatePresentation,
+  mandateVerification,
   maxReceiptAge: 300,
 });
 
@@ -55,3 +60,4 @@ if (!verification.verified) {
 console.log('Receipt JWT:', receiptJwt);
 console.log('Verified receipt:', verification.receipt);
 console.log('Mandate reference verified:', verification.referenceVerified);
+console.log('Mandate verified:', verification.mandateVerified);

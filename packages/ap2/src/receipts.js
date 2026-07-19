@@ -107,14 +107,69 @@ export function issueReceipt(keypair, receipt, { type, kid } = {}) {
 }
 
 /**
+ * Resolves an optional mandate-verification result or synchronous callback.
+ *
+ * Accepts Dock-style `{ verified }` results and `@ar-agents/ap2`-style
+ * `{ ok, reason }` results. Async callbacks are rejected so callers await
+ * mandate verification themselves and pass the settled result.
+ *
+ * @param {object|function|undefined} mandateVerification
+ * @param {string|undefined} mandatePresentation
+ * @returns {object|undefined}
+ */
+function resolveMandateVerification(mandateVerification, mandatePresentation) {
+  if (mandateVerification === undefined) {
+    return undefined;
+  }
+
+  const result = typeof mandateVerification === 'function'
+    ? mandateVerification(mandatePresentation)
+    : mandateVerification;
+
+  if (result == null || typeof result !== 'object') {
+    throw new TypeError(
+      '"mandateVerification" must be a result object or a synchronous callback',
+    );
+  }
+  if (typeof result.then === 'function') {
+    throw new TypeError(
+      '"mandateVerification" callbacks must be synchronous; await mandate verification and pass the result',
+    );
+  }
+
+  const verified = result.verified === true || result.ok === true;
+  if (!verified) {
+    if (result.error instanceof Error) {
+      throw result.error;
+    }
+    if (result.error != null) {
+      throw new Error(String(result.error));
+    }
+    if (result.reason != null) {
+      throw new Error(String(result.reason));
+    }
+    throw new Error('Mandate verification failed');
+  }
+
+  return result;
+}
+
+/**
  * Verifies an AP2 receipt JWT and validates its receipt claims.
+ *
+ * Supplying `mandatePresentation` only checks that `receipt.reference` matches
+ * the presentation hash. It does not verify mandate signatures, delegation,
+ * audience, or other mandate claims. Pass `mandateVerification` (a prior
+ * verification result, or a synchronous callback that returns one) to compose
+ * full mandate verification with the receipt check.
  *
  * @param {string} jwt
  * @param {{publicKey: *, type?: 'checkout'|'payment', expectedIssuer: string,
  * expectedReference?: string, mandatePresentation?: string,
+ * mandateVerification?: object|function,
  * currentDate?: Date, clockTolerance?: number, maxReceiptAge?: number}} options
  * @returns {{verified: boolean, receipt?: object, protectedHeader?: object,
- * referenceVerified?: boolean, error?: Error}}
+ * referenceVerified?: boolean, mandateVerified?: boolean, error?: Error}}
  */
 export function verifyReceipt(
   jwt,
@@ -124,6 +179,7 @@ export function verifyReceipt(
     expectedIssuer,
     expectedReference,
     mandatePresentation,
+    mandateVerification,
     currentDate = new Date(),
     clockTolerance = DEFAULT_CLOCK_TOLERANCE,
     maxReceiptAge,
@@ -168,6 +224,12 @@ export function verifyReceipt(
         `Receipt reference mismatch: expected '${expectedReference}', got '${receipt.reference}'`,
       );
     }
+
+    const resolvedMandateVerification = resolveMandateVerification(
+      mandateVerification,
+      mandatePresentation,
+    );
+
     if (mandatePresentation !== undefined) {
       const mandateReference = computeMandateReference(mandatePresentation);
       if (receipt.reference !== mandateReference) {
@@ -184,6 +246,9 @@ export function verifyReceipt(
       ...(mandatePresentation === undefined
         ? {}
         : { referenceVerified: true }),
+      ...(resolvedMandateVerification === undefined
+        ? {}
+        : { mandateVerified: true }),
     };
   } catch (error) {
     return {

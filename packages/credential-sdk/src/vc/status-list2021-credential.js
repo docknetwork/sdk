@@ -8,7 +8,6 @@ import { gzip, ungzip } from 'pako';
 import { u8aToU8a } from '../utils/types/bytes';
 import VerifiableCredential from './verifiable-credential';
 import { ensureStatusListId } from '../utils';
-import { KeyDoc } from "./helpers"; // eslint-disable-line
 
 /**
  * Status list 2021 verifiable credential as per https://www.w3.org/TR/vc-status-list/#statuslist2021credential.
@@ -44,7 +43,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * To allow unrevoking indices in the future, use `statusPurpose` = `suspension`.
    * The proof will be generated immediately using supplied `keyDoc`.
    *
-   * @param {KeyDoc} keyDoc
+   * @param {object} keyDoc - key document used to sign the credential (see `getKeyDoc`)
    * @param {string} id - on-chain hex identifier for the `StatusList2021Credential`.
    * @param {object} [params={}]
    * @param {'revocation'|'suspension'} [params.statusPurpose=revocation] - `statusPurpose` of the `StatusList2021Credential`.
@@ -79,7 +78,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * the underlying value won't be modified.
    * Throws an error if the underlying status list can't be decoded or any of the supplied indices is out of range.
    *
-   * @param {KeyDoc} keyDoc
+   * @param {object} keyDoc - key document used to re-sign the credential (see `getKeyDoc`)
    * @param {object} [update={}]
    * @param {Iterable<number>} update.revokeIndices - indices to be revoked or suspended
    * @param {Iterable<number>} update.unsuspendIndices - indices to be unsuspended

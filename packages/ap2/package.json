@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/ap2",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Basic AP2 support",
   "license": "MIT",
   "type": "module",
@@ -52,6 +52,7 @@
   },
   "scripts": {
     "build": "rollup -c",
+    "generate-schemas": "node scripts/generate-schemas.mjs",
     "example:receipt": "yarn build && node examples/issue-and-verify-receipt.mjs",
     "test": "jest --runInBand",
     "lint": "eslint \"src/**/*.js\"",

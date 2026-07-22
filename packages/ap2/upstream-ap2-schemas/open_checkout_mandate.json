@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ap2-protocol.org/schemas/open_checkout_mandate",
   "title": "Open Checkout Mandate",
   "description": "Agreement between a user and an agent (or chain of agents) to authorize future checkout actions.",
   "type": "object",
@@ -60,26 +61,7 @@
           "type": "array",
           "description": "Array of allowed Merchant objects.",
           "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "description": "Unique identifier for the merchant."
-              },
-              "name": {
-                "type": "string",
-                "description": "Human-readable name of the merchant."
-              },
-              "website": {
-                "type": "string",
-                "description": "Website belonging to the merchant."
-              }
-            },
-            "required": [
-              "id",
-              "name"
-            ],
-            "description": "Schema defining a Mechant object"
+            "$ref": "types/merchant.json"
           },
           "x-selectively-disclosable-array": true
         }

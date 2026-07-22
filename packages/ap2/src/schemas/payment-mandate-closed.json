@@ -3,7 +3,13 @@
   "title": "Payment Mandate",
   "description": "Agreement from a User or an Agent to authorize a particular Payment action.",
   "type": "object",
-  "required": ["vct", "transaction_id", "payee", "payment_amount", "payment_instrument"],
+  "required": [
+    "vct",
+    "transaction_id",
+    "payee",
+    "payment_amount",
+    "payment_instrument"
+  ],
   "properties": {
     "vct": {
       "type": "string",
@@ -17,23 +23,88 @@
     },
     "payee": {
       "description": "The merchant receiving the payment.",
-      "$ref": "#/$defs/merchant",
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the merchant."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the merchant."
+        },
+        "website": {
+          "type": "string",
+          "description": "Website belonging to the merchant."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "pisp": {
       "description": "The Payment Initiation Service Provider.",
-      "$ref": "#/$defs/pisp",
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "legal_name": {
+          "type": "string",
+          "description": "Legal name of the PISP."
+        },
+        "brand_name": {
+          "type": "string",
+          "description": "Brand name of the PISP."
+        },
+        "domain_name": {
+          "type": "string",
+          "description": "Domain name of the PISP as secured by the [eIDAS] QWAC certificate of the TPP."
+        }
+      },
+      "required": [
+        "legal_name",
+        "brand_name",
+        "domain_name"
+      ]
     },
     "payment_amount": {
       "description": "Transaction amount object containing currency (ISO 4217 code, e.g., \"USD\") and amount (integer minor units per ISO 4217, e.g., 27999 = $279.99). Final value confirmed by the user.",
-      "$ref": "#/$defs/amount",
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "description": "Amount in minor units, according to the ISO-4217 spec."
+        },
+        "currency": {
+          "type": "string",
+          "description": "ISO-4217 3-letter alphabetic currency code of the payment."
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ]
     },
     "payment_instrument": {
       "description": "The payment instrument used.",
-      "$ref": "#/$defs/payment_instrument",
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "unique identifier for this instrument"
+        },
+        "type": {
+          "type": "string",
+          "description": "unique string identifying this category of instrument"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the instrument to be displayed to the user for informational purposes"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ]
     },
     "execution_date": {
       "type": "string",
@@ -51,93 +122,5 @@
       "type": "integer",
       "description": "The expiration timestamp as a Unix epoch."
     }
-  },
-  "$defs": {
-    "merchant": {
-      "title": "Merchant",
-      "description": "Schema defining a Mechant object",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the merchant."
-        },
-        "name": {
-          "type": "string",
-          "description": "Human-readable name of the merchant."
-        },
-        "website": {
-          "type": "string",
-          "description": "Website belonging to the merchant."
-        }
-      },
-      "required": ["id", "name"]
-    },
-    "pisp": {
-      "title": "PISP",
-      "description": "Schema defining a Payment Initiation Service Provider (PISP) object",
-      "type": "object",
-      "properties": {
-        "legal_name": {
-          "type": "string",
-          "description": "Legal name of the PISP."
-        },
-        "brand_name": {
-          "type": "string",
-          "description": "Brand name of the PISP."
-        },
-        "domain_name": {
-          "type": "string",
-          "description": "Domain name of the PISP as secured by the [eIDAS] QWAC certificate of the TPP."
-        }
-      },
-      "required": ["legal_name", "brand_name", "domain_name"]
-    },
-    "amount": {
-      "title": "Amount",
-      "description": "Schema defining an Amount and Current object",
-      "type": "object",
-      "properties": {
-        "amount": {
-          "type": "integer",
-          "description": "Amount in minor units, according to the ISO-4217 spec."
-        },
-        "currency": {
-          "type": "string",
-          "description": "ISO-4217 3-letter alphabetic currency code of the payment."
-        }
-      },
-      "required": ["amount", "currency"]
-    },
-    "payment_instrument": {
-      "title": "Payment Instrument",
-      "description": "Instrument used for payment.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "unique identifier for this instrument"
-        },
-        "type": {
-          "type": "string",
-          "description": "unique string identifying this category of instrument"
-        },
-        "description": {
-          "type": "string",
-          "description": "Description of the instrument to be displayed to the user for informational purposes"
-        }
-      },
-      "required": ["id", "type"]
-    }
-  },
-  "name": "Payment Mandate",
-  "$metadata": {
-    "version": 1,
-    "uris": {
-      "jsonSchema": "https://schema.truvera.io/PaymentMandate-V1-1784315530495.json",
-      "jsonLdContext": "https://schema.truvera.io/PaymentMandate-V1784315530495.json-ld"
-    }
-  },
-  "additionalProperties": true,
-  "$id": "https://schema.truvera.io/PaymentMandate-V1-1784315530495.json"
+  }
 }

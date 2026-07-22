@@ -11,6 +11,15 @@ export {
   encodeSdJwtDisclosure as encodeDisclosure,
 } from '@docknetwork/crypto-utils/vc';
 
+export {
+  checkoutReceiptSchema,
+  paymentReceiptSchema,
+  checkoutMandateOpenSchema,
+  checkoutMandateClosedSchema,
+  paymentMandateOpenSchema,
+  paymentMandateClosedSchema,
+};
+
 export const RECEIPT_TYPE_CHECKOUT = 'checkout';
 export const RECEIPT_TYPE_PAYMENT = 'payment';
 export const DEFAULT_CLOCK_TOLERANCE = 30;

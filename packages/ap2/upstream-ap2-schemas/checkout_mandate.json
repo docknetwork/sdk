@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ap2-protocol.org/schemas/checkout_mandate.json",
   "title": "Checkout Mandate",
   "description": "Agreement from a User or an Agent to authorize a particular Checkout action.",
   "type": "object",
@@ -15,9 +16,10 @@
       "const": "mandate.checkout.1",
       "default": "mandate.checkout.1"
     },
-    "checkout_jwt": {
-      "type": "string",
-      "description": "base64url-encoded serialized merchant-signed JWT of the Checkout payload.",
+
+   "checkout_jwt": {
+     "type": "string",
+     "description": "base64url-encoded serialized merchant-signed JWT of the Checkout payload.",
       "x-selectively-disclosable-field": true
     },
     "checkout_hash": {

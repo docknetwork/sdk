@@ -65,7 +65,11 @@ style. Successful results may also include `referenceVerified` and
 ## Payloads and signing
 
 `buildCheckoutReceipt` and `buildPaymentReceipt` validate against the packaged
-AP2 JSON Schemas, clone the payload, and preserve extension properties.
+AP2 JSON Schemas, clone the payload, and preserve extension properties. These
+schemas are also available as named exports (`checkoutReceiptSchema`,
+`paymentReceiptSchema`) for consumers that want the raw JSON Schema — e.g. for
+form generation or documentation — without re-validating through this
+package.
 
 `signReceipt` is the BYOK entry point. Its `signer.sign(data)` function may be
 synchronous or asynchronous and must return an ES256 signature in 64-byte JOSE
@@ -148,10 +152,14 @@ pattern, binding to a Checkout Mandate via `transaction_id` (a hash of
 `checkout_jwt`, verified against a `checkoutJwt` passed to
 `verifyClosedPaymentMandate`).
 
-`build*` validates content against Truvera's published JSON Schemas
-(`src/schemas/*.json`, matching the canonical documents at
-`schema.truvera.io` — see each file's `$id`). Two constraints are
-schema-required, not just conventional: an Open Checkout Mandate's
+`build*` validates content against this package's JSON Schemas
+(`src/schemas/*.json`), generated from the real upstream AP2 source
+(`upstream-ap2-schemas/`, a pinned mirror of
+[google-agentic-commerce/AP2](https://github.com/google-agentic-commerce/AP2))
+via `npm run generate-schemas` — re-run that script and rebuild after
+re-vendoring a newer upstream tag; don't hand-edit `src/schemas/*.json`
+directly. Two constraints are schema-required, not just conventional: an Open
+Checkout Mandate's
 `constraints` must contain at least one `checkout.line_items` entry, and an
 Open Payment Mandate's `constraints` must contain a `payment.reference` entry
 (with a `conditional_transaction_id` — see the Open Payment Mandate schema

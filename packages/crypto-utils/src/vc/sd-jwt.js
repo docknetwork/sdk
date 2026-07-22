@@ -45,11 +45,16 @@ function getDocLoader(documentLoader, resolver) {
   if (!resolver) {
     return null;
   }
-  return async (uri) => ({
-    document: await resolver.resolve(uri),
-    documentUrl: uri,
-    contextUrl: null,
-  });
+  return async (uri) => {
+    if (typeof resolver.supports === 'function' && !resolver.supports(uri)) {
+      throw new Error(`Resolver does not support: ${uri}`);
+    }
+    return {
+      document: await resolver.resolve(uri),
+      documentUrl: uri,
+      contextUrl: null,
+    };
+  };
 }
 
 function decodeJwtPartAsJson(part, partName) {

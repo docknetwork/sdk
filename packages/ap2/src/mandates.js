@@ -155,13 +155,16 @@ function redactCheckoutConstraints(constraints, sdAlg) {
 }
 
 // Redacts the array-element-disclosable fields of an Open Payment Mandate's
-// constraints (payment.allowed_payees.allowed), per the property tables on
-// the AP2 Payment Mandate spec page.
+// constraints (payment.allowed_payees.allowed and
+// payment.allowed_payment_instruments.allowed — marked
+// "x-selectively-disclosable-array" in the published Truvera schema;
+// payment.allowed_pisps.allowed is not marked disclosable and is left as-is).
 function redactPaymentConstraints(constraints, sdAlg) {
   const { redact, disclosures } = createArrayElementRedactor(sdAlg);
+  const disclosableTypes = ['payment.allowed_payees', 'payment.allowed_payment_instruments'];
 
   const redacted = (constraints ?? []).map((constraint) => {
-    if (constraint?.type === 'payment.allowed_payees' && Array.isArray(constraint.allowed)) {
+    if (disclosableTypes.includes(constraint?.type) && Array.isArray(constraint.allowed)) {
       return { ...constraint, allowed: constraint.allowed.map(redact) };
     }
     return constraint;

@@ -8,7 +8,10 @@ import { gzip, ungzip } from 'pako';
 import { u8aToU8a } from '../utils/types/bytes';
 import VerifiableCredential from './verifiable-credential';
 import { ensureStatusListId } from '../utils';
-import { KeyDoc } from "./helpers"; // eslint-disable-line
+
+/**
+ * @typedef {import('./helpers').KeyDoc} KeyDoc
+ */
 
 /**
  * Status list 2021 verifiable credential as per https://www.w3.org/TR/vc-status-list/#statuslist2021credential.

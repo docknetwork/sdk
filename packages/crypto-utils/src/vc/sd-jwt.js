@@ -175,8 +175,25 @@ async function resolveIssuerKey({
   return { verifierKey, dockPublicKey: verifierKey };
 }
 
+function signatureBytes(sig) {
+  return typeof sig === 'string'
+    ? new Uint8Array(base64url.toBuffer(sig))
+    : valueBytes(sig);
+}
+
+async function verifyWithVerifierKey(verifierKey, data, sig) {
+  const { verify } = verifierKey.verifier();
+  const signature = signatureBytes(sig);
+  if (verifierKey.type === 'JsonWebKey2020') {
+    return verify({
+      data: Buffer.from(data),
+      signature,
+    });
+  }
+  return verify({ data, signature });
+}
+
 function createPresentationVerifier({
-  jwtStr,
   signAlg,
   getState,
 }) {
@@ -193,21 +210,7 @@ function createPresentationVerifier({
     }
 
     if (verifierKey && typeof verifierKey.verifier === 'function') {
-      const isJWK = verifierKey.type === 'JsonWebKey2020';
-      const { verify } = verifierKey.verifier();
-      if (isJWK) {
-        const signature = typeof sig === 'string'
-          ? new Uint8Array(base64url.toBuffer(sig))
-          : valueBytes(sig);
-        return verify({
-          data: Buffer.from(data),
-          signature,
-        });
-      }
-      const signature = typeof sig === 'string'
-        ? new Uint8Array(base64url.toBuffer(sig))
-        : valueBytes(sig);
-      return verify({ data, signature });
+      return verifyWithVerifierKey(verifierKey, data, sig);
     }
 
     const publicKey = dockPublicKey ?? verifierKey;
@@ -428,7 +431,6 @@ export async function verifySDJWTCredential(
   const sdjwt = createSdJwtInstance({
     signAlg,
     verifier: createPresentationVerifier({
-      jwtStr,
       signAlg,
       getState: () => state,
     }),

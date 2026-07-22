@@ -152,10 +152,10 @@ async function resolveIssuerKey({
   signAlg,
 }) {
   if (typeof keyResolver === 'function') {
-    return normalizeResolvedKey(
-      await keyResolver(issuerKey ?? headerKid),
-      signAlg,
-    );
+    const resolved = await keyResolver(issuerKey ?? headerKid);
+    if (resolved != null) {
+      return normalizeResolvedKey(resolved, signAlg);
+    }
   }
   if (!docLoader) {
     // eslint-disable-next-line sonarjs/no-duplicate-string -- keep dock-compatible raw error text

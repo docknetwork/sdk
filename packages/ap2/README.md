@@ -148,6 +148,18 @@ pattern, binding to a Checkout Mandate via `transaction_id` (a hash of
 `checkout_jwt`, verified against a `checkoutJwt` passed to
 `verifyClosedPaymentMandate`).
 
+`build*` validates content against Truvera's published JSON Schemas
+(`src/schemas/*.json`, matching the canonical documents at
+`schema.truvera.io` — see each file's `$id`). Two constraints are
+schema-required, not just conventional: an Open Checkout Mandate's
+`constraints` must contain at least one `checkout.line_items` entry, and an
+Open Payment Mandate's `constraints` must contain a `payment.reference` entry
+(with a `conditional_transaction_id` — see the Open Payment Mandate schema
+for the full set of supported constraint types, including
+`payment.allowed_payees`, `payment.allowed_payment_instruments`,
+`payment.allowed_pisps`, `payment.amount_range`, `payment.budget`,
+`payment.agent_recurrence`, and `payment.execution_date`).
+
 The `signer` for both signing functions uses the same BYOK
 `signer.sign(data)` contract as `signReceipt` — bridge it to a wallet-held key
 without ever exposing the private key to this package.

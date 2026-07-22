@@ -5,6 +5,7 @@ import {
   parseSdJwtPresentation,
   decodeJwtPayload,
   secp256r1PublicKeyToJwk,
+  computeSdHash,
 } from '@docknetwork/crypto-utils/vc';
 
 import {
@@ -29,6 +30,12 @@ import {
 const VCT_CHECKOUT_OPEN = 'mandate.checkout.open.1';
 const VCT_CHECKOUT_CLOSED = 'mandate.checkout.1';
 const SAMPLE_CHECKOUT_JWT = 'eyJhbGciOiJFUzI1NiJ9.eyJvcmRlcl9pZCI6Im9yZGVyLTEifQ.sig';
+// The published Truvera schema requires an Open Checkout Mandate's
+// constraints to contain at least one checkout.line_items entry.
+const MINIMAL_LINE_ITEMS_CONSTRAINT = {
+  type: 'checkout.line_items',
+  items: [{ id: 'line_1', acceptable_items: [{ id: 'SKU-1', title: 'Widget' }], quantity: 1 }],
+};
 
 const SPEC_OPEN_CHECKOUT_TOKEN = 'eyJhbGciOiAiRVMyNTYiLCAidHlwIjogImV4YW1wbGUrc2Qtand0IiwgImtpZCI6ICJhZ2VudC1wcm92aWRlci1rZXktMSJ9.eyJkZWxlZ2F0ZV9wYXlsb2FkIjogW3siLi4uIjogIlF0WFRKdFdxZzk5OUNtVVdHakhGVFdNa1JQZ3VEZmVLM3dHU2FJbmQtZHcifV0sICJfc2RfYWxnIjogInNoYS0yNTYifQ.HvCGk7ye_c0LN2-NFG13wfyu3LA--rckTPGm36ugO2aRvsded7ngw1py8W3JF7wBpoQnsKr17tNTF3zLeYcoWA~WyI0bjNMXy0zX0ZtMkdneUZBRjhDdF9nIiwgeyJpZCI6ICJzdXBlcnNob2VfbGltaXRlZF9lZGl0aW9uX2dvbGRfc25lYWtlcl93b21lbnNfOV8wIiwgInRpdGxlIjogIlN1cGVyU2hvZSBMaW1pdGVkIEVkaXRpb24gR29sZCJ9XQ~WyIyelBMNnZxTEJnMldZQWRiVzktMWxRIiwgeyJpZCI6ICJtZXJjaGFudF8xIiwgIm5hbWUiOiAiRGVtbyBNZXJjaGFudCIsICJ3ZWJzaXRlIjogImh0dHBzOi8vZGVtby1tZXJjaGFudC5leGFtcGxlIn1d~WyJsYUFvV0tOUnVHbndSRWpKV1lKN3BnIiwgeyJ2Y3QiOiAibWFuZGF0ZS5jaGVja291dC5vcGVuLjEiLCAiY29uc3RyYWludHMiOiBbeyJ0eXBlIjogImNoZWNrb3V0LmxpbmVfaXRlbXMiLCAiaXRlbXMiOiBbeyJpZCI6ICJsaW5lXzEiLCAiYWNjZXB0YWJsZV9pdGVtcyI6IFt7Ii4uLiI6ICJ5M2FvY0FEMnJoWXBKUU9VTU4wMTZmYURGR2tUQkdFRFZsMVIxVFJIZGJ3In1dLCAicXVhbnRpdHkiOiAxfV19LCB7InR5cGUiOiAiY2hlY2tvdXQuYWxsb3dlZF9tZXJjaGFudHMiLCAiYWxsb3dlZCI6IFt7Ii4uLiI6ICJhNVVNQWR4Q2tfTVJheXlWZFJocElBWjBaaGpWTEVxMWcyQld5cndLVXdnIn1dfV0sICJjbmYiOiB7Imp3ayI6IHsiY3J2IjogIlAtMjU2IiwgImt0eSI6ICJFQyIsICJ4IjogIlFwU3l4UFFIeTM4eGNreXZEcjU0Z1ozVDQyemo5aUx0VjRrb3liNVUyN2MiLCAieSI6ICIzN0hMZDdKSmlueGpKSW44SjdIaWpzc29lY0JsZmhkVy1nVUw3ZmVJOWx3In19LCAiaWF0IjogMTc3NzM0MjM1NywgImV4cCI6IDE3NzczNDU5NTd9XQ~';
 
@@ -131,6 +138,7 @@ describe('AP2 mandates: round trip', () => {
     expect(checkoutResult.checkoutJwt).toBe(checkoutJwt);
     expect(checkoutResult.sdHashVerified).toBe(true);
 
+    const conditionalTransactionId = computeSdHash(parseSdJwtPresentation(openCheckoutPresentation));
     const openPaymentContent = buildOpenPaymentMandate({
       vct: 'mandate.payment.open.1',
       constraints: [
@@ -138,6 +146,7 @@ describe('AP2 mandates: round trip', () => {
           type: 'payment.amount_range', currency: 'USD', min: 0, max: 20000,
         },
         { type: 'payment.allowed_payees', allowed: [merchant] },
+        { type: 'payment.reference', conditional_transaction_id: conditionalTransactionId },
       ],
       cnf,
       iat: 1000,
@@ -178,7 +187,7 @@ describe('AP2 mandates: round trip', () => {
     const openCheckoutPresentation = await signOpenCheckoutMandate(
       buildOpenCheckoutMandate({
         vct: VCT_CHECKOUT_OPEN,
-        constraints: [],
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
         cnf,
       }),
       { signer: userKeypair },
@@ -214,7 +223,7 @@ describe('AP2 mandates: round trip', () => {
     const openCheckoutPresentation = await signOpenCheckoutMandate(
       buildOpenCheckoutMandate({
         vct: VCT_CHECKOUT_OPEN,
-        constraints: [],
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
         cnf,
       }),
       { signer: userKeypair },

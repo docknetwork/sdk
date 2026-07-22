@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Closed Checkout Mandate Content",
+  "description": "The disclosed content of a Closed Checkout Mandate (mandate.checkout.1). checkout_jwt is the fully-revealed input to signing; it is replaced by an _sd digest (object-property disclosure) at signing time, leaving checkout_hash as the caller-visible binding value.",
+  "type": "object",
+  "properties": {
+    "vct": {
+      "const": "mandate.checkout.1"
+    },
+    "checkout_jwt": {
+      "type": "string",
+      "description": "The merchant-signed Checkout JWT, base64url-encoded. Present in the fully-revealed content passed to signClosedMandate; replaced by an _sd digest in the final disclosed/signed form."
+    },
+    "checkout_hash": {
+      "type": "string",
+      "description": "base64url hash of checkout_jwt."
+    },
+    "iat": {
+      "type": "integer"
+    },
+    "exp": {
+      "type": "integer"
+    }
+  },
+  "required": ["vct", "checkout_jwt", "checkout_hash"],
+  "additionalProperties": true
+}

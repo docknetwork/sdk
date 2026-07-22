@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open Checkout Mandate Content",
+  "description": "The disclosed content of an Open Checkout Mandate (mandate.checkout.open.1). This describes the fully-revealed logical shape; array-element selective disclosure of constraints[].items[].acceptable_items and constraints[].allowed is applied separately at signing time.",
+  "type": "object",
+  "properties": {
+    "vct": {
+      "const": "mandate.checkout.open.1"
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cnf": {
+      "type": "object",
+      "properties": {
+        "jwk": {
+          "type": "object",
+          "required": ["kty", "crv", "x", "y"],
+          "properties": {
+            "kty": { "const": "EC" },
+            "crv": { "const": "P-256" },
+            "x": { "type": "string" },
+            "y": { "type": "string" }
+          }
+        }
+      },
+      "required": ["jwk"]
+    },
+    "iat": {
+      "type": "integer",
+      "description": "Creation timestamp as a Unix epoch."
+    },
+    "exp": {
+      "type": "integer",
+      "description": "Expiration timestamp as a Unix epoch."
+    }
+  },
+  "required": ["vct", "constraints", "cnf"],
+  "additionalProperties": true
+}

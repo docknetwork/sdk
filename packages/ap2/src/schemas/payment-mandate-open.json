@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open Payment Mandate Content",
+  "description": "The disclosed content of an Open Payment Mandate (mandate.payment.open.1). This describes the fully-revealed logical shape; array-element selective disclosure of constraints[].allowed (payment.allowed_payees) is applied separately at signing time.",
+  "type": "object",
+  "properties": {
+    "vct": {
+      "const": "mandate.payment.open.1"
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cnf": {
+      "type": "object",
+      "properties": {
+        "jwk": {
+          "type": "object",
+          "required": ["kty", "crv", "x", "y"],
+          "properties": {
+            "kty": { "const": "EC" },
+            "crv": { "const": "P-256" },
+            "x": { "type": "string" },
+            "y": { "type": "string" }
+          }
+        }
+      },
+      "required": ["jwk"]
+    },
+    "iat": {
+      "type": "integer"
+    },
+    "exp": {
+      "type": "integer"
+    }
+  },
+  "required": ["vct", "constraints", "cnf"],
+  "additionalProperties": true
+}

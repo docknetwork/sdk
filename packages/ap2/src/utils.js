@@ -2,6 +2,10 @@ import Ajv from 'ajv';
 
 import checkoutReceiptSchema from './schemas/checkout-receipt.json';
 import paymentReceiptSchema from './schemas/payment-receipt.json';
+import checkoutMandateOpenSchema from './schemas/checkout-mandate-open.json';
+import checkoutMandateClosedSchema from './schemas/checkout-mandate-closed.json';
+import paymentMandateOpenSchema from './schemas/payment-mandate-open.json';
+import paymentMandateClosedSchema from './schemas/payment-mandate-closed.json';
 
 export {
   encodeSdJwtDisclosure as encodeDisclosure,
@@ -11,10 +15,28 @@ export const RECEIPT_TYPE_CHECKOUT = 'checkout';
 export const RECEIPT_TYPE_PAYMENT = 'payment';
 export const DEFAULT_CLOCK_TOLERANCE = 30;
 
+export const MANDATE_TYPE_CHECKOUT_OPEN = 'checkout-open';
+export const MANDATE_TYPE_CHECKOUT_CLOSED = 'checkout-closed';
+export const MANDATE_TYPE_PAYMENT_OPEN = 'payment-open';
+export const MANDATE_TYPE_PAYMENT_CLOSED = 'payment-closed';
+
+export const MANDATE_VCT = {
+  [MANDATE_TYPE_CHECKOUT_OPEN]: 'mandate.checkout.open.1',
+  [MANDATE_TYPE_CHECKOUT_CLOSED]: 'mandate.checkout.1',
+  [MANDATE_TYPE_PAYMENT_OPEN]: 'mandate.payment.open.1',
+  [MANDATE_TYPE_PAYMENT_CLOSED]: 'mandate.payment.1',
+};
+
 const ajv = new Ajv({ allErrors: true, strict: false });
 const receiptValidators = {
   [RECEIPT_TYPE_CHECKOUT]: ajv.compile(checkoutReceiptSchema),
   [RECEIPT_TYPE_PAYMENT]: ajv.compile(paymentReceiptSchema),
+};
+const mandateContentValidators = {
+  [MANDATE_TYPE_CHECKOUT_OPEN]: ajv.compile(checkoutMandateOpenSchema),
+  [MANDATE_TYPE_CHECKOUT_CLOSED]: ajv.compile(checkoutMandateClosedSchema),
+  [MANDATE_TYPE_PAYMENT_OPEN]: ajv.compile(paymentMandateOpenSchema),
+  [MANDATE_TYPE_PAYMENT_CLOSED]: ajv.compile(paymentMandateClosedSchema),
 };
 
 function formatValidationErrors(errors = []) {
@@ -44,6 +66,23 @@ export function validateReceipt(receipt, type) {
   }
 
   return { ...receipt };
+}
+
+export function validateMandateContent(content, type) {
+  if (content == null || typeof content !== 'object' || Array.isArray(content)) {
+    throw new TypeError('Mandate content must be an object');
+  }
+  const validate = mandateContentValidators[type];
+  if (!validate) {
+    throw new Error(`Unsupported mandate type: ${type}`);
+  }
+  if (!validate(content)) {
+    throw new TypeError(
+      `Invalid ${type} mandate content: ${formatValidationErrors(validate.errors)}`,
+    );
+  }
+
+  return { ...content };
 }
 
 export function inferReceiptType(receipt) {

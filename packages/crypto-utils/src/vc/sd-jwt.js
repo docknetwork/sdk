@@ -45,11 +45,16 @@ function getDocLoader(documentLoader, resolver) {
   if (!resolver) {
     return null;
   }
-  return async (uri) => ({
-    document: await resolver.resolve(uri),
-    documentUrl: uri,
-    contextUrl: null,
-  });
+  return async (uri) => {
+    if (typeof resolver.supports === 'function' && !resolver.supports(uri)) {
+      throw new Error(`Resolver does not support: ${uri}`);
+    }
+    return {
+      document: await resolver.resolve(uri),
+      documentUrl: uri,
+      contextUrl: null,
+    };
+  };
 }
 
 function decodeJwtPartAsJson(part, partName) {
@@ -147,10 +152,10 @@ async function resolveIssuerKey({
   signAlg,
 }) {
   if (typeof keyResolver === 'function') {
-    return normalizeResolvedKey(
-      await keyResolver(issuerKey ?? headerKid),
-      signAlg,
-    );
+    const resolved = await keyResolver(issuerKey ?? headerKid);
+    if (resolved != null) {
+      return normalizeResolvedKey(resolved, signAlg);
+    }
   }
   if (!docLoader) {
     // eslint-disable-next-line sonarjs/no-duplicate-string -- keep dock-compatible raw error text
@@ -191,9 +196,12 @@ function createPresentationVerifier({
       const isJWK = verifierKey.type === 'JsonWebKey2020';
       const { verify } = verifierKey.verifier();
       if (isJWK) {
+        const signature = typeof sig === 'string'
+          ? new Uint8Array(base64url.toBuffer(sig))
+          : valueBytes(sig);
         return verify({
           data: Buffer.from(data),
-          signature: jwtStr.split('~')[0],
+          signature,
         });
       }
       const signature = typeof sig === 'string'

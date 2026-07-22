@@ -10,10 +10,6 @@ import VerifiableCredential from './verifiable-credential';
 import { ensureStatusListId } from '../utils';
 
 /**
- * @typedef {import('./helpers').KeyDoc} KeyDoc
- */
-
-/**
  * Status list 2021 verifiable credential as per https://www.w3.org/TR/vc-status-list/#statuslist2021credential.
  */
 export default class StatusList2021Credential extends VerifiableCredential {

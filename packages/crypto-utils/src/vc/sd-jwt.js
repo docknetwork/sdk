@@ -196,9 +196,12 @@ function createPresentationVerifier({
       const isJWK = verifierKey.type === 'JsonWebKey2020';
       const { verify } = verifierKey.verifier();
       if (isJWK) {
+        const signature = typeof sig === 'string'
+          ? new Uint8Array(base64url.toBuffer(sig))
+          : valueBytes(sig);
         return verify({
           data: Buffer.from(data),
-          signature: jwtStr.split('~')[0],
+          signature,
         });
       }
       const signature = typeof sig === 'string'

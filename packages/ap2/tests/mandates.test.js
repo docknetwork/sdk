@@ -19,6 +19,7 @@ import {
   signClosedPaymentMandate,
   verifyClosedCheckoutMandate,
   verifyClosedPaymentMandate,
+  resolveOpenPaymentMandateContent,
   computeDisclosureDigest,
   computeCheckoutHash,
 } from '../src';
@@ -247,5 +248,114 @@ describe('AP2 mandates: round trip', () => {
       publicKey: otherKeypair.publicKey(),
     });
     expect(result.verified).toBe(false);
+  });
+});
+
+describe('AP2 mandates: resolveOpenPaymentMandateContent', () => {
+  const merchant = { id: 'merchant_1', name: 'Demo Merchant', website: 'https://demo-merchant.example' };
+  const instrument = { id: 'card_1', type: 'card', description: 'Card ****4242' };
+
+  test('resolves budget, allowed_payees, and allowed_payment_instruments constraints', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const cnf = { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) };
+
+    const presentation = await signOpenPaymentMandate(
+      buildOpenPaymentMandate({
+        vct: 'mandate.payment.open.1',
+        constraints: [
+          { type: 'payment.budget', max: 20000, currency: 'USD' },
+          { type: 'payment.allowed_payees', allowed: [merchant] },
+          { type: 'payment.allowed_payment_instruments', allowed: [instrument] },
+          { type: 'payment.reference', conditional_transaction_id: 'digest-1' },
+        ],
+        cnf,
+      }),
+      { signer: userKeypair },
+    );
+
+    const { content, protectedHeader } = resolveOpenPaymentMandateContent(presentation);
+
+    expect(content.cnf).toEqual(cnf);
+    expect(protectedHeader.typ).toBe('dc+sd-jwt');
+    expect(content.constraints).toEqual(
+      expect.arrayContaining([
+        { type: 'payment.budget', max: 20000, currency: 'USD' },
+        { type: 'payment.allowed_payees', allowed: [merchant] },
+        { type: 'payment.allowed_payment_instruments', allowed: [instrument] },
+      ]),
+    );
+  });
+
+  test('rejects a hand-edited presentation whose content no longer matches its digest', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const cnf = { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) };
+
+    const presentation = await signOpenPaymentMandate(
+      buildOpenPaymentMandate({
+        vct: 'mandate.payment.open.1',
+        constraints: [
+          { type: 'payment.budget', max: 100, currency: 'USD' },
+          { type: 'payment.reference', conditional_transaction_id: 'digest-1' },
+        ],
+        cnf,
+      }),
+      { signer: userKeypair },
+    );
+
+    // Hand-edit the content disclosure (the last '~'-delimited segment) to
+    // claim a much larger budget, without re-signing.
+    const parts = presentation.split('~');
+    const contentDisclosure = parts[parts.length - 2];
+    const decoded = JSON.parse(Buffer.from(contentDisclosure, 'base64url').toString('utf8'));
+    decoded[1].constraints[0].max = 999999999;
+    const tamperedDisclosure = Buffer.from(JSON.stringify(decoded)).toString('base64url');
+    const tamperedPresentation = [...parts.slice(0, -2), tamperedDisclosure, ''].join('~');
+
+    expect(() => resolveOpenPaymentMandateContent(tamperedPresentation)).toThrow(
+      /No disclosure found/,
+    );
+  });
+
+  test('rejects an expired Open Payment Mandate', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const cnf = { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) };
+
+    const presentation = await signOpenPaymentMandate(
+      buildOpenPaymentMandate({
+        vct: 'mandate.payment.open.1',
+        constraints: [{ type: 'payment.reference', conditional_transaction_id: 'digest-1' }],
+        cnf,
+        iat: 1000,
+        exp: 2000,
+      }),
+      { signer: userKeypair },
+    );
+
+    expect(() => resolveOpenPaymentMandateContent(presentation, {
+      currentDate: new Date(3000 * 1000),
+    })).toThrow(/expired/);
+  });
+
+  test('accepts a mandate with no exp -- no expiry enforced', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const cnf = { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) };
+
+    const presentation = await signOpenPaymentMandate(
+      buildOpenPaymentMandate({
+        vct: 'mandate.payment.open.1',
+        constraints: [{ type: 'payment.reference', conditional_transaction_id: 'digest-1' }],
+        cnf,
+      }),
+      { signer: userKeypair },
+    );
+
+    const { content } = resolveOpenPaymentMandateContent(presentation, {
+      currentDate: new Date(Date.now() + 1000 * 365 * 24 * 60 * 60 * 1000),
+    });
+    expect(content.vct).toBe('mandate.payment.open.1');
   });
 });

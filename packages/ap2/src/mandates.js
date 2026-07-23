@@ -6,6 +6,8 @@ import {
   parseSdJwtPresentation,
   computeSdHash,
   jwkToSecp256r1PublicKey,
+  decodeJwtPayload,
+  decodeJwtProtectedHeader,
 } from '@docknetwork/crypto-utils/vc';
 import {
   MANDATE_TYPE_CHECKOUT_OPEN,
@@ -22,6 +24,8 @@ export {
   MANDATE_TYPE_PAYMENT_OPEN,
   MANDATE_TYPE_PAYMENT_CLOSED,
 } from './utils';
+
+const OPEN_PAYMENT_MANDATE_LABEL = 'Open Payment Mandate';
 
 const DEFAULT_SD_ALG = 'sha-256';
 const SD_HASH_ALGORITHMS = {
@@ -574,7 +578,7 @@ export function verifyClosedPaymentMandate(
     const sdHashVerified = checkSdHashAgainstOpenMandate(
       payload,
       openMandatePresentation,
-      'Open Payment Mandate',
+      OPEN_PAYMENT_MANDATE_LABEL,
     );
 
     return {
@@ -587,4 +591,74 @@ export function verifyClosedPaymentMandate(
   } catch (error) {
     return { verified: false, error: error instanceof Error ? error : new Error(String(error)) };
   }
+}
+
+// Reveals the array-element disclosures inside an Open Payment Mandate's
+// resolved content -- the reverse of `redactPaymentConstraints`. Entries that
+// are already plain objects (not SD-redacted, e.g. from a hand-built content
+// object that skipped signing) are passed through unchanged.
+function resolvePaymentConstraintDisclosures(content, disclosures, sdAlg) {
+  const disclosableTypes = ['payment.allowed_payees', 'payment.allowed_payment_instruments'];
+  const constraints = (content.constraints ?? []).map((constraint) => {
+    if (!disclosableTypes.includes(constraint?.type) || !Array.isArray(constraint.allowed)) {
+      return constraint;
+    }
+    const allowed = constraint.allowed.map((entry) => {
+      const digest = entry?.['...'];
+      if (typeof digest !== 'string') {
+        return entry;
+      }
+      const disclosure = findDisclosureByDigest(disclosures, digest, sdAlg);
+      if (!disclosure) {
+        throw new Error(`No disclosure found for a "${constraint.type}" array-element digest`);
+      }
+      return decodeArrayElementDisclosure(disclosure);
+    });
+    return { ...constraint, allowed };
+  });
+  return { ...content, constraints };
+}
+
+/**
+ * Decodes and resolves an Open Payment Mandate presentation's own content
+ * (`constraints`, `cnf`, `exp`, ...) -- WITHOUT verifying an issuer signature.
+ *
+ * Open Payment Mandates are signed by the User's key (see
+ * `signOpenPaymentMandate`), which is generally a *different* key from the
+ * mandate's own `cnf.jwk` (the Agent's key, only endorsed to close it later)
+ * -- so, unlike `verifyClosedCheckoutMandate`/`verifyClosedPaymentMandate`,
+ * there is no single key this package can check the envelope signature
+ * against on its own. A caller that independently knows the issuing User's
+ * public key can verify the envelope itself (`verifyJWT`, on the `issuerJwt`
+ * half of `parseSdJwtPresentation`'s result) before or after calling this.
+ *
+ * What this DOES check: the SD-JWT's internal digest/disclosure consistency
+ * (a hand-edited constraints blob whose digest no longer matches
+ * `delegate_payload` is rejected), that the resolved content matches the
+ * Open Payment Mandate schema, and (when `exp` is present) that it hasn't
+ * passed.
+ *
+ * @param {string} presentation
+ * @param {{currentDate?: Date, clockTolerance?: number}} options
+ * @returns {{content: object, protectedHeader: object}}
+ */
+export function resolveOpenPaymentMandateContent(
+  presentation,
+  { currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE } = {},
+) {
+  const { issuerJwt, disclosures } = parseSdJwtPresentation(presentation);
+  const payload = decodeJwtPayload(issuerJwt, OPEN_PAYMENT_MANDATE_LABEL);
+  const protectedHeader = decodeJwtProtectedHeader(issuerJwt, OPEN_PAYMENT_MANDATE_LABEL);
+  const sdAlg = getSdAlg(payload);
+
+  const rawContent = resolveMandateContent(payload, disclosures, sdAlg);
+  const resolvedContent = resolvePaymentConstraintDisclosures(rawContent, disclosures, sdAlg);
+  const content = buildOpenPaymentMandate(resolvedContent);
+
+  // Unlike the Closed mandate envelopes, `exp` lives on the disclosed content
+  // itself, not on the outer signed envelope payload (which is just
+  // `{delegate_payload, _sd_alg}`) -- so it's checked against `content` here.
+  checkNotExpired(content, { currentDate, clockTolerance }, OPEN_PAYMENT_MANDATE_LABEL);
+
+  return { content, protectedHeader };
 }

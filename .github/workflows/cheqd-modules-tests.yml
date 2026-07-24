@@ -16,7 +16,12 @@ jobs:
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: npm install -g turbo@2.0.5
       - run: turbo telemetry disable
-      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK turbo run test-with-node --filter @docknetwork/cheqd-blockchain-modules
+      - name: Run tests (with retry for transient testnet failures)
+        run: |
+          for attempt in 1 2 3; do
+            CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK turbo run test-with-node --filter @docknetwork/cheqd-blockchain-modules && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 60s..." && sleep 60
+          done
 
   mainnet:
     runs-on: ubuntu-latest
@@ -32,4 +37,9 @@ jobs:
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: npm install -g turbo@2.0.5
       - run: turbo telemetry disable
-      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK turbo run test-with-node --filter @docknetwork/cheqd-blockchain-modules
+      - name: Run tests (with retry for transient mainnet failures)
+        run: |
+          for attempt in 1 2 3; do
+            CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK turbo run test-with-node --filter @docknetwork/cheqd-blockchain-modules && break
+            [ $attempt -lt 3 ] && echo "Attempt $attempt failed, retrying in 60s..." && sleep 60
+          done

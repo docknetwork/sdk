@@ -6,7 +6,7 @@ export default {
     '^.+\\.(ts|js)$': ['babel-jest', { rootMode: 'upward' }],
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!@stablelib|uuid)',
+    '/node_modules/(?!@stablelib|uuid|@sd-jwt|@ar-agents/ap2|jose|@noble)',
   ],
   verbose: true,
 };

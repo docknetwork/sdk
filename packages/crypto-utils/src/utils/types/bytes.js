@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import { applyToValue } from '../interfaces';
 import { ensureString } from './string';
 import { ensureIterable, isIterable } from './iterable';
@@ -204,10 +203,23 @@ export const normalizeOrConvertStringToU8a = (bytesOrString) => (typeof bytesOrS
 
 /**
  * Creates random `Uint8Array` array of supplied byte length.
+ * Uses `globalThis.crypto.getRandomValues` (Node 22+, browsers, modern RN).
  * @param {number} length
  * @returns {Uint8Array}
  */
-export const randomAsU8a = (length) => u8aToU8a(crypto.randomBytes(length));
+export const randomAsU8a = (length) => {
+  if (
+    globalThis.crypto == null
+    || typeof globalThis.crypto.getRandomValues !== 'function'
+  ) {
+    throw new Error(
+      'globalThis.crypto.getRandomValues is required for randomAsU8a',
+    );
+  }
+  const bytes = new Uint8Array(length);
+  globalThis.crypto.getRandomValues(bytes);
+  return bytes;
+};
 
 /**
  * Creates random hex string of supplied byte length.

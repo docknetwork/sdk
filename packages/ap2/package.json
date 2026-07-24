@@ -34,7 +34,7 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@docknetwork/crypto-utils": "0.2.1",
+    "@docknetwork/crypto-utils": "0.2.2",
     "ajv": "^8.20.0"
   },
   "devDependencies": {

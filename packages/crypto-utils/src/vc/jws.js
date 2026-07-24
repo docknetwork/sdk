@@ -31,9 +31,9 @@ const jwtAlgorithms = {
   },
 };
 
-const supportedJWTAlgorithms = Object.keys(jwtAlgorithms);
+export const supportedJWTAlgorithms = Object.keys(jwtAlgorithms);
 
-function verKeyType(value) {
+export function verKeyType(value) {
   return value?.verKeyType
     ?? value?.constructor?.VerKeyType
     ?? value?.value?.constructor?.VerKeyType
@@ -48,12 +48,50 @@ function inferJWTAlgorithm(keypair) {
   );
 }
 
-function getJWTAlgorithm(algorithm) {
+export function getJWTAlgorithm(algorithm) {
   const config = jwtAlgorithms[algorithm];
   if (!config) {
     throw new Error(`Unsupported JWT algorithm: ${algorithm}`);
   }
   return config;
+}
+
+/**
+ * Verifies a JOSE signing-input / signature pair with a Dock public key.
+ *
+ * @param {string|Uint8Array} data signing input (`header.payload`)
+ * @param {string|Uint8Array} signature base64url string or raw JOSE signature bytes
+ * @param {*} publicKey Dock public key
+ * @param {string} algorithm JWT alg (EdDSA | ES256K | ES256)
+ * @returns {boolean}
+ */
+export function verifyJwtSignature(data, signature, publicKey, algorithm) {
+  const { Keypair } = getJWTAlgorithm(algorithm);
+  const publicKeyType = verKeyType(publicKey);
+  if (
+    publicKeyType != null
+    && !jwtAlgorithms[algorithm].verKeyTypes.includes(publicKeyType)
+  ) {
+    throw new Error(
+      `JWT algorithm ${algorithm} does not match public key type`,
+    );
+  }
+
+  const verifyData = typeof data === 'string'
+    ? new Uint8Array(Buffer.from(data, 'utf8'))
+    : valueBytes(data);
+  const signatureBytes = typeof signature === 'string'
+    ? new Uint8Array(base64url.toBuffer(signature))
+    : valueBytes(signature);
+  const verificationSignature = algorithm.startsWith('ES')
+    ? joseSignatureToDER(signatureBytes)
+    : signatureBytes;
+
+  return Keypair.verify(
+    verifyData,
+    verificationSignature,
+    valueBytes(publicKey),
+  );
 }
 
 // Taken from https://github.com/transmute-industries/verifiable-data/blob/main/packages/jose-ld/src/JWS/createSigner.ts
@@ -229,28 +267,11 @@ export function verifyJWT(
       throw new Error(`Unsupported JWT algorithm: ${protectedHeader.alg}`);
     }
 
-    const algorithm = getJWTAlgorithm(protectedHeader.alg);
-    const publicKeyType = verKeyType(publicKey);
-    if (
-      publicKeyType != null
-      && !algorithm.verKeyTypes.includes(publicKeyType)
-    ) {
-      throw new Error(
-        `JWT algorithm ${protectedHeader.alg} does not match public key type`,
-      );
-    }
-
-    const signature = new Uint8Array(base64url.toBuffer(encodedSignature));
-    const verifyData = new Uint8Array(
-      Buffer.from(`${encodedHeader}.${encodedPayload}`, 'utf8'),
-    );
-    const verificationSignature = protectedHeader.alg.startsWith('ES')
-      ? joseSignatureToDER(signature)
-      : signature;
-    const verified = algorithm.Keypair.verify(
-      verifyData,
-      verificationSignature,
-      valueBytes(publicKey),
+    const verified = verifyJwtSignature(
+      `${encodedHeader}.${encodedPayload}`,
+      encodedSignature,
+      publicKey,
+      protectedHeader.alg,
     );
 
     return verified

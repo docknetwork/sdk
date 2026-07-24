@@ -1,5 +1,3 @@
-import { createHash } from 'node:crypto';
-
 import base64url from 'base64url';
 
 import {
@@ -9,15 +7,11 @@ import {
   SignatureEd25519Value,
   Secp256k1Keypair,
   Secp256r1Keypair,
-  computeSdHash,
   createJws,
   createJwsSigner,
   createRawSigner,
-  decodeJwtPayload,
   joseSignatureToDER,
   jwkToSecp256r1PublicKey,
-  parseFinalSdJwtPresentation,
-  parseSdJwtPresentation,
   secp256r1PublicKeyToJwk,
   signJWT,
   signJWS,
@@ -161,47 +155,6 @@ describe('JWS helpers', () => {
     const result = createJws({ encodedHeader: 'header', verifyData });
 
     expect(Buffer.from(result)).toEqual(Buffer.from('header.\u0001\u0002\u0003'));
-  });
-
-  test('decodes JWT payloads and computes SD-JWT presentation hashes', () => {
-    const issuerPayload = { _sd_alg: 'sha-256', vct: 'mandate.payment.1' };
-    const issuerJwt = [
-      base64url.encode(JSON.stringify({ alg: 'ES256' })),
-      base64url.encode(JSON.stringify(issuerPayload)),
-      'signature',
-    ].join('.');
-    const disclosure = base64url.encode(JSON.stringify([
-      'salt',
-      'payment_id',
-      'PAY-001',
-    ]));
-    const expected = createHash('sha256')
-      .update(Buffer.from(`${issuerJwt}~${disclosure}~`, 'ascii'))
-      .digest('base64url');
-    const kbJwt = [
-      base64url.encode(JSON.stringify({ alg: 'ES256', typ: 'kb+jwt' })),
-      base64url.encode(JSON.stringify({ sd_hash: expected })),
-      'kb-signature',
-    ].join('.');
-    const presentation = `${issuerJwt}~${disclosure}~${kbJwt}`;
-
-    expect(decodeJwtPayload(issuerJwt)).toEqual(issuerPayload);
-    expect(parseSdJwtPresentation(presentation)).toEqual({
-      issuerJwt,
-      disclosures: [disclosure],
-      kbJwt,
-    });
-    expect(parseFinalSdJwtPresentation(
-      `${issuerJwt}~~~${presentation}`,
-    )).toEqual({
-      issuerJwt,
-      disclosures: [disclosure],
-      kbJwt,
-    });
-    expect(computeSdHash({
-      issuerJwt,
-      disclosures: [disclosure],
-    })).toBe(expected);
   });
 
   test('converts P-256 public keys to and from JWK', () => {

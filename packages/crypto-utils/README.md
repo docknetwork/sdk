@@ -31,4 +31,12 @@ the 64-byte `r || s` representation required by JOSE. To verify that JOSE
 representation with a Dock ECDSA keypair, first convert it to DER with
 `joseSignatureToDER`.
 
-Subpath exports are available at `keypairs`, `types`, `utils`, and `vc`.
+Subpath exports are available at `keypairs`, `types`, `utils`, `key-utils`, and
+`vc`.
+
+## Environments
+
+Node is the default target. Browser and React Native bundlers resolve
+`@sd-jwt/crypto-nodejs` to `@sd-jwt/crypto-browser` via this package's
+`browser` / `react-native` fields. Apps still need a `Buffer` polyfill where
+the runtime does not provide one.

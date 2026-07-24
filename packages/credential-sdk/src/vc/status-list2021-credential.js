@@ -43,7 +43,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * To allow unrevoking indices in the future, use `statusPurpose` = `suspension`.
    * The proof will be generated immediately using supplied `keyDoc`.
    *
-   * @param {object} keyDoc - key document used to sign the credential (see `getKeyDoc`)
+   * @param {KeyDoc} keyDoc
    * @param {string} id - on-chain hex identifier for the `StatusList2021Credential`.
    * @param {object} [params={}]
    * @param {'revocation'|'suspension'} [params.statusPurpose=revocation] - `statusPurpose` of the `StatusList2021Credential`.
@@ -78,7 +78,7 @@ export default class StatusList2021Credential extends VerifiableCredential {
    * the underlying value won't be modified.
    * Throws an error if the underlying status list can't be decoded or any of the supplied indices is out of range.
    *
-   * @param {object} keyDoc - key document used to re-sign the credential (see `getKeyDoc`)
+   * @param {KeyDoc} keyDoc
    * @param {object} [update={}]
    * @param {Iterable<number>} update.revokeIndices - indices to be revoked or suspended
    * @param {Iterable<number>} update.unsuspendIndices - indices to be unsuspended

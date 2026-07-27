@@ -12,13 +12,13 @@ details.
 import {
   buildPaymentReceipt,
   computeMandateReference,
+  generateSigner,
   signReceipt,
   verifyPaymentReceipt,
   verifyClosedPaymentMandate,
 } from '@docknetwork/ap2';
-import { Secp256r1Keypair } from '@docknetwork/crypto-utils/keypairs';
 
-const keypair = Secp256r1Keypair.random();
+const keypair = generateSigner();
 // Use the exact compact presentation received from the Shopping Agent.
 const closedMandatePresentation = receivedClosedMandatePresentation;
 const receipt = buildPaymentReceipt({
@@ -57,6 +57,12 @@ if (!result.verified) {
 Checkout receipts use `issueCheckoutReceipt` and `verifyCheckoutReceipt`.
 The generic `issueReceipt` and `verifyReceipt` functions remain available for
 the Dock keypair flow.
+`generateSigner()` is a quick-start convenience -- a fresh ES256 keypair, the
+only algorithm these receipt functions currently accept. `signer` is really
+just `{sign: function(Uint8Array): *}`, so bringing your own signer (an
+HSM/KMS-backed one, or an existing key via `Secp256r1Keypair.fromSeed`/
+`fromPrivateKey`, both re-exported from this package) works the same way --
+`generateSigner()` isn't required.
 Verification returns `{ verified, receipt, protectedHeader }` on success and
 `{ verified: false, error }` on failure, following the credential SDK result
 style. Successful results may also include `referenceVerified` and

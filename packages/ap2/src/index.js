@@ -1,6 +1,8 @@
 export * from './receipts';
 export * from './mandates';
-export { computeSdHash } from '@docknetwork/crypto-utils/vc';
+export * from './signer';
+export { computeSdHash, parseSdJwtPresentation } from '@docknetwork/crypto-utils/vc';
+export { Secp256r1Keypair } from '@docknetwork/crypto-utils/keypairs';
 export {
   encodeDisclosure,
   inferReceiptType,

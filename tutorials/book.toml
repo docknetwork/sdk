@@ -7,6 +7,5 @@ authors = [
     "Oleg Nosov",
 ]
 language = "en"
-multilingual = false
 src = "src"
 title = "Dock SDK Tutorial"

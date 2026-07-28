@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/ap2",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Basic AP2 support",
   "license": "MIT",
   "type": "module",

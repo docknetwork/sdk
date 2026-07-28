@@ -1,5 +1,12 @@
 # @docknetwork/credential-sdk
 
+## 0.56.3
+
+### Patch Changes
+
+- Updated dependencies [8e97488]
+  - @docknetwork/crypto-utils@0.2.3
+
 ## 0.56.2
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @docknetwork/ap2
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [8e97488]
+  - @docknetwork/crypto-utils@0.2.3
+
 ## 0.4.1
 
 ### Patch Changes

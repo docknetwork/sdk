@@ -133,7 +133,6 @@ describe('AP2 mandates: round trip', () => {
     });
 
     const checkoutResult = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
-      publicKey: agentKeypair.publicKey(),
       openMandatePresentation: openCheckoutPresentation,
     });
     expect(checkoutResult.verified).toBe(true);
@@ -172,7 +171,6 @@ describe('AP2 mandates: round trip', () => {
     });
 
     const paymentResult = verifyClosedPaymentMandate(closedPaymentPresentation, {
-      publicKey: agentKeypair.publicKey(),
       checkoutJwt,
       openMandatePresentation: openPaymentPresentation,
     });
@@ -210,13 +208,13 @@ describe('AP2 mandates: round trip', () => {
     );
 
     const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
-      publicKey: agentKeypair.publicKey(),
+      openMandatePresentation: openCheckoutPresentation,
     });
     expect(result.verified).toBe(false);
     expect(result.error.message).toMatch(/checkout_hash/);
   });
 
-  test('rejects a Closed Checkout Mandate signed by the wrong key', async () => {
+  test('rejects a Closed Checkout Mandate closed by an unauthorized key', async () => {
     const userKeypair = Secp256r1Keypair.random();
     const agentKeypair = Secp256r1Keypair.random();
     const otherKeypair = Secp256r1Keypair.random();
@@ -232,6 +230,7 @@ describe('AP2 mandates: round trip', () => {
     );
 
     const checkoutJwt = SAMPLE_CHECKOUT_JWT;
+    // otherKeypair is not the key endorsed in the Open Mandate's cnf.jwk.
     const closedCheckoutPresentation = await signClosedCheckoutMandate(
       buildClosedCheckoutMandate({
         vct: VCT_CHECKOUT_CLOSED,
@@ -239,14 +238,14 @@ describe('AP2 mandates: round trip', () => {
         checkout_hash: computeCheckoutHash(checkoutJwt),
       }),
       {
-        signer: agentKeypair,
+        signer: otherKeypair,
         nonce: 'nonce-1',
         openMandatePresentation: openCheckoutPresentation,
       },
     );
 
     const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
-      publicKey: otherKeypair.publicKey(),
+      openMandatePresentation: openCheckoutPresentation,
     });
     expect(result.verified).toBe(false);
   });
@@ -434,7 +433,7 @@ describe('AP2 mandates: resolveOpenCheckoutMandateContent', () => {
 });
 
 describe('AP2 mandates: cnf is derived from the Open Mandate, not trusted from the caller', () => {
-  test('verifyClosedCheckoutMandate rejects a mandate closed by an unauthorized key, even when the caller vouches for that same key', async () => {
+  test('verifyClosedCheckoutMandate rejects a mandate closed by an unauthorized key', async () => {
     const userKeypair = Secp256r1Keypair.random();
     const authorizedAgentKeypair = Secp256r1Keypair.random();
     const attackerKeypair = Secp256r1Keypair.random();
@@ -464,25 +463,16 @@ describe('AP2 mandates: cnf is derived from the Open Mandate, not trusted from t
       },
     );
 
-    // A caller naively trusting the attacker's own claim of "I'm the holder"
-    // (passing the attacker's key directly, with no openMandatePresentation)
-    // would incorrectly see this as verified -- signature-only verification
-    // can't tell an unauthorized key from an authorized one.
-    const signatureOnlyResult = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
-      publicKey: attackerKeypair.publicKey(),
-    });
-    expect(signatureOnlyResult.verified).toBe(true);
-
-    // But deriving the key from the actual Open Mandate rejects it, because
-    // the attacker's key was never the one endorsed in cnf.
+    // The verification key is always derived from the Open Mandate's own
+    // cnf.jwk -- verifyClosedCheckoutMandate has no caller-supplied-key
+    // option that could be used to bless the attacker's key instead.
     const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
-      publicKey: attackerKeypair.publicKey(),
       openMandatePresentation: openCheckoutPresentation,
     });
     expect(result.verified).toBe(false);
   });
 
-  test('verifyClosedPaymentMandate rejects a mandate closed by an unauthorized key, even when the caller vouches for that same key', async () => {
+  test('verifyClosedPaymentMandate rejects a mandate closed by an unauthorized key', async () => {
     const userKeypair = Secp256r1Keypair.random();
     const authorizedAgentKeypair = Secp256r1Keypair.random();
     const attackerKeypair = Secp256r1Keypair.random();
@@ -511,16 +501,66 @@ describe('AP2 mandates: cnf is derived from the Open Mandate, not trusted from t
       },
     );
 
-    const signatureOnlyResult = verifyClosedPaymentMandate(closedPaymentPresentation, {
-      publicKey: attackerKeypair.publicKey(),
-    });
-    expect(signatureOnlyResult.verified).toBe(true);
-
     const result = verifyClosedPaymentMandate(closedPaymentPresentation, {
-      publicKey: attackerKeypair.publicKey(),
       openMandatePresentation: openPaymentPresentation,
     });
     expect(result.verified).toBe(false);
+  });
+
+  test('verifyClosedCheckoutMandate requires openMandatePresentation -- there is no caller-supplied-key fallback', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const cnf = { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) };
+
+    const openCheckoutPresentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        cnf,
+      }),
+      { signer: userKeypair },
+    );
+    const closedCheckoutPresentation = await signClosedCheckoutMandate(
+      buildClosedCheckoutMandate({
+        vct: VCT_CHECKOUT_CLOSED,
+        checkout_jwt: SAMPLE_CHECKOUT_JWT,
+        checkout_hash: computeCheckoutHash(SAMPLE_CHECKOUT_JWT),
+      }),
+      { signer: agentKeypair, nonce: 'nonce-1', openMandatePresentation: openCheckoutPresentation },
+    );
+
+    const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {});
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toMatch(/openMandatePresentation/);
+  });
+
+  test('verifyClosedPaymentMandate requires openMandatePresentation -- there is no caller-supplied-key fallback', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const cnf = { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) };
+
+    const openPaymentPresentation = await signOpenPaymentMandate(
+      buildOpenPaymentMandate({
+        vct: 'mandate.payment.open.1',
+        constraints: [{ type: 'payment.reference', conditional_transaction_id: 'digest-1' }],
+        cnf,
+      }),
+      { signer: userKeypair },
+    );
+    const closedPaymentPresentation = await signClosedPaymentMandate(
+      buildClosedPaymentMandate({
+        vct: 'mandate.payment.1',
+        transaction_id: computeCheckoutHash(SAMPLE_CHECKOUT_JWT),
+        payee: { id: 'merchant_1', name: 'Demo Merchant', website: 'https://demo-merchant.example' },
+        payment_amount: { amount: 19900, currency: 'USD' },
+        payment_instrument: { id: 'stub', type: 'card', description: 'Card ****4242' },
+      }),
+      { signer: agentKeypair, nonce: 'nonce-1', openMandatePresentation: openPaymentPresentation },
+    );
+
+    const result = verifyClosedPaymentMandate(closedPaymentPresentation, {});
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toMatch(/openMandatePresentation/);
   });
 });
 

@@ -2,15 +2,19 @@
 "@docknetwork/ap2": minor
 ---
 
-`verifyClosedCheckoutMandate` and `verifyClosedPaymentMandate` now derive the
-envelope's expected signing key from the referenced Open Mandate's own
-`cnf.jwk` when `openMandatePresentation` is supplied, instead of trusting a
-separately passed `publicKey`/`holderJwk`. Previously, a caller that
-verified a signature against a self-supplied key had no guarantee that key
-was ever the one the Open Mandate actually endorsed as its holder — a
-Closed Mandate signed by an unauthorized key would still "verify" as long
-as the caller supplied that same (wrong) key. Passing `publicKey`/`holderJwk`
-without `openMandatePresentation` continues to work exactly as before.
+`verifyClosedCheckoutMandate` and `verifyClosedPaymentMandate` now require
+`openMandatePresentation` and always derive the envelope's expected signing
+key from the referenced Open Mandate's own `cnf.jwk`. The `publicKey`/
+`holderJwk` parameters are removed entirely — there is no longer a way to
+verify a Closed Mandate against a caller-supplied key. Previously, a caller
+that verified a signature against a self-supplied key had no guarantee that
+key was ever the one the Open Mandate actually endorsed as its holder — a
+Closed Mandate signed by an unauthorized key would still "verify" as long as
+the caller supplied that same (wrong) key. Since this package has no
+production usage yet, that insecure fallback is removed rather than kept
+for backwards compatibility: calling either function without
+`openMandatePresentation` now returns `{ verified: false, error }` instead
+of silently trusting an unverified key.
 
 Added `resolveOpenCheckoutMandateContent`, mirroring
 `resolveOpenPaymentMandateContent` for Open Checkout Mandates, which the fix

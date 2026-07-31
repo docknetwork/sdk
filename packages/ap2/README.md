@@ -34,9 +34,12 @@ const jwt = await signReceipt(receipt, {
   type: 'payment',
 });
 // Verify the mandate first (signature, cnf key-binding, checkout binding, aud, expiry).
+// openMandatePresentation is required -- it's how the trusted verification
+// key is derived from the Open Mandate's own cnf.jwk, rather than trusted
+// from a caller-supplied key.
 const mandateVerification = verifyClosedPaymentMandate(
   closedMandatePresentation,
-  { /* publicKey or holderJwk, checkoutJwt, openMandatePresentation, ... */ },
+  { openMandatePresentation, checkoutJwt, openCheckoutMandatePresentation },
 );
 
 const result = verifyPaymentReceipt(jwt, {
@@ -145,9 +148,11 @@ const closedCheckoutPresentation = await signClosedCheckoutMandate(closedCheckou
   openMandatePresentation: openCheckoutPresentation,
 });
 
-// 3. The Merchant/Credential Provider verifies it.
+// 3. The Merchant/Credential Provider verifies it. The verification key is
+// always derived from the Open Mandate's own cnf.jwk -- there is no
+// caller-supplied-key option, since a caller-supplied key that happens to
+// verify a signature proves nothing about *whose* key it was authorized to be.
 const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
-  holderJwk: agentPublicJwk, // or publicKey
   openMandatePresentation: openCheckoutPresentation,
 });
 if (!result.verified) throw result.error;

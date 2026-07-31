@@ -434,6 +434,28 @@ function requireOpenMandatePresentation(openMandatePresentation) {
   }
 }
 
+function requireUserPublicKey(userPublicKey) {
+  if (userPublicKey === undefined) {
+    throw new TypeError(
+      '"userPublicKey" is required: without it, the Open Mandate\'s own issuer signature -- '
+      + 'and therefore its cnf.jwk delegation -- is never verified, and the whole mandate chain '
+      + 'could be entirely self-forged',
+    );
+  }
+}
+
+// Verifies an Open Mandate's own issuer envelope against the trusted User
+// key the caller separately resolved (e.g. via DID resolution or a wallet
+// registry) -- the only way to confirm this Open Mandate, and therefore the
+// cnf.jwk delegation inside it, actually came from the User it claims to,
+// rather than being entirely self-forged.
+function verifyOpenMandateIssuer(issuerJwt, userPublicKey, label) {
+  const result = verifyJWT(issuerJwt, userPublicKey, { algorithms: ['ES256'] });
+  if (!result.verified) {
+    throw new Error(`${label} issuer signature verification failed`);
+  }
+}
+
 // Resolves the checkout_jwt claim disclosure referenced by a Closed Checkout
 // Mandate content's "_sd" digest array, returning the revealed checkout_jwt
 // string. Throws if the digest, disclosure, or claim name don't line up.
@@ -464,29 +486,43 @@ function resolveCheckoutJwtClaim(content, disclosures, sdAlg) {
  * claims is the holder, is what actually enforces that this presentation was
  * closed by the party the Open Mandate delegated to — a caller-supplied key
  * that happens to verify a signature proves nothing about *whose* key it was
- * authorized to be. Also verifies the `checkout_jwt` disclosure against the
- * content's `_sd` digest, `checkout_hash` against a fresh hash of the
- * revealed `checkout_jwt`, `aud === "merchant"`, expiry, and `sd_hash`
- * against `openMandatePresentation`. See `signClosedCheckoutMandate` for the
+ * authorized to be.
+ *
+ * That delegation is only meaningful if the Open Mandate itself was actually
+ * signed by the User it claims to be from -- otherwise an attacker can
+ * fabricate an entire Open + Closed Mandate chain naming their own key in
+ * `cnf.jwk`. The required `userPublicKey` is the caller's independently
+ * resolved trusted key for that User (e.g. via DID resolution or a wallet
+ * registry), verified here against the Open Mandate's envelope.
+ *
+ * Also verifies the `checkout_jwt` disclosure against the content's `_sd`
+ * digest, `checkout_hash` against a fresh hash of the revealed
+ * `checkout_jwt`, `aud === "merchant"`, expiry, and `sd_hash` against
+ * `openMandatePresentation`. See `signClosedCheckoutMandate` for the
  * `sd_hash` caveat.
  *
  * @param {string} presentation
- * @param {{openMandatePresentation: string,
+ * @param {{openMandatePresentation: string, userPublicKey: *,
  * currentDate?: Date, clockTolerance?: number}} options
  * @returns {{verified: boolean, content?: object, checkoutJwt?: string,
- * protectedHeader?: object, sdHashVerified?: boolean, error?: Error}}
+ * protectedHeader?: object, sdHashVerified?: boolean,
+ * openMandateIssuerVerified?: boolean, error?: Error}}
  */
 export function verifyClosedCheckoutMandate(
   presentation,
   {
-    openMandatePresentation, currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE,
+    openMandatePresentation, userPublicKey, currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE,
   } = {},
 ) {
   try {
     requireOpenMandatePresentation(openMandatePresentation);
+    requireUserPublicKey(userPublicKey);
     const { issuerJwt, disclosures } = parseSdJwtPresentation(presentation);
     const verificationKey = jwkToSecp256r1PublicKey(
-      resolveOpenCheckoutMandateContent(openMandatePresentation, { currentDate, clockTolerance }).content.cnf.jwk,
+      resolveOpenCheckoutMandateContent(
+        openMandatePresentation,
+        { userPublicKey, currentDate, clockTolerance },
+      ).content.cnf.jwk,
     );
     const result = verifyJWT(issuerJwt, verificationKey, { algorithms: ['ES256'] });
     if (!result.verified) {
@@ -516,6 +552,7 @@ export function verifyClosedCheckoutMandate(
       checkoutJwt,
       protectedHeader,
       sdHashVerified: true,
+      openMandateIssuerVerified: true,
     };
   } catch (error) {
     return { verified: false, error: error instanceof Error ? error : new Error(String(error)) };
@@ -528,38 +565,46 @@ export function verifyClosedCheckoutMandate(
  * The envelope signature is verified against the referenced Open Payment
  * Mandate's own `cnf.jwk`, derived from the required `openMandatePresentation`
  * — never against a caller-supplied key. See `verifyClosedCheckoutMandate`'s
- * doc comment for why deriving the key from the mandate itself matters. Also
- * verifies `aud === "credential-provider"`, expiry, and `sd_hash` against
+ * doc comment for why deriving the key from the mandate itself matters, and
+ * for why the required `userPublicKey` (verified against the Open Payment
+ * Mandate's own envelope) is what makes that delegation trustworthy in the
+ * first place, rather than an entirely self-forgeable chain. Also verifies
+ * `aud === "credential-provider"`, expiry, and `sd_hash` against
  * `openMandatePresentation`; when the corresponding Closed Checkout Mandate's
  * `checkout_jwt` is supplied, that `transaction_id` matches a fresh hash of
  * it.
  *
- * When `openCheckoutMandatePresentation` is also supplied, also verifies the
- * Open Payment Mandate's `payment.reference.conditional_transaction_id`
- * constraint against a fresh `sd_hash` of that Open Checkout Mandate
- * presentation — the binding that ties this payment authorization to one
- * specific checkout (see the AP2 spec's Reference constraint).
+ * When `openCheckoutMandatePresentation` is also supplied, also verifies its
+ * issuer envelope against the same `userPublicKey` (the AP2 flow's Open
+ * Checkout and Open Payment Mandates are both signed by the same User) and
+ * checks the Open Payment Mandate's
+ * `payment.reference.conditional_transaction_id` constraint against a fresh
+ * `sd_hash` of that Open Checkout Mandate presentation — the binding that
+ * ties this payment authorization to one specific checkout (see the AP2
+ * spec's Reference constraint).
  *
  * @param {string} presentation
- * @param {{openMandatePresentation: string, checkoutJwt?: string,
+ * @param {{openMandatePresentation: string, userPublicKey: *, checkoutJwt?: string,
  * openCheckoutMandatePresentation?: string, currentDate?: Date, clockTolerance?: number}} options
  * @returns {{verified: boolean, content?: object, protectedHeader?: object,
- * transactionIdVerified?: boolean, sdHashVerified?: boolean, referenceVerified?: boolean, error?: Error}}
+ * transactionIdVerified?: boolean, sdHashVerified?: boolean, referenceVerified?: boolean,
+ * openMandateIssuerVerified?: boolean, error?: Error}}
  */
 export function verifyClosedPaymentMandate(
   presentation,
   {
-    checkoutJwt, openMandatePresentation, openCheckoutMandatePresentation,
+    checkoutJwt, openMandatePresentation, userPublicKey, openCheckoutMandatePresentation,
     currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE,
   } = {},
 ) {
   try {
     requireOpenMandatePresentation(openMandatePresentation);
+    requireUserPublicKey(userPublicKey);
     const { issuerJwt, disclosures } = parseSdJwtPresentation(presentation);
 
     const openPaymentContent = resolveOpenPaymentMandateContent(
       openMandatePresentation,
-      { currentDate, clockTolerance },
+      { userPublicKey, currentDate, clockTolerance },
     ).content;
     const verificationKey = jwkToSecp256r1PublicKey(openPaymentContent.cnf.jwk);
 
@@ -588,10 +633,11 @@ export function verifyClosedPaymentMandate(
 
     let referenceVerified;
     if (openCheckoutMandatePresentation !== undefined) {
-      const reference = (openPaymentContent.constraints ?? []).find((c) => c?.type === 'payment.reference');
       const { issuerJwt: checkoutIssuerJwt, disclosures: checkoutDisclosures } = parseSdJwtPresentation(
         openCheckoutMandatePresentation,
       );
+      verifyOpenMandateIssuer(checkoutIssuerJwt, userPublicKey, OPEN_CHECKOUT_MANDATE_LABEL);
+      const reference = (openPaymentContent.constraints ?? []).find((c) => c?.type === 'payment.reference');
       const expectedTransactionId = computeSdHash({ issuerJwt: checkoutIssuerJwt, disclosures: checkoutDisclosures });
       referenceVerified = reference?.conditional_transaction_id === expectedTransactionId;
     }
@@ -603,6 +649,7 @@ export function verifyClosedPaymentMandate(
       ...(transactionIdVerified === undefined ? {} : { transactionIdVerified }),
       ...(referenceVerified === undefined ? {} : { referenceVerified }),
       sdHashVerified: true,
+      openMandateIssuerVerified: true,
     };
   } catch (error) {
     return { verified: false, error: error instanceof Error ? error : new Error(String(error)) };
@@ -637,32 +684,38 @@ function resolvePaymentConstraintDisclosures(content, disclosures, sdAlg) {
 
 /**
  * Decodes and resolves an Open Payment Mandate presentation's own content
- * (`constraints`, `cnf`, `exp`, ...) -- WITHOUT verifying an issuer signature.
+ * (`constraints`, `cnf`, `exp`, ...).
  *
  * Open Payment Mandates are signed by the User's key (see
  * `signOpenPaymentMandate`), which is generally a *different* key from the
  * mandate's own `cnf.jwk` (the Agent's key, only endorsed to close it later)
  * -- so, unlike `verifyClosedCheckoutMandate`/`verifyClosedPaymentMandate`,
- * there is no single key this package can check the envelope signature
- * against on its own. A caller that independently knows the issuing User's
- * public key can verify the envelope itself (`verifyJWT`, on the `issuerJwt`
- * half of `parseSdJwtPresentation`'s result) before or after calling this.
+ * there is no single key this package can derive the envelope's expected
+ * signer from on its own. Pass `userPublicKey` (the User's key, resolved by
+ * the caller via whatever identity system applies -- DID resolution, a
+ * wallet registry, etc.) to have this function verify the issuer signature
+ * itself; **omitting it skips that verification and only checks internal
+ * self-consistency**, so a mandate's `cnf.jwk` delegation cannot be trusted
+ * from an unverified call.
  *
- * What this DOES check: the SD-JWT's internal digest/disclosure consistency
- * (a hand-edited constraints blob whose digest no longer matches
- * `delegate_payload` is rejected), that the resolved content matches the
- * Open Payment Mandate schema, and (when `exp` is present) that it hasn't
- * passed.
+ * What this always checks, regardless of `userPublicKey`: the SD-JWT's
+ * internal digest/disclosure consistency (a hand-edited constraints blob
+ * whose digest no longer matches `delegate_payload` is rejected), that the
+ * resolved content matches the Open Payment Mandate schema, and (when `exp`
+ * is present) that it hasn't passed.
  *
  * @param {string} presentation
- * @param {{currentDate?: Date, clockTolerance?: number}} options
- * @returns {{content: object, protectedHeader: object}}
+ * @param {{userPublicKey?: *, currentDate?: Date, clockTolerance?: number}} options
+ * @returns {{content: object, protectedHeader: object, issuerVerified?: boolean}}
  */
 export function resolveOpenPaymentMandateContent(
   presentation,
-  { currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE } = {},
+  { userPublicKey, currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE } = {},
 ) {
   const { issuerJwt, disclosures } = parseSdJwtPresentation(presentation);
+  if (userPublicKey !== undefined) {
+    verifyOpenMandateIssuer(issuerJwt, userPublicKey, OPEN_PAYMENT_MANDATE_LABEL);
+  }
   const payload = decodeJwtPayload(issuerJwt, OPEN_PAYMENT_MANDATE_LABEL);
   const protectedHeader = decodeJwtProtectedHeader(issuerJwt, OPEN_PAYMENT_MANDATE_LABEL);
   const sdAlg = getSdAlg(payload);
@@ -676,7 +729,11 @@ export function resolveOpenPaymentMandateContent(
   // `{delegate_payload, _sd_alg}`) -- so it's checked against `content` here.
   checkNotExpired(content, { currentDate, clockTolerance }, OPEN_PAYMENT_MANDATE_LABEL);
 
-  return { content, protectedHeader };
+  return {
+    content,
+    protectedHeader,
+    ...(userPublicKey === undefined ? {} : { issuerVerified: true }),
+  };
 }
 
 // Reveals the array-element disclosures inside an Open Checkout Mandate's
@@ -717,20 +774,24 @@ function resolveCheckoutConstraintDisclosures(content, disclosures, sdAlg) {
 
 /**
  * Decodes and resolves an Open Checkout Mandate presentation's own content
- * (`constraints`, `cnf`, `exp`, ...) -- WITHOUT verifying an issuer signature.
- * See `resolveOpenPaymentMandateContent`'s doc comment for the same caveat:
- * Open Checkout Mandates are signed by the User's key, which this package
- * cannot check on its own without the caller separately supplying it.
+ * (`constraints`, `cnf`, `exp`, ...). See `resolveOpenPaymentMandateContent`'s
+ * doc comment for the same caveat: Open Checkout Mandates are signed by the
+ * User's key, which this package cannot verify without the caller supplying
+ * `userPublicKey` -- omitting it skips issuer verification and only checks
+ * internal self-consistency.
  *
  * @param {string} presentation
- * @param {{currentDate?: Date, clockTolerance?: number}} options
- * @returns {{content: object, protectedHeader: object}}
+ * @param {{userPublicKey?: *, currentDate?: Date, clockTolerance?: number}} options
+ * @returns {{content: object, protectedHeader: object, issuerVerified?: boolean}}
  */
 export function resolveOpenCheckoutMandateContent(
   presentation,
-  { currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE } = {},
+  { userPublicKey, currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE } = {},
 ) {
   const { issuerJwt, disclosures } = parseSdJwtPresentation(presentation);
+  if (userPublicKey !== undefined) {
+    verifyOpenMandateIssuer(issuerJwt, userPublicKey, OPEN_CHECKOUT_MANDATE_LABEL);
+  }
   const payload = decodeJwtPayload(issuerJwt, OPEN_CHECKOUT_MANDATE_LABEL);
   const protectedHeader = decodeJwtProtectedHeader(issuerJwt, OPEN_CHECKOUT_MANDATE_LABEL);
   const sdAlg = getSdAlg(payload);
@@ -744,5 +805,9 @@ export function resolveOpenCheckoutMandateContent(
   // payload -- same reasoning as `resolveOpenPaymentMandateContent`.
   checkNotExpired(content, { currentDate, clockTolerance }, OPEN_CHECKOUT_MANDATE_LABEL);
 
-  return { content, protectedHeader };
+  return {
+    content,
+    protectedHeader,
+    ...(userPublicKey === undefined ? {} : { issuerVerified: true }),
+  };
 }

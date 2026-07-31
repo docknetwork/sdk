@@ -36,10 +36,16 @@ const jwt = await signReceipt(receipt, {
 // Verify the mandate first (signature, cnf key-binding, checkout binding, aud, expiry).
 // openMandatePresentation is required -- it's how the trusted verification
 // key is derived from the Open Mandate's own cnf.jwk, rather than trusted
-// from a caller-supplied key.
+// from a caller-supplied key. userPublicKey is also required: it's the
+// User's own key (resolved independently, e.g. via DID resolution or a
+// wallet registry), verified against the Open Mandate's issuer signature --
+// without it, the cnf.jwk delegation inside a self-consistent but entirely
+// forged Open + Closed Mandate chain would go unnoticed.
 const mandateVerification = verifyClosedPaymentMandate(
   closedMandatePresentation,
-  { openMandatePresentation, checkoutJwt, openCheckoutMandatePresentation },
+  {
+    openMandatePresentation, userPublicKey, checkoutJwt, openCheckoutMandatePresentation,
+  },
 );
 
 const result = verifyPaymentReceipt(jwt, {
@@ -152,8 +158,14 @@ const closedCheckoutPresentation = await signClosedCheckoutMandate(closedCheckou
 // always derived from the Open Mandate's own cnf.jwk -- there is no
 // caller-supplied-key option, since a caller-supplied key that happens to
 // verify a signature proves nothing about *whose* key it was authorized to be.
+// userPublicKey (the User's own key, resolved independently -- e.g. via DID
+// resolution or a wallet registry) is required too, and is checked against
+// the Open Mandate's own issuer signature: without it, cnf.jwk could name
+// anyone, since nothing would confirm the Open Mandate actually came from
+// the User it claims to.
 const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
   openMandatePresentation: openCheckoutPresentation,
+  userPublicKey,
 });
 if (!result.verified) throw result.error;
 ```

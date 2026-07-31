@@ -53,3 +53,13 @@ presentation (`typ: "dc+sd-jwt"`) or any other envelope type fed in where a
 Closed Mandate is expected. Other checks (schema shape, `aud`,
 `checkout_hash`) would likely catch a swapped-in envelope in practice, but
 this closes the gap explicitly rather than relying on that.
+
+Both functions also now require `expectedNonce`, checked against the
+envelope's `nonce` claim. Closed Mandate envelopes carry no `exp` of their
+own -- their only expiry comes transitively from the referenced Open
+Mandate, which is typically valid for an entire shopping session -- and
+`nonce` was previously accepted at signing time but never checked at
+verification time, so a validly-signed Closed Mandate presentation could be
+replayed for a different transaction indefinitely. `expectedNonce` should be
+the single-use value the merchant/credential-provider itself generated and
+tracks for this specific transaction.

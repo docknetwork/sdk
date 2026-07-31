@@ -415,6 +415,28 @@ function checkAudience(payload, expectedAud) {
   }
 }
 
+// Binds a Closed Mandate to the one transaction it was issued for. Closed
+// Mandate envelopes carry no exp of their own (see requireExpectedNonce) --
+// their only expiry is inherited from the referenced Open Mandate, which is
+// typically valid for an entire shopping session. Without comparing "nonce"
+// against a value the verifier itself generated and tracks as single-use,
+// a validly-signed Closed Mandate presentation can be replayed indefinitely.
+function checkNonce(payload, expectedNonce) {
+  if (payload.nonce !== expectedNonce) {
+    throw new Error('"nonce" does not match the expected value');
+  }
+}
+
+function requireExpectedNonce(expectedNonce) {
+  if (typeof expectedNonce !== 'string' || expectedNonce.length === 0) {
+    throw new TypeError(
+      '"expectedNonce" is required: the merchant-generated, single-use nonce is what binds a '
+      + 'Closed Mandate to one specific transaction -- without checking it, a validly-signed '
+      + 'presentation could be replayed for a different transaction indefinitely',
+    );
+  }
+}
+
 // Rejects an Open Mandate presentation (typ: dc+sd-jwt) fed in where a Closed
 // Mandate (typ: kb+sd-jwt) is expected, or any other envelope type confusion.
 // Other checks (aud, _sd, checkout_hash) would likely also catch a swapped-in
@@ -510,12 +532,19 @@ function resolveCheckoutJwtClaim(content, disclosures, sdAlg) {
  * Mandate or other envelope type fed in where a Closed Mandate is expected),
  * the `checkout_jwt` disclosure against the content's `_sd` digest,
  * `checkout_hash` against a fresh hash of the revealed `checkout_jwt`,
- * `aud === "merchant"`, expiry, and `sd_hash` against
- * `openMandatePresentation`. See `signClosedCheckoutMandate` for the
- * `sd_hash` caveat.
+ * `aud === "merchant"`, expiry, `nonce` against the required `expectedNonce`,
+ * and `sd_hash` against `openMandatePresentation`. See
+ * `signClosedCheckoutMandate` for the `sd_hash` caveat.
+ *
+ * `expectedNonce` matters because Closed Mandate envelopes carry no `exp` of
+ * their own -- their only expiry is inherited from the referenced Open
+ * Mandate, which is typically valid for an entire shopping session. Without
+ * checking `nonce` against a value the merchant itself generated and tracks
+ * as single-use, a validly-signed Closed Mandate presentation could be
+ * replayed for a different transaction indefinitely.
  *
  * @param {string} presentation
- * @param {{openMandatePresentation: string, userPublicKey: *,
+ * @param {{openMandatePresentation: string, userPublicKey: *, expectedNonce: string,
  * currentDate?: Date, clockTolerance?: number}} options
  * @returns {{verified: boolean, content?: object, checkoutJwt?: string,
  * protectedHeader?: object, sdHashVerified?: boolean,
@@ -524,12 +553,14 @@ function resolveCheckoutJwtClaim(content, disclosures, sdAlg) {
 export function verifyClosedCheckoutMandate(
   presentation,
   {
-    openMandatePresentation, userPublicKey, currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE,
+    openMandatePresentation, userPublicKey, expectedNonce,
+    currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE,
   } = {},
 ) {
   try {
     requireOpenMandatePresentation(openMandatePresentation);
     requireUserPublicKey(userPublicKey);
+    requireExpectedNonce(expectedNonce);
     const { issuerJwt, disclosures } = parseSdJwtPresentation(presentation);
     const verificationKey = jwkToSecp256r1PublicKey(
       resolveOpenCheckoutMandateContent(
@@ -558,6 +589,7 @@ export function verifyClosedCheckoutMandate(
 
     checkAudience(payload, 'merchant');
     checkNotExpired(payload, { currentDate, clockTolerance }, 'Closed Checkout Mandate');
+    checkNonce(payload, expectedNonce);
     checkSdHashAgainstOpenMandate(payload, openMandatePresentation, 'Open Checkout Mandate');
 
     return {
@@ -584,9 +616,12 @@ export function verifyClosedCheckoutMandate(
  * Mandate's own envelope) is what makes that delegation trustworthy in the
  * first place, rather than an entirely self-forgeable chain. Also verifies
  * the envelope's `typ === "kb+sd-jwt"`, `aud === "credential-provider"`,
- * expiry, and `sd_hash` against `openMandatePresentation`; when the
- * corresponding Closed Checkout Mandate's `checkout_jwt` is supplied, that
- * `transaction_id` matches a fresh hash of it.
+ * expiry, `nonce` against the required `expectedNonce` (see
+ * `verifyClosedCheckoutMandate` for why this matters -- Closed Mandate
+ * envelopes carry no `exp` of their own), and `sd_hash` against
+ * `openMandatePresentation`; when the corresponding Closed Checkout
+ * Mandate's `checkout_jwt` is supplied, that `transaction_id` matches a
+ * fresh hash of it.
  *
  * When `openCheckoutMandatePresentation` is also supplied, also verifies its
  * issuer envelope against the same `userPublicKey` (the AP2 flow's Open
@@ -598,8 +633,9 @@ export function verifyClosedCheckoutMandate(
  * spec's Reference constraint).
  *
  * @param {string} presentation
- * @param {{openMandatePresentation: string, userPublicKey: *, checkoutJwt?: string,
- * openCheckoutMandatePresentation?: string, currentDate?: Date, clockTolerance?: number}} options
+ * @param {{openMandatePresentation: string, userPublicKey: *, expectedNonce: string,
+ * checkoutJwt?: string, openCheckoutMandatePresentation?: string,
+ * currentDate?: Date, clockTolerance?: number}} options
  * @returns {{verified: boolean, content?: object, protectedHeader?: object,
  * transactionIdVerified?: boolean, sdHashVerified?: boolean, referenceVerified?: boolean,
  * openMandateIssuerVerified?: boolean, error?: Error}}
@@ -607,13 +643,14 @@ export function verifyClosedCheckoutMandate(
 export function verifyClosedPaymentMandate(
   presentation,
   {
-    checkoutJwt, openMandatePresentation, userPublicKey, openCheckoutMandatePresentation,
+    checkoutJwt, openMandatePresentation, userPublicKey, expectedNonce, openCheckoutMandatePresentation,
     currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE,
   } = {},
 ) {
   try {
     requireOpenMandatePresentation(openMandatePresentation);
     requireUserPublicKey(userPublicKey);
+    requireExpectedNonce(expectedNonce);
     const { issuerJwt, disclosures } = parseSdJwtPresentation(presentation);
 
     const openPaymentContent = resolveOpenPaymentMandateContent(
@@ -635,6 +672,7 @@ export function verifyClosedPaymentMandate(
 
     checkAudience(payload, 'credential-provider');
     checkNotExpired(payload, { currentDate, clockTolerance }, 'Closed Payment Mandate');
+    checkNonce(payload, expectedNonce);
 
     let transactionIdVerified;
     if (checkoutJwt !== undefined) {

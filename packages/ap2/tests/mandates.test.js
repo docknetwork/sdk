@@ -135,6 +135,7 @@ describe('AP2 mandates: round trip', () => {
     const checkoutResult = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
       openMandatePresentation: openCheckoutPresentation,
       userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'nonce-1',
     });
     expect(checkoutResult.verified).toBe(true);
     expect(checkoutResult.checkoutJwt).toBe(checkoutJwt);
@@ -176,6 +177,7 @@ describe('AP2 mandates: round trip', () => {
       checkoutJwt,
       openMandatePresentation: openPaymentPresentation,
       userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'nonce-2',
     });
     expect(paymentResult.verified).toBe(true);
     expect(paymentResult.transactionIdVerified).toBe(true);
@@ -214,6 +216,7 @@ describe('AP2 mandates: round trip', () => {
     const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
       openMandatePresentation: openCheckoutPresentation,
       userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'nonce-1',
     });
     expect(result.verified).toBe(false);
     expect(result.error.message).toMatch(/checkout_hash/);
@@ -252,6 +255,7 @@ describe('AP2 mandates: round trip', () => {
     const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
       openMandatePresentation: openCheckoutPresentation,
       userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'nonce-1',
     });
     expect(result.verified).toBe(false);
   });
@@ -524,6 +528,7 @@ describe('AP2 mandates: cnf is derived from the Open Mandate, not trusted from t
     const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
       openMandatePresentation: openCheckoutPresentation,
       userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'nonce-1',
     });
     expect(result.verified).toBe(false);
   });
@@ -560,6 +565,7 @@ describe('AP2 mandates: cnf is derived from the Open Mandate, not trusted from t
     const result = verifyClosedPaymentMandate(closedPaymentPresentation, {
       openMandatePresentation: openPaymentPresentation,
       userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'nonce-1',
     });
     expect(result.verified).toBe(false);
   });
@@ -597,6 +603,7 @@ describe('AP2 mandates: cnf is derived from the Open Mandate, not trusted from t
     const result = verifyClosedCheckoutMandate(forgedClosedPresentation, {
       openMandatePresentation: forgedOpenPresentation,
       userPublicKey: realUserKeypair.publicKey(),
+      expectedNonce: 'nonce-1',
     });
     expect(result.verified).toBe(false);
     expect(result.error.message).toMatch(/issuer signature verification failed/);
@@ -632,6 +639,7 @@ describe('AP2 mandates: cnf is derived from the Open Mandate, not trusted from t
     const result = verifyClosedPaymentMandate(forgedClosedPresentation, {
       openMandatePresentation: forgedOpenPresentation,
       userPublicKey: realUserKeypair.publicKey(),
+      expectedNonce: 'nonce-1',
     });
     expect(result.verified).toBe(false);
     expect(result.error.message).toMatch(/issuer signature verification failed/);
@@ -802,6 +810,7 @@ describe('AP2 mandates: payment.reference binding', () => {
       openMandatePresentation: openPaymentPresentation,
       openCheckoutMandatePresentation: openCheckoutPresentation,
       userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'nonce-1',
     });
     expect(result.verified).toBe(true);
     expect(result.referenceVerified).toBe(true);
@@ -838,6 +847,7 @@ describe('AP2 mandates: payment.reference binding', () => {
       openMandatePresentation: openPaymentPresentation,
       openCheckoutMandatePresentation: openCheckoutPresentation,
       userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'nonce-1',
     });
     expect(result.verified).toBe(true);
     expect(result.referenceVerified).toBe(false);
@@ -864,6 +874,9 @@ describe('AP2 mandates: envelope typ confusion', () => {
     const result = verifyClosedCheckoutMandate(openCheckoutPresentation, {
       openMandatePresentation: openCheckoutPresentation,
       userPublicKey: userKeypair.publicKey(),
+      // The Open Mandate envelope has no "nonce" of its own; any value here
+      // is enough to clear the precondition and reach the typ check below.
+      expectedNonce: 'irrelevant',
     });
     expect(result.verified).toBe(false);
     expect(result.error.message).toMatch(/"typ"/);
@@ -884,8 +897,137 @@ describe('AP2 mandates: envelope typ confusion', () => {
     const result = verifyClosedPaymentMandate(openPaymentPresentation, {
       openMandatePresentation: openPaymentPresentation,
       userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'irrelevant',
     });
     expect(result.verified).toBe(false);
     expect(result.error.message).toMatch(/"typ"/);
+  });
+});
+
+describe('AP2 mandates: nonce binding', () => {
+  test('verifyClosedCheckoutMandate rejects a nonce that does not match expectedNonce', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const cnf = { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) };
+
+    const openCheckoutPresentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        cnf,
+      }),
+      { signer: userKeypair },
+    );
+    const closedCheckoutPresentation = await signClosedCheckoutMandate(
+      buildClosedCheckoutMandate({
+        vct: VCT_CHECKOUT_CLOSED,
+        checkout_jwt: SAMPLE_CHECKOUT_JWT,
+        checkout_hash: computeCheckoutHash(SAMPLE_CHECKOUT_JWT),
+      }),
+      { signer: agentKeypair, nonce: 'the-real-nonce', openMandatePresentation: openCheckoutPresentation },
+    );
+
+    const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
+      openMandatePresentation: openCheckoutPresentation,
+      userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'a-different-nonce',
+    });
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toMatch(/"nonce"/);
+  });
+
+  test('verifyClosedCheckoutMandate requires expectedNonce -- a valid presentation cannot be replayed unnoticed', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const cnf = { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) };
+
+    const openCheckoutPresentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        cnf,
+      }),
+      { signer: userKeypair },
+    );
+    const closedCheckoutPresentation = await signClosedCheckoutMandate(
+      buildClosedCheckoutMandate({
+        vct: VCT_CHECKOUT_CLOSED,
+        checkout_jwt: SAMPLE_CHECKOUT_JWT,
+        checkout_hash: computeCheckoutHash(SAMPLE_CHECKOUT_JWT),
+      }),
+      { signer: agentKeypair, nonce: 'nonce-1', openMandatePresentation: openCheckoutPresentation },
+    );
+
+    const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
+      openMandatePresentation: openCheckoutPresentation,
+      userPublicKey: userKeypair.publicKey(),
+    });
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toMatch(/expectedNonce/);
+  });
+
+  test('verifyClosedPaymentMandate rejects a nonce that does not match expectedNonce', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const cnf = { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) };
+
+    const openPaymentPresentation = await signOpenPaymentMandate(
+      buildOpenPaymentMandate({
+        vct: 'mandate.payment.open.1',
+        constraints: [{ type: 'payment.reference', conditional_transaction_id: 'digest-1' }],
+        cnf,
+      }),
+      { signer: userKeypair },
+    );
+    const closedPaymentPresentation = await signClosedPaymentMandate(
+      buildClosedPaymentMandate({
+        vct: 'mandate.payment.1',
+        transaction_id: computeCheckoutHash(SAMPLE_CHECKOUT_JWT),
+        payee: { id: 'merchant_1', name: 'Demo Merchant', website: 'https://demo-merchant.example' },
+        payment_amount: { amount: 19900, currency: 'USD' },
+        payment_instrument: { id: 'stub', type: 'card', description: 'Card ****4242' },
+      }),
+      { signer: agentKeypair, nonce: 'the-real-nonce', openMandatePresentation: openPaymentPresentation },
+    );
+
+    const result = verifyClosedPaymentMandate(closedPaymentPresentation, {
+      openMandatePresentation: openPaymentPresentation,
+      userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'a-different-nonce',
+    });
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toMatch(/"nonce"/);
+  });
+
+  test('verifyClosedPaymentMandate requires expectedNonce -- a valid presentation cannot be replayed unnoticed', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const cnf = { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) };
+
+    const openPaymentPresentation = await signOpenPaymentMandate(
+      buildOpenPaymentMandate({
+        vct: 'mandate.payment.open.1',
+        constraints: [{ type: 'payment.reference', conditional_transaction_id: 'digest-1' }],
+        cnf,
+      }),
+      { signer: userKeypair },
+    );
+    const closedPaymentPresentation = await signClosedPaymentMandate(
+      buildClosedPaymentMandate({
+        vct: 'mandate.payment.1',
+        transaction_id: computeCheckoutHash(SAMPLE_CHECKOUT_JWT),
+        payee: { id: 'merchant_1', name: 'Demo Merchant', website: 'https://demo-merchant.example' },
+        payment_amount: { amount: 19900, currency: 'USD' },
+        payment_instrument: { id: 'stub', type: 'card', description: 'Card ****4242' },
+      }),
+      { signer: agentKeypair, nonce: 'nonce-1', openMandatePresentation: openPaymentPresentation },
+    );
+
+    const result = verifyClosedPaymentMandate(closedPaymentPresentation, {
+      openMandatePresentation: openPaymentPresentation,
+      userPublicKey: userKeypair.publicKey(),
+    });
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toMatch(/expectedNonce/);
   });
 });

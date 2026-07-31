@@ -33,18 +33,22 @@ const jwt = await signReceipt(receipt, {
   signer: keypair,
   type: 'payment',
 });
-// Verify the mandate first (signature, cnf key-binding, checkout binding, aud, expiry).
+// Verify the mandate first (signature, cnf key-binding, checkout binding, aud, expiry, nonce).
 // openMandatePresentation is required -- it's how the trusted verification
 // key is derived from the Open Mandate's own cnf.jwk, rather than trusted
 // from a caller-supplied key. userPublicKey is also required: it's the
 // User's own key (resolved independently, e.g. via DID resolution or a
 // wallet registry), verified against the Open Mandate's issuer signature --
 // without it, the cnf.jwk delegation inside a self-consistent but entirely
-// forged Open + Closed Mandate chain would go unnoticed.
+// forged Open + Closed Mandate chain would go unnoticed. expectedNonce is
+// required too: Closed Mandate envelopes carry no exp of their own, so
+// nonce -- checked against the single-use value the merchant generated for
+// this transaction -- is what stops a validly-signed presentation from
+// being replayed for a different one.
 const mandateVerification = verifyClosedPaymentMandate(
   closedMandatePresentation,
   {
-    openMandatePresentation, userPublicKey, checkoutJwt, openCheckoutMandatePresentation,
+    openMandatePresentation, userPublicKey, expectedNonce, checkoutJwt, openCheckoutMandatePresentation,
   },
 );
 
@@ -162,10 +166,13 @@ const closedCheckoutPresentation = await signClosedCheckoutMandate(closedCheckou
 // resolution or a wallet registry) is required too, and is checked against
 // the Open Mandate's own issuer signature: without it, cnf.jwk could name
 // anyone, since nothing would confirm the Open Mandate actually came from
-// the User it claims to.
+// the User it claims to. expectedNonce -- the same single-use value the
+// merchant generated in step 2 -- is required as well, since a Closed
+// Mandate envelope has no exp of its own to bound how long it stays replayable.
 const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
   openMandatePresentation: openCheckoutPresentation,
   userPublicKey,
+  expectedNonce: 'merchant-supplied-nonce',
 });
 if (!result.verified) throw result.error;
 ```

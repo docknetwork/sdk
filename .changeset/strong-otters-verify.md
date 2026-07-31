@@ -63,3 +63,7 @@ verification time, so a validly-signed Closed Mandate presentation could be
 replayed for a different transaction indefinitely. `expectedNonce` should be
 the single-use value the merchant/credential-provider itself generated and
 tracks for this specific transaction.
+
+Added an example, `examples/verify-mandate-with-did-user-key.mjs` (run via
+`yarn example:did-mandate`), showing how to resolve `userPublicKey` from a
+User's DID document and use it in the verification flow above.

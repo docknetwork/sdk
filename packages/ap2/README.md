@@ -247,7 +247,7 @@ digests, key binding, delegation, audience, nonce, dates, constraints,
 `checkout_hash`, and payment transaction linkage — then pass that result as
 `mandateVerification` alongside `mandatePresentation`.
 
-## Example
+## Examples
 
 Run the complete payment receipt issue-and-verify example:
 
@@ -256,3 +256,12 @@ yarn example:receipt
 ```
 
 See [`examples/issue-and-verify-receipt.mjs`](examples/issue-and-verify-receipt.mjs).
+
+Run the Closed Checkout Mandate verification example, showing how to resolve
+`userPublicKey` from a User's DID:
+
+```bash
+yarn example:did-mandate
+```
+
+See [`examples/verify-mandate-with-did-user-key.mjs`](examples/verify-mandate-with-did-user-key.mjs).

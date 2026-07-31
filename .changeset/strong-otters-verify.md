@@ -46,3 +46,10 @@ a fresh `sd_hash` of that Open Checkout Mandate presentation, returning
 `referenceVerified` in the result. This was previously left entirely to the
 caller (see the AP2 spec's Reference constraint) even though the package
 already required both presentations for its other checks.
+
+Both `verifyClosedCheckoutMandate` and `verifyClosedPaymentMandate` now also
+check the envelope's `typ` claim (`"kb+sd-jwt"`), rejecting an Open Mandate
+presentation (`typ: "dc+sd-jwt"`) or any other envelope type fed in where a
+Closed Mandate is expected. Other checks (schema shape, `aud`,
+`checkout_hash`) would likely catch a swapped-in envelope in practice, but
+this closes the gap explicitly rather than relying on that.

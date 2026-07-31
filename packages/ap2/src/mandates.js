@@ -415,6 +415,17 @@ function checkAudience(payload, expectedAud) {
   }
 }
 
+// Rejects an Open Mandate presentation (typ: dc+sd-jwt) fed in where a Closed
+// Mandate (typ: kb+sd-jwt) is expected, or any other envelope type confusion.
+// Other checks (aud, _sd, checkout_hash) would likely also catch a swapped-in
+// envelope, but this rejects it immediately, with a clearer error, rather
+// than relying on that being true in every case.
+function checkTyp(protectedHeader) {
+  if (protectedHeader.typ !== 'kb+sd-jwt') {
+    throw new Error(`Expected envelope "typ" of "kb+sd-jwt", got "${protectedHeader.typ}"`);
+  }
+}
+
 function checkSdHashAgainstOpenMandate(payload, openMandatePresentation, label) {
   const { issuerJwt: openIssuerJwt, disclosures: openDisclosures } = parseSdJwtPresentation(
     openMandatePresentation,
@@ -495,9 +506,11 @@ function resolveCheckoutJwtClaim(content, disclosures, sdAlg) {
  * resolved trusted key for that User (e.g. via DID resolution or a wallet
  * registry), verified here against the Open Mandate's envelope.
  *
- * Also verifies the `checkout_jwt` disclosure against the content's `_sd`
- * digest, `checkout_hash` against a fresh hash of the revealed
- * `checkout_jwt`, `aud === "merchant"`, expiry, and `sd_hash` against
+ * Also verifies the envelope's `typ === "kb+sd-jwt"` (rejecting an Open
+ * Mandate or other envelope type fed in where a Closed Mandate is expected),
+ * the `checkout_jwt` disclosure against the content's `_sd` digest,
+ * `checkout_hash` against a fresh hash of the revealed `checkout_jwt`,
+ * `aud === "merchant"`, expiry, and `sd_hash` against
  * `openMandatePresentation`. See `signClosedCheckoutMandate` for the
  * `sd_hash` caveat.
  *
@@ -529,6 +542,7 @@ export function verifyClosedCheckoutMandate(
       return result;
     }
     const { payload, protectedHeader } = result;
+    checkTyp(protectedHeader);
     const sdAlg = getSdAlg(payload);
 
     const content = resolveMandateContent(payload, disclosures, sdAlg);
@@ -569,10 +583,10 @@ export function verifyClosedCheckoutMandate(
  * for why the required `userPublicKey` (verified against the Open Payment
  * Mandate's own envelope) is what makes that delegation trustworthy in the
  * first place, rather than an entirely self-forgeable chain. Also verifies
- * `aud === "credential-provider"`, expiry, and `sd_hash` against
- * `openMandatePresentation`; when the corresponding Closed Checkout Mandate's
- * `checkout_jwt` is supplied, that `transaction_id` matches a fresh hash of
- * it.
+ * the envelope's `typ === "kb+sd-jwt"`, `aud === "credential-provider"`,
+ * expiry, and `sd_hash` against `openMandatePresentation`; when the
+ * corresponding Closed Checkout Mandate's `checkout_jwt` is supplied, that
+ * `transaction_id` matches a fresh hash of it.
  *
  * When `openCheckoutMandatePresentation` is also supplied, also verifies its
  * issuer envelope against the same `userPublicKey` (the AP2 flow's Open
@@ -613,6 +627,7 @@ export function verifyClosedPaymentMandate(
       return result;
     }
     const { payload, protectedHeader } = result;
+    checkTyp(protectedHeader);
     const sdAlg = getSdAlg(payload);
 
     const content = resolveMandateContent(payload, disclosures, sdAlg);

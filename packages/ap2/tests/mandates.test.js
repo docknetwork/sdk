@@ -843,3 +843,49 @@ describe('AP2 mandates: payment.reference binding', () => {
     expect(result.referenceVerified).toBe(false);
   });
 });
+
+describe('AP2 mandates: envelope typ confusion', () => {
+  // Self-delegates cnf to the User's own key, so an Open Mandate's envelope
+  // signature verifies fine against the key verifyClosed*Mandate derives --
+  // isolating the "typ" check as the only thing that can catch an Open
+  // Mandate presentation fed in where a Closed one is expected.
+  test('verifyClosedCheckoutMandate rejects an Open Checkout Mandate presentation', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+
+    const openCheckoutPresentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        cnf: { jwk: secp256r1PublicKeyToJwk(userKeypair.publicKey()) },
+      }),
+      { signer: userKeypair },
+    );
+
+    const result = verifyClosedCheckoutMandate(openCheckoutPresentation, {
+      openMandatePresentation: openCheckoutPresentation,
+      userPublicKey: userKeypair.publicKey(),
+    });
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toMatch(/"typ"/);
+  });
+
+  test('verifyClosedPaymentMandate rejects an Open Payment Mandate presentation', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+
+    const openPaymentPresentation = await signOpenPaymentMandate(
+      buildOpenPaymentMandate({
+        vct: 'mandate.payment.open.1',
+        constraints: [{ type: 'payment.reference', conditional_transaction_id: 'digest-1' }],
+        cnf: { jwk: secp256r1PublicKeyToJwk(userKeypair.publicKey()) },
+      }),
+      { signer: userKeypair },
+    );
+
+    const result = verifyClosedPaymentMandate(openPaymentPresentation, {
+      openMandatePresentation: openPaymentPresentation,
+      userPublicKey: userKeypair.publicKey(),
+    });
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toMatch(/"typ"/);
+  });
+});

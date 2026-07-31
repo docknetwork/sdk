@@ -852,6 +852,38 @@ describe('AP2 mandates: payment.reference binding', () => {
     expect(result.verified).toBe(true);
     expect(result.referenceVerified).toBe(false);
   });
+
+  test('rejects when the supplied Open Checkout Mandate is expired, rather than computing referenceVerified from it anyway', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+
+    const openCheckoutPresentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        cnf: { jwk: secp256r1PublicKeyToJwk(userKeypair.publicKey()) },
+        iat: 1000,
+        exp: 2000,
+      }),
+      { signer: userKeypair },
+    );
+    const conditionalTransactionId = computeSdHash(parseSdJwtPresentation(openCheckoutPresentation));
+    const { openPaymentPresentation, closedPaymentPresentation } = await buildBoundClosedPaymentMandate(
+      userKeypair,
+      agentKeypair,
+      conditionalTransactionId,
+    );
+
+    const result = verifyClosedPaymentMandate(closedPaymentPresentation, {
+      openMandatePresentation: openPaymentPresentation,
+      openCheckoutMandatePresentation: openCheckoutPresentation,
+      userPublicKey: userKeypair.publicKey(),
+      expectedNonce: 'nonce-1',
+      currentDate: new Date(3000 * 1000),
+    });
+    expect(result.verified).toBe(false);
+    expect(result.error.message).toMatch(/expired/);
+  });
 });
 
 describe('AP2 mandates: envelope typ confusion', () => {

@@ -638,12 +638,12 @@ export function verifyClosedCheckoutMandate(
  * Mandate's `checkout_jwt` is supplied, that `transaction_id` matches a
  * fresh hash of it.
  *
- * When `openCheckoutMandatePresentation` is also supplied, also verifies its
- * issuer envelope against the same `userPublicKey` (the AP2 flow's Open
- * Checkout and Open Payment Mandates are both signed by the same User) and
- * checks the Open Payment Mandate's
- * `payment.reference.conditional_transaction_id` constraint against a fresh
- * `sd_hash` of that Open Checkout Mandate presentation — the binding that
+ * When `openCheckoutMandatePresentation` is also supplied, it is fully
+ * resolved (issuer envelope against the same `userPublicKey` -- the AP2 flow's
+ * Open Checkout and Open Payment Mandates are both signed by the same User --
+ * disclosed-content schema, and its own `exp`), then the Open Payment
+ * Mandate's `payment.reference.conditional_transaction_id` constraint is
+ * checked against a fresh `sd_hash` of that presentation — the binding that
  * ties this payment authorization to one specific checkout (see the AP2
  * spec's Reference constraint).
  *
@@ -701,10 +701,18 @@ export function verifyClosedPaymentMandate(
 
     let referenceVerified;
     if (openCheckoutMandatePresentation !== undefined) {
+      // Resolving (not just checking the raw envelope signature) also
+      // validates the disclosed content's schema and enforces its `exp` --
+      // both of which live on the content, not the envelope, and would
+      // otherwise go unchecked here even though this Open Checkout Mandate
+      // is being used to authorize a payment.
+      resolveOpenCheckoutMandateContent(
+        openCheckoutMandatePresentation,
+        { userPublicKey, currentDate, clockTolerance },
+      );
       const { issuerJwt: checkoutIssuerJwt, disclosures: checkoutDisclosures } = parseSdJwtPresentation(
         openCheckoutMandatePresentation,
       );
-      verifyOpenMandateIssuer(checkoutIssuerJwt, userPublicKey, OPEN_CHECKOUT_MANDATE_LABEL);
       const reference = (openPaymentContent.constraints ?? []).find((c) => c?.type === 'payment.reference');
       const expectedTransactionId = computeSdHash({ issuerJwt: checkoutIssuerJwt, disclosures: checkoutDisclosures });
       referenceVerified = reference?.conditional_transaction_id === expectedTransactionId;

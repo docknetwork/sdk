@@ -20,6 +20,7 @@ import {
   verifyClosedCheckoutMandate,
   verifyClosedPaymentMandate,
   resolveOpenPaymentMandateContent,
+  resolveOpenCheckoutMandateContent,
   computeDisclosureDigest,
   computeCheckoutHash,
 } from '../src';
@@ -113,7 +114,7 @@ describe('AP2 mandates: round trip', () => {
       ],
       cnf,
       iat: 1000,
-      exp: 100000,
+      exp: 4102444800, // 2100-01-01 -- resolving the Open Mandate now enforces its own expiry too
     });
     const openCheckoutPresentation = await signOpenCheckoutMandate(openCheckoutContent, {
       signer: userKeypair,
@@ -151,7 +152,7 @@ describe('AP2 mandates: round trip', () => {
       ],
       cnf,
       iat: 1000,
-      exp: 100000,
+      exp: 4102444800, // 2100-01-01 -- resolving the Open Mandate now enforces its own expiry too
     });
     const openPaymentPresentation = await signOpenPaymentMandate(openPaymentContent, {
       signer: userKeypair,
@@ -357,5 +358,256 @@ describe('AP2 mandates: resolveOpenPaymentMandateContent', () => {
       currentDate: new Date(Date.now() + 1000 * 365 * 24 * 60 * 60 * 1000),
     });
     expect(content.vct).toBe('mandate.payment.open.1');
+  });
+});
+
+describe('AP2 mandates: resolveOpenCheckoutMandateContent', () => {
+  test('resolves line_items and allowed_merchants constraints', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+    const merchant = { id: 'merchant_1', name: 'Demo Merchant', website: 'https://demo-merchant.example' };
+
+    const presentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [
+          MINIMAL_LINE_ITEMS_CONSTRAINT,
+          { type: 'checkout.allowed_merchants', allowed: [merchant] },
+        ],
+        cnf: { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) },
+      }),
+      { signer: userKeypair },
+    );
+
+    const { content } = resolveOpenCheckoutMandateContent(presentation);
+    expect(content.constraints).toEqual([
+      MINIMAL_LINE_ITEMS_CONSTRAINT,
+      { type: 'checkout.allowed_merchants', allowed: [merchant] },
+    ]);
+    expect(content.cnf.jwk).toMatchObject({ crv: 'P-256', kty: 'EC' });
+  });
+
+  test('rejects a hand-edited presentation whose content no longer matches its digest', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+
+    const presentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        cnf: { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) },
+      }),
+      { signer: userKeypair },
+    );
+
+    const parts = presentation.split('~');
+    const contentDisclosure = parts[parts.length - 2];
+    const decoded = JSON.parse(Buffer.from(contentDisclosure, 'base64url').toString('utf8'));
+    decoded[1].constraints[0].items[0].quantity = 999;
+    const tamperedDisclosure = Buffer.from(JSON.stringify(decoded)).toString('base64url');
+    const tamperedPresentation = [...parts.slice(0, -2), tamperedDisclosure, ''].join('~');
+
+    expect(() => resolveOpenCheckoutMandateContent(tamperedPresentation)).toThrow(
+      /No disclosure found/,
+    );
+  });
+
+  test('rejects an expired Open Checkout Mandate', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+
+    const presentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        cnf: { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) },
+        iat: 1000,
+        exp: 2000,
+      }),
+      { signer: userKeypair },
+    );
+
+    expect(() => resolveOpenCheckoutMandateContent(presentation, {
+      currentDate: new Date(3000 * 1000),
+    })).toThrow(/expired/);
+  });
+});
+
+describe('AP2 mandates: cnf is derived from the Open Mandate, not trusted from the caller', () => {
+  test('verifyClosedCheckoutMandate rejects a mandate closed by an unauthorized key, even when the caller vouches for that same key', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const authorizedAgentKeypair = Secp256r1Keypair.random();
+    const attackerKeypair = Secp256r1Keypair.random();
+
+    const openCheckoutPresentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        // Only authorizedAgentKeypair is endorsed to close this mandate.
+        cnf: { jwk: secp256r1PublicKeyToJwk(authorizedAgentKeypair.publicKey()) },
+      }),
+      { signer: userKeypair },
+    );
+
+    // The attacker signs their own Closed Checkout Mandate against the same
+    // Open Mandate, using their own key instead of the authorized one.
+    const closedCheckoutPresentation = await signClosedCheckoutMandate(
+      buildClosedCheckoutMandate({
+        vct: VCT_CHECKOUT_CLOSED,
+        checkout_jwt: SAMPLE_CHECKOUT_JWT,
+        checkout_hash: computeCheckoutHash(SAMPLE_CHECKOUT_JWT),
+      }),
+      {
+        signer: attackerKeypair,
+        nonce: 'nonce-1',
+        openMandatePresentation: openCheckoutPresentation,
+      },
+    );
+
+    // A caller naively trusting the attacker's own claim of "I'm the holder"
+    // (passing the attacker's key directly, with no openMandatePresentation)
+    // would incorrectly see this as verified -- signature-only verification
+    // can't tell an unauthorized key from an authorized one.
+    const signatureOnlyResult = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
+      publicKey: attackerKeypair.publicKey(),
+    });
+    expect(signatureOnlyResult.verified).toBe(true);
+
+    // But deriving the key from the actual Open Mandate rejects it, because
+    // the attacker's key was never the one endorsed in cnf.
+    const result = verifyClosedCheckoutMandate(closedCheckoutPresentation, {
+      publicKey: attackerKeypair.publicKey(),
+      openMandatePresentation: openCheckoutPresentation,
+    });
+    expect(result.verified).toBe(false);
+  });
+
+  test('verifyClosedPaymentMandate rejects a mandate closed by an unauthorized key, even when the caller vouches for that same key', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const authorizedAgentKeypair = Secp256r1Keypair.random();
+    const attackerKeypair = Secp256r1Keypair.random();
+
+    const openPaymentPresentation = await signOpenPaymentMandate(
+      buildOpenPaymentMandate({
+        vct: 'mandate.payment.open.1',
+        constraints: [{ type: 'payment.reference', conditional_transaction_id: 'digest-1' }],
+        cnf: { jwk: secp256r1PublicKeyToJwk(authorizedAgentKeypair.publicKey()) },
+      }),
+      { signer: userKeypair },
+    );
+
+    const closedPaymentPresentation = await signClosedPaymentMandate(
+      buildClosedPaymentMandate({
+        vct: 'mandate.payment.1',
+        transaction_id: computeCheckoutHash(SAMPLE_CHECKOUT_JWT),
+        payee: { id: 'merchant_1', name: 'Demo Merchant', website: 'https://demo-merchant.example' },
+        payment_amount: { amount: 19900, currency: 'USD' },
+        payment_instrument: { id: 'stub', type: 'card', description: 'Card ****4242' },
+      }),
+      {
+        signer: attackerKeypair,
+        nonce: 'nonce-1',
+        openMandatePresentation: openPaymentPresentation,
+      },
+    );
+
+    const signatureOnlyResult = verifyClosedPaymentMandate(closedPaymentPresentation, {
+      publicKey: attackerKeypair.publicKey(),
+    });
+    expect(signatureOnlyResult.verified).toBe(true);
+
+    const result = verifyClosedPaymentMandate(closedPaymentPresentation, {
+      publicKey: attackerKeypair.publicKey(),
+      openMandatePresentation: openPaymentPresentation,
+    });
+    expect(result.verified).toBe(false);
+  });
+});
+
+describe('AP2 mandates: payment.reference binding', () => {
+  const merchant = { id: 'merchant_1', name: 'Demo Merchant', website: 'https://demo-merchant.example' };
+
+  async function buildBoundClosedPaymentMandate(userKeypair, agentKeypair, conditionalTransactionId) {
+    const openPaymentPresentation = await signOpenPaymentMandate(
+      buildOpenPaymentMandate({
+        vct: 'mandate.payment.open.1',
+        constraints: [{ type: 'payment.reference', conditional_transaction_id: conditionalTransactionId }],
+        cnf: { jwk: secp256r1PublicKeyToJwk(agentKeypair.publicKey()) },
+      }),
+      { signer: userKeypair },
+    );
+    const closedPaymentPresentation = await signClosedPaymentMandate(
+      buildClosedPaymentMandate({
+        vct: 'mandate.payment.1',
+        transaction_id: computeCheckoutHash(SAMPLE_CHECKOUT_JWT),
+        payee: merchant,
+        payment_amount: { amount: 19900, currency: 'USD' },
+        payment_instrument: { id: 'stub', type: 'card', description: 'Card ****4242' },
+      }),
+      { signer: agentKeypair, nonce: 'nonce-1', openMandatePresentation: openPaymentPresentation },
+    );
+    return { openPaymentPresentation, closedPaymentPresentation };
+  }
+
+  test('verifies payment.reference against a fresh sd_hash of the supplied Open Checkout Mandate', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+
+    const openCheckoutPresentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        cnf: { jwk: secp256r1PublicKeyToJwk(userKeypair.publicKey()) },
+      }),
+      { signer: userKeypair },
+    );
+    const conditionalTransactionId = computeSdHash(parseSdJwtPresentation(openCheckoutPresentation));
+    const { openPaymentPresentation, closedPaymentPresentation } = await buildBoundClosedPaymentMandate(
+      userKeypair,
+      agentKeypair,
+      conditionalTransactionId,
+    );
+
+    const result = verifyClosedPaymentMandate(closedPaymentPresentation, {
+      openMandatePresentation: openPaymentPresentation,
+      openCheckoutMandatePresentation: openCheckoutPresentation,
+    });
+    expect(result.verified).toBe(true);
+    expect(result.referenceVerified).toBe(true);
+  });
+
+  test('fails referenceVerified when payment.reference points at a different checkout', async () => {
+    const userKeypair = Secp256r1Keypair.random();
+    const agentKeypair = Secp256r1Keypair.random();
+
+    const openCheckoutPresentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        cnf: { jwk: secp256r1PublicKeyToJwk(userKeypair.publicKey()) },
+      }),
+      { signer: userKeypair },
+    );
+    const unrelatedCheckoutPresentation = await signOpenCheckoutMandate(
+      buildOpenCheckoutMandate({
+        vct: VCT_CHECKOUT_OPEN,
+        constraints: [MINIMAL_LINE_ITEMS_CONSTRAINT],
+        cnf: { jwk: secp256r1PublicKeyToJwk(userKeypair.publicKey()) },
+      }),
+      { signer: userKeypair },
+    );
+    const wrongTransactionId = computeSdHash(parseSdJwtPresentation(unrelatedCheckoutPresentation));
+    const { openPaymentPresentation, closedPaymentPresentation } = await buildBoundClosedPaymentMandate(
+      userKeypair,
+      agentKeypair,
+      wrongTransactionId,
+    );
+
+    const result = verifyClosedPaymentMandate(closedPaymentPresentation, {
+      openMandatePresentation: openPaymentPresentation,
+      openCheckoutMandatePresentation: openCheckoutPresentation,
+    });
+    expect(result.verified).toBe(true);
+    expect(result.referenceVerified).toBe(false);
   });
 });

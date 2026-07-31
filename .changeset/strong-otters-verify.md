@@ -67,3 +67,10 @@ tracks for this specific transaction.
 Added an example, `examples/verify-mandate-with-did-user-key.mjs` (run via
 `yarn example:did-mandate`), showing how to resolve `userPublicKey` from a
 User's DID document and use it in the verification flow above.
+
+Documented (README + JSDoc on `buildOpenCheckoutMandate`/
+`buildOpenPaymentMandate`) that AP2 v0.2 defines no Mandate revocation
+mechanism at all -- it's explicitly out of scope per spec -- and that `exp`
+is the only verifier-enforceable lifecycle control, RECOMMENDED but
+schema-optional. No behavior changed; this closes a documentation gap
+identified while reviewing the spec, not a code gap.

@@ -195,6 +195,14 @@ async function signMandateEnvelope(envelope, { signer, kid, typ }) {
 
 /**
  * Validates and clones an Open Checkout Mandate's disclosed content.
+ *
+ * `exp` is schema-optional, but the AP2 spec RECOMMENDS setting it to the
+ * smallest value that still lets the Shopping Agent complete its task --
+ * it's the only verifier-enforceable way this mandate's lifetime ends. See
+ * the README's "Mandate lifecycle and revocation" section: AP2 v0.2 defines
+ * no revocation mechanism at all, so an Open Mandate issued with no `exp`
+ * remains valid, and closeable, indefinitely.
+ *
  * @param {object} content
  * @returns {object}
  */
@@ -215,6 +223,13 @@ export function buildClosedCheckoutMandate(content) {
 
 /**
  * Validates and clones an Open Payment Mandate's disclosed content.
+ *
+ * `exp` is schema-optional, but the AP2 spec RECOMMENDS setting it to the
+ * smallest value that still lets the Shopping Agent complete its task --
+ * it's the only verifier-enforceable way this mandate's lifetime ends. See
+ * `buildOpenCheckoutMandate`'s doc comment and the README's "Mandate
+ * lifecycle and revocation" section.
+ *
  * @param {object} content
  * @returns {object}
  */

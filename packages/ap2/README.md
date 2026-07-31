@@ -215,6 +215,43 @@ placeholder string in the docs rather than a deliberate alternate meaning
 confirmed against a reference implementation or the normative "Delegate
 SD-JWT" individual draft this spec depends on for chain verification.
 
+## Mandate lifecycle and revocation
+
+**AP2 v0.2 defines no revocation mechanism for Mandates, and this package
+does not invent one.** The spec's only lifecycle-management guidance
+(§ Mandate Management) reads: "In the case of external Trusted Surfaces it
+could make sense to allow for management of delegated Mandates but that is
+outside the scope of this specification." Managing (and revoking) a granted
+Open Mandate is left entirely to the Shopping Agent / wallet UI layer as a
+local, User-facing concern — there is no protocol-level status check, status
+list, or `credentialStatus`-style claim a verifier can query, and no way for
+a Merchant or Credential Provider to learn that a User revoked a mandate
+after the fact.
+
+`exp` is therefore the *only* verifier-enforceable way a mandate's lifetime
+ends, and it's schema-optional — `buildOpenCheckoutMandate`/
+`buildOpenPaymentMandate` both accept content with no `exp` at all, which
+this package then treats as never expiring (see "accepts a mandate with no
+exp" in the test suite). The spec (§ Autonomous) only RECOMMENDS setting
+`exp` "to the smallest value that will allow the Shopping Agent to complete
+the assigned task" — it does not require it, and this package does not
+enforce it either, since doing so would exceed what the spec actually
+mandates. **If your integration needs a shorter effective lifetime or a way
+to invalidate a mandate mid-flight, set `exp` deliberately tight yourself**
+(re-issuing Open Mandates as needed) and/or track revocation state out of
+band on your own side (e.g. a Merchant's own record of voided orders, or a
+Credential Provider invalidating the payment *token* it separately issued —
+the one place the spec does gesture at invalidation, under § Security
+Considerations' Double Spend discussion, and only as a `MAY`).
+
+Adding a proprietary status/revocation field would not help: it would be
+invisible to any AP2-conformant counterparty that isn't running this exact
+package, and the spec's Constraint mechanism explicitly requires unknown
+constraint types to fail evaluation (§ Agent Authorization: "Any unknown
+Constraints MUST be treated as failing evaluation"), so a custom
+constraint-based revocation scheme would break interop with stock verifiers
+rather than add safety.
+
 ## Verification guarantees
 
 Receipt verification:

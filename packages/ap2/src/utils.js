@@ -102,18 +102,12 @@ export function inferReceiptType(receipt) {
     : RECEIPT_TYPE_CHECKOUT;
 }
 
-function validateTimeOptions(currentDate, clockTolerance, maxReceiptAge) {
+export function validateTimeOptions(currentDate, clockTolerance) {
   if (!(currentDate instanceof Date) || Number.isNaN(currentDate.getTime())) {
     throw new TypeError('"currentDate" must be a valid Date');
   }
   if (!Number.isFinite(clockTolerance) || clockTolerance < 0) {
     throw new TypeError('"clockTolerance" must be a non-negative number');
-  }
-  if (
-    maxReceiptAge !== undefined
-    && (!Number.isFinite(maxReceiptAge) || maxReceiptAge < 0)
-  ) {
-    throw new TypeError('"maxReceiptAge" must be a non-negative number');
   }
 }
 
@@ -125,7 +119,13 @@ export function validateReceiptTime(
     maxReceiptAge,
   },
 ) {
-  validateTimeOptions(currentDate, clockTolerance, maxReceiptAge);
+  validateTimeOptions(currentDate, clockTolerance);
+  if (
+    maxReceiptAge !== undefined
+    && (!Number.isFinite(maxReceiptAge) || maxReceiptAge < 0)
+  ) {
+    throw new TypeError('"maxReceiptAge" must be a non-negative number');
+  }
   const now = Math.floor(currentDate.getTime() / 1000);
   if (receipt.iat > now + clockTolerance) {
     throw new Error('Receipt "iat" is in the future');

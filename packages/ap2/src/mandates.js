@@ -16,6 +16,7 @@ import {
   MANDATE_TYPE_PAYMENT_CLOSED,
   DEFAULT_CLOCK_TOLERANCE,
   validateMandateContent,
+  validateTimeOptions,
 } from './utils';
 
 export {
@@ -424,6 +425,18 @@ function checkNotExpired(payload, { currentDate, clockTolerance }, label) {
   }
 }
 
+// exp alone only bounds one side of the validity window; a future-dated iat
+// (clock skew or forgery) would otherwise pass. Mirrors validateReceiptTime.
+function checkNotIssuedInFuture(payload, { currentDate, clockTolerance }, label) {
+  if (typeof payload.iat !== 'number') {
+    return;
+  }
+  const now = Math.floor(currentDate.getTime() / 1000);
+  if (payload.iat > now + clockTolerance) {
+    throw new Error(`${label} "iat" is in the future`);
+  }
+}
+
 function checkAudience(payload, expectedAud) {
   if (payload.aud !== expectedAud) {
     throw new Error(`Expected envelope "aud" of "${expectedAud}", got "${payload.aud}"`);
@@ -483,7 +496,7 @@ function requireOpenMandatePresentation(openMandatePresentation) {
 }
 
 function requireUserPublicKey(userPublicKey) {
-  if (userPublicKey === undefined) {
+  if (userPublicKey === undefined || userPublicKey === null) {
     throw new TypeError(
       '"userPublicKey" is required: without it, the Open Mandate\'s own issuer signature -- '
       + 'and therefore its cnf.jwk delegation -- is never verified, and the whole mandate chain '
@@ -547,9 +560,10 @@ function resolveCheckoutJwtClaim(content, disclosures, sdAlg) {
  * Mandate or other envelope type fed in where a Closed Mandate is expected),
  * the `checkout_jwt` disclosure against the content's `_sd` digest,
  * `checkout_hash` against a fresh hash of the revealed `checkout_jwt`,
- * `aud === "merchant"`, expiry, `nonce` against the required `expectedNonce`,
- * and `sd_hash` against `openMandatePresentation`. See
- * `signClosedCheckoutMandate` for the `sd_hash` caveat.
+ * `aud === "merchant"`, expiry, that `iat` isn't in the future, `nonce`
+ * against the required `expectedNonce`, and `sd_hash` against
+ * `openMandatePresentation`. See `signClosedCheckoutMandate` for the
+ * `sd_hash` caveat.
  *
  * `expectedNonce` matters because Closed Mandate envelopes carry no `exp` of
  * their own -- their only expiry is inherited from the referenced Open
@@ -573,6 +587,7 @@ export function verifyClosedCheckoutMandate(
   } = {},
 ) {
   try {
+    validateTimeOptions(currentDate, clockTolerance);
     requireOpenMandatePresentation(openMandatePresentation);
     requireUserPublicKey(userPublicKey);
     requireExpectedNonce(expectedNonce);
@@ -604,6 +619,7 @@ export function verifyClosedCheckoutMandate(
 
     checkAudience(payload, 'merchant');
     checkNotExpired(payload, { currentDate, clockTolerance }, 'Closed Checkout Mandate');
+    checkNotIssuedInFuture(payload, { currentDate, clockTolerance }, 'Closed Checkout Mandate');
     checkNonce(payload, expectedNonce);
     checkSdHashAgainstOpenMandate(payload, openMandatePresentation, 'Open Checkout Mandate');
 
@@ -631,21 +647,20 @@ export function verifyClosedCheckoutMandate(
  * Mandate's own envelope) is what makes that delegation trustworthy in the
  * first place, rather than an entirely self-forgeable chain. Also verifies
  * the envelope's `typ === "kb+sd-jwt"`, `aud === "credential-provider"`,
- * expiry, `nonce` against the required `expectedNonce` (see
- * `verifyClosedCheckoutMandate` for why this matters -- Closed Mandate
- * envelopes carry no `exp` of their own), and `sd_hash` against
- * `openMandatePresentation`; when the corresponding Closed Checkout
+ * expiry, that `iat` isn't in the future, `nonce` against the required
+ * `expectedNonce` (see `verifyClosedCheckoutMandate` for why this matters --
+ * Closed Mandate envelopes carry no `exp` of their own), and `sd_hash`
+ * against `openMandatePresentation`; when the corresponding Closed Checkout
  * Mandate's `checkout_jwt` is supplied, that `transaction_id` matches a
  * fresh hash of it.
  *
  * When `openCheckoutMandatePresentation` is also supplied, it is fully
- * resolved (issuer envelope against the same `userPublicKey` -- the AP2 flow's
- * Open Checkout and Open Payment Mandates are both signed by the same User --
- * disclosed-content schema, and its own `exp`), then the Open Payment
- * Mandate's `payment.reference.conditional_transaction_id` constraint is
- * checked against a fresh `sd_hash` of that presentation — the binding that
- * ties this payment authorization to one specific checkout (see the AP2
- * spec's Reference constraint).
+ * resolved (issuer envelope against the same `userPublicKey`, disclosed-content
+ * schema, and its own `exp`), then the Open Payment Mandate's
+ * `payment.reference.conditional_transaction_id` constraint is checked
+ * against a fresh `sd_hash` of that presentation (see the AP2 spec's
+ * Reference constraint). A mismatch fails verification outright (`verified:
+ * false`), not just `referenceVerified: false`.
  *
  * @param {string} presentation
  * @param {{openMandatePresentation: string, userPublicKey: *, expectedNonce: string,
@@ -663,6 +678,7 @@ export function verifyClosedPaymentMandate(
   } = {},
 ) {
   try {
+    validateTimeOptions(currentDate, clockTolerance);
     requireOpenMandatePresentation(openMandatePresentation);
     requireUserPublicKey(userPublicKey);
     requireExpectedNonce(expectedNonce);
@@ -687,6 +703,7 @@ export function verifyClosedPaymentMandate(
 
     checkAudience(payload, 'credential-provider');
     checkNotExpired(payload, { currentDate, clockTolerance }, 'Closed Payment Mandate');
+    checkNotIssuedInFuture(payload, { currentDate, clockTolerance }, 'Closed Payment Mandate');
     checkNonce(payload, expectedNonce);
 
     let transactionIdVerified;
@@ -701,21 +718,25 @@ export function verifyClosedPaymentMandate(
 
     let referenceVerified;
     if (openCheckoutMandatePresentation !== undefined) {
-      // Resolving (not just checking the raw envelope signature) also
-      // validates the disclosed content's schema and enforces its `exp` --
-      // both of which live on the content, not the envelope, and would
-      // otherwise go unchecked here even though this Open Checkout Mandate
-      // is being used to authorize a payment.
+      // Resolving, not just checking the raw envelope signature, also
+      // enforces this content's own schema and exp.
       resolveOpenCheckoutMandateContent(
         openCheckoutMandatePresentation,
         { userPublicKey, currentDate, clockTolerance },
       );
+      // Schema-required (payment-mandate-open.json's "contains"), so always found.
+      const reference = openPaymentContent.constraints.find((c) => c?.type === 'payment.reference');
       const { issuerJwt: checkoutIssuerJwt, disclosures: checkoutDisclosures } = parseSdJwtPresentation(
         openCheckoutMandatePresentation,
       );
-      const reference = (openPaymentContent.constraints ?? []).find((c) => c?.type === 'payment.reference');
-      const expectedTransactionId = computeSdHash({ issuerJwt: checkoutIssuerJwt, disclosures: checkoutDisclosures });
-      referenceVerified = reference?.conditional_transaction_id === expectedTransactionId;
+      const actualTransactionId = computeSdHash({ issuerJwt: checkoutIssuerJwt, disclosures: checkoutDisclosures });
+      if (reference.conditional_transaction_id !== actualTransactionId) {
+        throw new Error(
+          '"payment.reference.conditional_transaction_id" does not match a fresh sd_hash '
+          + 'of the provided openCheckoutMandatePresentation',
+        );
+      }
+      referenceVerified = true;
     }
 
     return {
@@ -777,8 +798,8 @@ function resolvePaymentConstraintDisclosures(content, disclosures, sdAlg) {
  * What this always checks, regardless of `userPublicKey`: the SD-JWT's
  * internal digest/disclosure consistency (a hand-edited constraints blob
  * whose digest no longer matches `delegate_payload` is rejected), that the
- * resolved content matches the Open Payment Mandate schema, and (when `exp`
- * is present) that it hasn't passed.
+ * resolved content matches the Open Payment Mandate schema, and (when
+ * present) that `exp` hasn't passed and `iat` isn't in the future.
  *
  * @param {string} presentation
  * @param {{userPublicKey?: *, currentDate?: Date, clockTolerance?: number}} options
@@ -788,6 +809,7 @@ export function resolveOpenPaymentMandateContent(
   presentation,
   { userPublicKey, currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE } = {},
 ) {
+  validateTimeOptions(currentDate, clockTolerance);
   const { issuerJwt, disclosures } = parseSdJwtPresentation(presentation);
   if (userPublicKey !== undefined) {
     verifyOpenMandateIssuer(issuerJwt, userPublicKey, OPEN_PAYMENT_MANDATE_LABEL);
@@ -804,6 +826,7 @@ export function resolveOpenPaymentMandateContent(
   // itself, not on the outer signed envelope payload (which is just
   // `{delegate_payload, _sd_alg}`) -- so it's checked against `content` here.
   checkNotExpired(content, { currentDate, clockTolerance }, OPEN_PAYMENT_MANDATE_LABEL);
+  checkNotIssuedInFuture(content, { currentDate, clockTolerance }, OPEN_PAYMENT_MANDATE_LABEL);
 
   return {
     content,
@@ -864,6 +887,7 @@ export function resolveOpenCheckoutMandateContent(
   presentation,
   { userPublicKey, currentDate = new Date(), clockTolerance = DEFAULT_CLOCK_TOLERANCE } = {},
 ) {
+  validateTimeOptions(currentDate, clockTolerance);
   const { issuerJwt, disclosures } = parseSdJwtPresentation(presentation);
   if (userPublicKey !== undefined) {
     verifyOpenMandateIssuer(issuerJwt, userPublicKey, OPEN_CHECKOUT_MANDATE_LABEL);
@@ -880,6 +904,7 @@ export function resolveOpenCheckoutMandateContent(
   // other properties) lives on the disclosed content, not the outer envelope
   // payload -- same reasoning as `resolveOpenPaymentMandateContent`.
   checkNotExpired(content, { currentDate, clockTolerance }, OPEN_CHECKOUT_MANDATE_LABEL);
+  checkNotIssuedInFuture(content, { currentDate, clockTolerance }, OPEN_CHECKOUT_MANDATE_LABEL);
 
   return {
     content,

@@ -16,21 +16,32 @@ import {
 export { JsonWebKey2020 };
 
 const getKeyPairForKtyAndCrv = (kty, crv) => {
-  if (kty === 'OKP') {
-    if (crv === 'Ed25519') {
-      return Ed25519KeyPair;
-    }
+  if (kty === 'OKP' && crv === 'Ed25519') {
+    return Ed25519KeyPair;
   }
-  if (kty === 'EC') {
-    if (crv === 'secp256k1') {
-      return Secp256k1KeyPair;
-    }
-
-    if (['P-256', 'P-384', 'P-521'].includes(crv)) {
-      return WebCryptoKey;
-    }
+  if (kty === 'EC' && crv === 'secp256k1') {
+    return Secp256k1KeyPair;
+  }
+  if (kty === 'EC' && ['P-256', 'P-384', 'P-521'].includes(crv)) {
+    return WebCryptoKey;
   }
   throw new Error(`getKeyPairForKtyAndCrv does not support: ${kty} and ${crv}`);
+};
+
+// Maps a JWK (kty, crv, alg) to the [keySuite, jwsAlg] pair passed to jose-ld.
+const jwaFor = (kty, crv, alg) => {
+  if (kty === 'OKP' && crv === 'Ed25519') {
+    return ['EdDsa', 'EdDSA'];
+  }
+  if (kty === 'EC' && crv === 'secp256k1') {
+    return alg === 'ES256K-R'
+      ? ['EcRecover', 'ES256K-R']
+      : ['Ecdsa', 'ES256K'];
+  }
+  if (kty === 'EC' && crv === 'P-256') return ['Ecdsa', 'ES256'];
+  if (kty === 'EC' && crv === 'P-384') return ['Ecdsa', 'ES384'];
+  if (kty === 'EC' && crv === 'P-521') return ['Ecdsa', 'ES512'];
+  return null;
 };
 
 const getKeyPairForType = (k) => {
@@ -54,65 +65,27 @@ const getKeyPairForType = (k) => {
 const getVerifier = async (k, options = { detached: true }) => {
   const { publicKeyJwk } = await k.export({ type: 'JsonWebKey2020' });
   const { kty, crv, alg } = publicKeyJwk;
-  if (kty === 'OKP') {
-    if (crv === 'Ed25519') {
-      return JWS.createVerifier(k.verifier('EdDsa'), 'EdDSA', options);
-    }
+  const jwa = jwaFor(kty, crv, alg);
+  if (!jwa) {
+    throw new Error(
+      `getVerifier does not suppport ${JSON.stringify(publicKeyJwk, null, 2)}`,
+    );
   }
-
-  if (kty === 'EC') {
-    if (crv === 'secp256k1') {
-      if (alg && alg === 'ES256K-R') {
-        return JWS.createVerifier(k.verifier('EcRecover'), 'ES256K-R', options);
-      }
-      return JWS.createVerifier(k.verifier('Ecdsa'), 'ES256K', options);
-    }
-
-    if (crv === 'P-256') {
-      return JWS.createVerifier(k.verifier('Ecdsa'), 'ES256', options);
-    }
-    if (crv === 'P-384') {
-      return JWS.createVerifier(k.verifier('Ecdsa'), 'ES384', options);
-    }
-    if (crv === 'P-521') {
-      return JWS.createVerifier(k.verifier('Ecdsa'), 'ES512', options);
-    }
-  }
-
-  throw new Error(
-    `getVerifier does not suppport ${JSON.stringify(publicKeyJwk, null, 2)}`,
-  );
+  const [keySuite, jwsAlg] = jwa;
+  return JWS.createVerifier(k.verifier(keySuite), jwsAlg, options);
 };
 
 const getSigner = async (k, options = { detached: true }) => {
   const { publicKeyJwk } = await k.export({ type: 'JsonWebKey2020' });
   const { kty, crv } = publicKeyJwk;
-  const { alg } = k;
-  if (kty === 'OKP') {
-    if (crv === 'Ed25519') {
-      return JWS.createSigner(k.signer('EdDsa'), 'EdDSA', options);
-    }
+  const jwa = jwaFor(kty, crv, k.alg);
+  if (!jwa) {
+    throw new Error(
+      `getSigner does not suppport ${JSON.stringify(publicKeyJwk, null, 2)}`,
+    );
   }
-  if (kty === 'EC') {
-    if (crv === 'secp256k1') {
-      if (alg && alg === 'ES256K-R') {
-        return JWS.createSigner(k.signer('EcRecover'), 'ES256K-R', options);
-      }
-      return JWS.createSigner(k.signer('Ecdsa'), 'ES256K', options);
-    }
-    if (crv === 'P-256') {
-      return JWS.createSigner(k.signer('Ecdsa'), 'ES256', options);
-    }
-    if (crv === 'P-384') {
-      return JWS.createSigner(k.signer('Ecdsa'), 'ES384', options);
-    }
-    if (crv === 'P-521') {
-      return JWS.createSigner(k.signer('Ecdsa'), 'ES512', options);
-    }
-  }
-  throw new Error(
-    `getSigner does not suppport ${JSON.stringify(publicKeyJwk, null, 2)}`,
-  );
+  const [keySuite, jwsAlg] = jwa;
+  return JWS.createSigner(k.signer(keySuite), jwsAlg, options);
 };
 
 const applyJwa = async (k, options) => {

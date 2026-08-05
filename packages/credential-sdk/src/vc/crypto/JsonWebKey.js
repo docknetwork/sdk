@@ -127,9 +127,7 @@ const applyJwa = async (k, options) => {
   return k;
 };
 
-// this is dirty...
 const useJwa = async (k, options) => {
-  // before mutation, annotate the apply function....
   // eslint-disable-next-line no-param-reassign
   k.useJwa = async (opts) => applyJwa(k, opts);
   return applyJwa(k, options);

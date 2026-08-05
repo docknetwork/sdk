@@ -1,19 +1,23 @@
-import {
-  Ed25519KeyPair,
-} from '@transmute/ed25519-key-pair';
-import {
-  Secp256k1KeyPair,
-} from '@transmute/secp256k1-key-pair';
-
+// Local copy of JsonWebKey from @transmute/json-web-signature@0.7.0-unstable.82,
+// extracted to drop that package's broken jsonld@5 -> @digitalbazaar/http-client@1
+// -> esm dependency chain (JsonWebKey itself never touches it).
+// 0.7.0-unstable.82 is the `latest` npm dist-tag for all @transmute packages —
+// no stable release exists, so there is no newer version to upgrade to. The
+// four @transmute deps are pinned exactly to keep them in sync with this copy.
+// These @transmute packages are CommonJS. Named ESM imports off them break
+// under Node's native loader (the examples-with-node CI job); a default import
+// breaks under babel/jest. `import * as` resolves to a namespace exposing the
+// named members in both, so destructure off that.
 import crypto from 'crypto';
-import { JWS } from '@transmute/jose-ld';
+import * as ed25519 from '@transmute/ed25519-key-pair';
+import * as secp256k1 from '@transmute/secp256k1-key-pair';
+import * as joseLd from '@transmute/jose-ld';
+import * as webCrypto from '@transmute/web-crypto-key-pair';
 
-import {
-  WebCryptoKey,
-  JsonWebKey2020,
-} from '@transmute/web-crypto-key-pair';
-
-export { JsonWebKey2020 };
+const { Ed25519KeyPair } = ed25519;
+const { Secp256k1KeyPair } = secp256k1;
+const { JWS } = joseLd;
+const { WebCryptoKey } = webCrypto;
 
 const getKeyPairForKtyAndCrv = (kty, crv) => {
   if (kty === 'OKP' && crv === 'Ed25519') {

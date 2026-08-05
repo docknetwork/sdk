@@ -28,11 +28,6 @@
       "default": "./dist/esm/*"
     }
   },
-  "resolutions": {
-    "@digitalbazaar/http-client": "^3.4.1",
-    "jsonld/@digitalbazaar/http-client": "^3.4.1",
-    "@transmute/jsonld/jsonld/@digitalbazaar/http-client": "^3.4.1"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/docknetwork/sdk"
@@ -49,7 +44,10 @@
     "@juanelas/base64": "^1.1.5",
     "@sphereon/pex": "^5.0.0-unstable.28",
     "@sphereon/ssi-sdk-ext.did-resolver-jwk": "^0.26.0",
-    "@transmute/json-web-signature": "^0.7.0-unstable.82",
+    "@transmute/ed25519-key-pair": "0.7.0-unstable.82",
+    "@transmute/jose-ld": "0.7.0-unstable.82",
+    "@transmute/secp256k1-key-pair": "0.7.0-unstable.82",
+    "@transmute/web-crypto-key-pair": "0.7.0-unstable.82",
     "base64url": "^3.0.1",
     "blake2b": "2.1.4",
     "blakejs": "^1.2.1",
@@ -59,7 +57,7 @@
     "json-canonicalize": "1.0.4",
     "json-stringify-deterministic": "^1.0.12",
     "jsonld": "^6.0.0",
-    "jsonld-signatures": "^9.3.1",
+    "jsonld-signatures": "^10.0.0",
     "jsonschema": "1.4.1",
     "key-did-resolver": "^1.4.0",
     "mrklt": "^0.2.0",

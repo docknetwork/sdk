@@ -1,4 +1,4 @@
-import { JsonWebKey } from '@transmute/json-web-signature';
+import { JsonWebKey } from './JsonWebKey';
 import CustomLinkedDataSignature from './common/CustomLinkedDataSignature';
 
 const SUITE_CONTEXT_URL = 'https://w3id.org/security/suites/jws-2020/v1';

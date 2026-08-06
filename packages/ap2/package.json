@@ -1,6 +1,6 @@
 {
   "name": "@docknetwork/ap2",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Basic AP2 support",
   "license": "MIT",
   "type": "module",
@@ -61,6 +61,7 @@
     "build": "yarn build:js && yarn build:types",
     "generate-schemas": "node scripts/generate-schemas.mjs",
     "example:receipt": "yarn build && node examples/issue-and-verify-receipt.mjs",
+    "example:did-mandate": "yarn build && node examples/verify-mandate-with-did-user-key.mjs",
     "test": "jest --runInBand",
     "lint": "eslint \"src/**/*.js\"",
     "prepublishOnly": "yarn build"

@@ -8,6 +8,9 @@
 // under Node's native loader (the examples-with-node CI job); a default import
 // breaks under babel/jest. `import * as` resolves to a namespace exposing the
 // named members in both, so destructure off that.
+// Deviations from upstream: getSigner reads `alg` from the exported JWK
+// (matching getVerifier) instead of `k.alg`, and useJwa restores the original
+// signer/verifier factories so it can be re-applied with new options.
 import crypto from 'crypto';
 import * as ed25519 from '@transmute/ed25519-key-pair';
 import * as secp256k1 from '@transmute/secp256k1-key-pair';
@@ -72,7 +75,7 @@ const getVerifier = async (k, options = { detached: true }) => {
   const jwa = jwaFor(kty, crv, alg);
   if (!jwa) {
     throw new Error(
-      `getVerifier does not suppport ${JSON.stringify(publicKeyJwk, null, 2)}`,
+      `getVerifier does not support ${JSON.stringify(publicKeyJwk, null, 2)}`,
     );
   }
   const [keySuite, jwsAlg] = jwa;
@@ -81,11 +84,11 @@ const getVerifier = async (k, options = { detached: true }) => {
 
 const getSigner = async (k, options = { detached: true }) => {
   const { publicKeyJwk } = await k.export({ type: 'JsonWebKey2020' });
-  const { kty, crv } = publicKeyJwk;
-  const jwa = jwaFor(kty, crv, k.alg);
+  const { kty, crv, alg } = publicKeyJwk;
+  const jwa = jwaFor(kty, crv, alg);
   if (!jwa) {
     throw new Error(
-      `getSigner does not suppport ${JSON.stringify(publicKeyJwk, null, 2)}`,
+      `getSigner does not support ${JSON.stringify(publicKeyJwk, null, 2)}`,
     );
   }
   const [keySuite, jwsAlg] = jwa;
@@ -105,8 +108,17 @@ const applyJwa = async (k, options) => {
 };
 
 const useJwa = async (k, options) => {
+  // applyJwa replaces `verifier`/`signer` with 0-arg wrappers, so keep the
+  // original factories and restore them before re-applying with new options.
+  const { verifier, signer } = k;
   // eslint-disable-next-line no-param-reassign
-  k.useJwa = async (opts) => applyJwa(k, opts);
+  k.useJwa = async (opts) => {
+    // eslint-disable-next-line no-param-reassign
+    k.verifier = verifier;
+    // eslint-disable-next-line no-param-reassign
+    k.signer = signer;
+    return applyJwa(k, opts);
+  };
   return applyJwa(k, options);
 };
 

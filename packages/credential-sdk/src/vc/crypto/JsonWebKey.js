@@ -131,14 +131,11 @@ export class JsonWebKey {
     },
   ) => {
     const KeyPair = getKeyPairForKtyAndCrv(options.kty, options.crv);
-    if (!options.secureRandom) {
-      // eslint-disable-next-line no-param-reassign
-      options.secureRandom = () => crypto.randomBytes(32);
-    }
+    const secureRandom = options.secureRandom || (() => crypto.randomBytes(32));
     const kp = await KeyPair.generate({
       kty: options.kty,
       crvOrSize: options.crv,
-      secureRandom: options.secureRandom,
+      secureRandom,
     });
     const { detached } = options;
     return useJwa(kp, { detached });

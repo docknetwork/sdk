@@ -20,7 +20,9 @@ import {
   Ed25519Keypair,
   DidKeypair,
 } from '@docknetwork/credential-sdk/keypairs';
-import { faucet, network, url } from './env.js';
+import {
+  faucet, network, url, infuraApiKey,
+} from './env.js';
 
 const universalResolverUrl = 'https://uniresolver.io';
 
@@ -29,7 +31,7 @@ const ethereumProviderConfig = {
   networks: [
     {
       name: 'mainnet',
-      rpcUrl: 'https://mainnet.infura.io/v3/05f321c3606e44599c54dbc92510e6a9',
+      rpcUrl: `https://mainnet.infura.io/v3/${infuraApiKey}`,
     },
   ],
 };

@@ -36,7 +36,7 @@
       "cache": false,
       "dependsOn": ["^build"],
       "outputs": [],
-      "env": ["CHEQD_MNEMONIC", "CHEQD_IMAGE_TAG", "CHEQD_NETWORK"]
+      "env": ["CHEQD_MNEMONIC", "CHEQD_IMAGE_TAG", "CHEQD_NETWORK", "INFURA_API_KEY"]
     },
     "publish-packages": {
       "dependsOn": ["^build"],

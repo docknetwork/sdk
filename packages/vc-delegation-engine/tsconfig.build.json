@@ -11,7 +11,7 @@
     "outDir": "dist/types",
     "rootDir": "src",
     "types": ["node"],
-    "typeRoots": ["./types", "./node_modules/@types"]
+    "typeRoots": ["./types", "./node_modules/@types", "../../node_modules/@types"]
   },
   "include": ["src/**/*.js", "types/**/*.d.ts"]
 }

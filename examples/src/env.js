@@ -16,3 +16,5 @@ export const faucet = {
 
 export const url = process.env.CHEQD_RPC_URL || 'http://localhost:26657';
 export const network = process.env.CHEQD_NETWORK || CheqdNetwork.Testnet;
+
+export const infuraApiKey = process.env.INFURA_API_KEY || '';

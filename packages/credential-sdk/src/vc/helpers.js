@@ -1,5 +1,5 @@
 import jsonld from 'jsonld';
-import { JsonWebKey } from '@transmute/json-web-signature';
+import { JsonWebKey } from './crypto/JsonWebKey';
 import defaultDocumentLoader from './document-loader';
 
 import {

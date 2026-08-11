@@ -8,6 +8,7 @@ jobs:
       CHEQD_MNEMONIC: "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse"
       CHEQD_IMAGE_TAG: 4.1.7
       CHEQD_NETWORK: "testnet"
+      INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v4
@@ -16,7 +17,7 @@ jobs:
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: npm install -g turbo@2.0.5
       - run: turbo telemetry disable
-      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK turbo run examples-with-node
+      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK INFURA_API_KEY=$INFURA_API_KEY turbo run examples-with-node
 
   mainnet:
     runs-on: ubuntu-latest
@@ -24,6 +25,7 @@ jobs:
       CHEQD_MNEMONIC: "steak come surprise obvious remain black trouble measure design volume retreat float coach amused match album moment radio stuff crack orphan ranch dose endorse"
       CHEQD_IMAGE_TAG: 4.1.7
       CHEQD_NETWORK: "mainnet"
+      INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v4
@@ -32,4 +34,4 @@ jobs:
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: npm install -g turbo@2.0.5
       - run: turbo telemetry disable
-      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK turbo run examples-with-node
+      - run: CHEQD_MNEMONIC=$CHEQD_MNEMONIC CHEQD_IMAGE_TAG=$CHEQD_IMAGE_TAG CHEQD_NETWORK=$CHEQD_NETWORK INFURA_API_KEY=$INFURA_API_KEY turbo run examples-with-node

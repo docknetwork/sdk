@@ -1,5 +1,11 @@
 # @docknetwork/credential-sdk
 
+## 0.57.0
+
+### Minor Changes
+
+- ESM interop
+
 ## 0.56.3
 
 ### Patch Changes

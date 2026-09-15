@@ -6,8 +6,8 @@
 
 - Updated dependencies
   - @docknetwork/credential-sdk@0.57.0
-  - @docknetwork/cheqd-blockchain-api@7.0.0
-  - @docknetwork/cheqd-blockchain-modules@7.0.0
+  - @docknetwork/cheqd-blockchain-api@6.0.2
+  - @docknetwork/cheqd-blockchain-modules@6.0.2
 
 ## 0.22.10
 

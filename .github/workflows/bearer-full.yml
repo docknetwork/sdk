@@ -1,0 +1,27 @@
+name: Bearer-CLI Full Scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      minimum_severity:
+        description: Lowest severity to include in the scan.
+        required: true
+        type: choice
+        default: high
+        options:
+          - critical
+          - high
+          - medium
+          - low
+          - all
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    uses: docknetwork/engineering-toolkit/.github/workflows/bearer-full.yml@main
+    with:
+      minimum_severity: ${{ inputs.minimum_severity }}
+      toolkit_repository: docknetwork/engineering-toolkit
+      toolkit_ref: main

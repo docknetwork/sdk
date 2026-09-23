@@ -1,0 +1,11 @@
+{
+  "extraKnownMarketplaces": {
+    "dock": {
+      "source": { "source": "github", "repo": "docknetwork/dock-claude-skills" },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "dock-skills@dock": true
+  }
+}

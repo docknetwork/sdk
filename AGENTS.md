@@ -61,8 +61,9 @@ npx turbo run examples-with-node
 yarn publish-packages          # changeset version && changeset publish
 ```
 
-Node/Yarn versions: `engines`/`packageManager` in the root `package.json`; each package also declares
-its own `engines.node` (currently `>=22.0.0`) — check the package's own `package.json` if in doubt.
+Node/Yarn versions: `engines`/`packageManager` in the root `package.json`; most packages also declare
+their own `engines.node` (currently `>=22.0.0`) — check the package's own `package.json` if in doubt.
+`vc-delegation-engine` is the exception: it declares no `engines` field at all.
 
 ## Code Style & Conventions
 
@@ -132,9 +133,11 @@ consumers, not libraries other packages depend on.
   mainnet configurations (`.github/workflows/cheqd-api-tests.yml`, `cheqd-modules-tests.yml`).
 - **Coverage:** `vc-delegation-engine`'s Vitest config enables `v8` coverage reporting but no repo
   package enforces a coverage threshold gate — treat coverage as informational, not a CI gate.
-- **Examples-as-tests:** `examples` and `vc-delegation-engine`'s own `examples` script run real
-  end-to-end scripts against a live node in CI (`.github/workflows/examples.yml`,
-  `vc-delegation-engine-examples.yml`) — these double as smoke tests.
+- **Examples-as-tests:** `examples` runs real end-to-end scripts against a live node in CI
+  (`.github/workflows/examples.yml`) — doubles as a smoke test. `vc-delegation-engine`'s own
+  `examples` script (run in CI via `vc-delegation-engine-examples.yml`) is local-only — it just
+  runs `node examples/*.js`, with no Cheqd node wrapper — so treat it as a local smoke script,
+  not a live-node integration test.
 - **CI:** one workflow per package under `.github/workflows/` (`ap2-tests.yml`,
   `credential-sdk-tests.yml`, `crypto-utils-tests.yml`, `cheqd-api-tests.yml`,
   `cheqd-modules-tests.yml`, `vc-delegation-engine-tests.yml`), plus `lint.yml` (lint + `turbo run

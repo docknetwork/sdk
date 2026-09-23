@@ -33,7 +33,9 @@ cd packages/credential-sdk
 yarn build                # rollup
 yarn test                 # jest --verbose ./tests/*
 yarn test-ipfs             # IPFS-specific suite (needs IPFS env)
-yarn test-ipfs-with-node   # via ../scripts/with_dock_docker_test_node
+yarn test-ipfs-with-node   # BROKEN: script points at ../scripts/with_dock_docker_test_node,
+                           # which resolves to packages/scripts/ (doesn't exist) — the real
+                           # helper is at the repo root, ../../scripts/with_dock_docker_test_node
 yarn test-with-all-nodes   # via ../../scripts/with_all_dock_docker_test_nodes
 yarn lint                  # eslint "src/**/*.js"
 yarn lint-tests            # eslint "{tests/unit,tests/integration}/**/*.js"

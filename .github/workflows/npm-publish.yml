@@ -4,16 +4,19 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write # OIDC token for npm trusted publishing
+  contents: read
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.x"
           registry-url: https://registry.npmjs.org/
+      - run: npm install -g npm@latest # trusted publishing needs npm >= 11.5.1
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn changeset publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

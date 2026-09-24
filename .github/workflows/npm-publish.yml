@@ -5,7 +5,7 @@ on:
     types: [published]
 
 permissions:
-  id-token: write # OIDC token for npm trusted publishing
+  id-token: write
   contents: read
 
 jobs:
@@ -17,6 +17,6 @@ jobs:
         with:
           node-version: "22.x"
           registry-url: https://registry.npmjs.org/
-      - run: npm install -g npm@latest # trusted publishing needs npm >= 11.5.1
+      - run: npm install -g npm@latest
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn changeset publish

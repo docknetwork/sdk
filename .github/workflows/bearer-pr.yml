@@ -1,0 +1,20 @@
+name: Bearer-CLI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  run:
+    uses: docknetwork/engineering-toolkit/.github/workflows/bearer-diff.yml@main
+    with:
+      minimum_severity: ${{ vars.BEARER_MIN_SEVERITY || 'high' }}
+      enforce: ${{ vars.BEARER_ENFORCE == 'true' }}
+      toolkit_repository: docknetwork/engineering-toolkit
+      toolkit_ref: main

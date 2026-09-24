@@ -1,0 +1,7 @@
+# Repository-specific Bearer configuration.
+
+rule:
+  skip-rule: []
+
+scan:
+  skip-path: []

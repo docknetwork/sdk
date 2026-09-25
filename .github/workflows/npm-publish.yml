@@ -13,8 +13,14 @@
 #      commit and workflow run.
 #
 # Every published package must have a Trusted Publisher configured on npmjs.com
-# with: owner `docknetwork`, repository `sdk`, workflow `npm-publish.yml`.
-# Renaming this file breaks publishing until those settings are updated.
+# with: owner `docknetwork`, repository `sdk`, workflow `npm-publish.yml`,
+# environment `npm-publish`. Renaming this file or the environment breaks
+# publishing until those settings are updated.
+#
+# Why the environment matters: npm only accepts tokens from jobs that ran in the
+# `npm-publish` environment. GitHub enforces that environment's rules (required
+# reviewer approval, allowed branches/tags) in repo settings, so editing this
+# file on a branch cannot skip them.
 
 name: npm Publish
 
@@ -29,6 +35,8 @@ permissions:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest # trusted publishing only works on GitHub-hosted runners
+    # Requires reviewer approval before the job starts (Settings > Environments).
+    environment: npm-publish
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

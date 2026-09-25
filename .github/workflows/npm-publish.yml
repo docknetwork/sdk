@@ -1,19 +1,51 @@
+# Publishes packages to npm using npm Trusted Publishing (OIDC).
+# Docs: https://docs.npmjs.com/trusted-publishers
+#
+# How authentication works (no NPM_TOKEN secret is used):
+#   1. GitHub gives this job a short-lived, signed OIDC token that says
+#      "I am workflow npm-publish.yml in repo docknetwork/sdk".
+#   2. `npm publish` (npm >= 11.5.1) detects GitHub Actions and sends that
+#      token to the npm registry.
+#   3. npm checks it against the Trusted Publisher configured on each package
+#      (npmjs.com > package > Settings > Trusted Publisher) and, if it matches,
+#      returns a temporary publish token valid only for that package.
+#   4. npm also attaches a provenance attestation linking the release to this
+#      commit and workflow run.
+#
+# Every published package must have a Trusted Publisher configured on npmjs.com
+# with: owner `docknetwork`, repository `sdk`, workflow `npm-publish.yml`,
+# environment `npm-publish`. Renaming this file or the environment breaks
+# publishing until those settings are updated.
+#
+# Why the environment matters: npm only accepts tokens from jobs that ran in the
+# `npm-publish` environment. GitHub enforces that environment's rules (required
+# reviewer approval, allowed branches/tags) in repo settings, so editing this
+# file on a branch cannot skip them.
+
 name: npm Publish
 
 on:
   release:
     types: [published]
 
+permissions:
+  id-token: write # lets the job request the OIDC token npm exchanges for a publish token
+  contents: read
+
 jobs:
   build-and-publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # trusted publishing only works on GitHub-hosted runners
+    # Requires reviewer approval before the job starts (Settings > Environments).
+    environment: npm-publish
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.x"
           registry-url: https://registry.npmjs.org/
+      # Node 22 ships npm 10; trusted publishing needs npm >= 11.5.1.
+      - run: npm install -g npm@latest
       - run: yarn install --frozen-lockfile --ignore-scripts
+      # Changesets runs `npm publish` for each package with a new version.
+      # No NODE_AUTH_TOKEN needed: npm authenticates via OIDC (see top of file).
       - run: yarn changeset publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
